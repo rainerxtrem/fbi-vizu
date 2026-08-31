@@ -1,7 +1,7 @@
 export function formatDate(d: Date | string | null | undefined): string {
   if (!d) return "—";
   const date = typeof d === "string" ? new Date(d) : d;
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString("fr-FR", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -11,7 +11,7 @@ export function formatDate(d: Date | string | null | undefined): string {
 export function formatDateTime(d: Date | string | null | undefined): string {
   if (!d) return "—";
   const date = typeof d === "string" ? new Date(d) : d;
-  return date.toLocaleString("en-US", {
+  return date.toLocaleString("fr-FR", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -33,12 +33,12 @@ export function relativeTime(d: Date | string): string {
   const date = typeof d === "string" ? new Date(d) : d;
   const diff = Date.now() - date.getTime();
   const mins = Math.round(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return "à l'instant";
+  if (mins < 60) return `il y a ${mins} min`;
   const hrs = Math.round(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return `il y a ${hrs} h`;
   const days = Math.round(hrs / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return `il y a ${days} j`;
   return formatDate(date);
 }
 
