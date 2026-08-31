@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { handle, created, fail } from "@/lib/api";
 import { timelineEventSchema } from "@/lib/validation";
 import { requireApiPermission } from "@/lib/auth";

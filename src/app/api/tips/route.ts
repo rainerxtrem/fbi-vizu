@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/db";
 import { handle, ok, created, assertRateLimit, clientIp, pageParams } from "@/lib/api";
 import { tipSchema } from "@/lib/validation";

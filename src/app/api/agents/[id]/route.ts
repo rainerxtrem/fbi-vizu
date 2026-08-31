@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/db";
 import { handle, ok, fail } from "@/lib/api";
 import { agentUpdateSchema } from "@/lib/validation";

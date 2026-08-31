@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/db";
 import { handle, ok } from "@/lib/api";
 import { requireApiActor } from "@/lib/auth";

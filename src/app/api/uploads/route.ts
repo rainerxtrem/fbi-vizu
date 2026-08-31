@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { handle, ok, fail, assertRateLimit } from "@/lib/api";
 import { getActor } from "@/lib/auth";
 import { storeUpload } from "@/lib/storage";
