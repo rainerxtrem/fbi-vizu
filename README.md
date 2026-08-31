@@ -1,7 +1,10 @@
-# Federal Investigative Agency (FIA) — Portal
+# Federal Bureau of Investigation (FBI) — Portail
 
-A full-stack federal investigations portal for a GTA RP server. Two experiences
-in one application:
+A full-stack federal investigations portal for a GTA RP server. The **UI is in
+French**; rank titles and a fixed set of institutional terms (Most Wanted,
+Special Agent, Agent, Case Number, Field Office, Submit a Tip, Apply, At Large,
+Captured, Seeking Information…) stay in English. Two experiences in one
+application:
 
 - **Public site** (`/`) — an institutional government-style portal: Most Wanted,
   investigations, newsroom, careers, tip submission, about/contact.
@@ -9,7 +12,7 @@ in one application:
   case management, suspects, evidence, Most Wanted workflow, applications, tips,
   agent administration, and a tamper-evident audit log.
 
-> The FIA is a **fictional agency**. All names, cases, and content are invented
+> The FBI is a **fictional agency**. All names, cases, and content are invented
 > for role-play. Nothing here is affiliated with any real agency.
 
 ## Stack
@@ -41,12 +44,12 @@ All seeded users share the password **`Password123!`**.
 
 | Role | Email |
 | --- | --- |
-| Director | `d.reyes@fia.gov` |
-| Special Agent in Charge | `j.mercer@fia.gov` |
-| Supervisory Special Agent | `t.boone@fia.gov` |
-| Special Agent | `c.duval@fia.gov` |
-| New Agent Trainee | `n.frost@fia.gov` |
-| Platform Admin (technical) | `admin@fia.gov` |
+| Director | `d.reyes@fbi.gov` |
+| Special Agent in Charge | `j.mercer@fbi.gov` |
+| Supervisory Special Agent | `t.boone@fbi.gov` |
+| Special Agent | `c.duval@fbi.gov` |
+| New Agent Trainee | `n.frost@fbi.gov` |
+| Platform Admin (technical) | `admin@fbi.gov` |
 
 ## Architecture
 
