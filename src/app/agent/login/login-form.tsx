@@ -1,0 +1,60 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Field, Input } from "@/components/ui/field";
+import { Button } from "@/components/ui/button";
+
+export function LoginForm() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const fd = new FormData(e.currentTarget);
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: fd.get("email"),
+        password: fd.get("password"),
+      }),
+    });
+    const json = await res.json();
+    setLoading(false);
+    if (!res.ok) {
+      setError(json.error ?? "Sign in failed.");
+      return;
+    }
+    router.push("/agent");
+    router.refresh();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      {error ? (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      ) : null}
+      <Field label="Email" htmlFor="email">
+        <Input id="email" name="email" type="email" required autoComplete="username" autoFocus />
+      </Field>
+      <Field label="Password" htmlFor="password">
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          required
+          autoComplete="current-password"
+        />
+      </Field>
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Signing in…" : "Sign In"}
+      </Button>
+    </form>
+  );
+}

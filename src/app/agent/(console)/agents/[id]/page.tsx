@@ -1,0 +1,149 @@
+import { notFound } from "next/navigation";
+import { requirePermission } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { can, rankLevel, RANK_LABELS, effectivePermissions, type Rank } from "@/lib/rbac";
+import { PageTitle } from "@/components/agent/ui";
+import { Breadcrumbs } from "@/components/ui/misc";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { RankControl } from "@/components/agent/rank-control";
+import { PermissionOverrides } from "@/components/agent/permission-overrides";
+import { formatDate, formatDateTime } from "@/lib/format";
+
+export default async function AgentDetailPage({ params }: { params: { id: string } }) {
+  const actor = await requirePermission("agents.view");
+  const agent = await prisma.agent.findUnique({
+    where: { id: params.id },
+    include: {
+      user: true,
+      fieldOffice: true,
+      rankChanges: {
+        include: { changedBy: { include: { user: true } } },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+  if (!agent) notFound();
+
+  const canManageRank =
+    (can(actor, "agents.promote") || can(actor, "agents.demote")) &&
+    actor.agent != null &&
+    (actor.agent.rank === "DIRECTOR" ||
+      rankLevel(agent.rank as Rank) < rankLevel(actor.agent.rank as Rank));
+  const maxLevel = actor.agent?.rank === "DIRECTOR" ? -1 : rankLevel(actor.agent?.rank as Rank);
+
+  const eff = Array.from(
+    effectivePermissions({
+      userId: agent.userId,
+      name: agent.user.name,
+      email: agent.user.email,
+      isAdmin: false,
+      agent: {
+        id: agent.id,
+        badgeNumber: agent.badgeNumber,
+        rank: agent.rank as Rank,
+        title: agent.title,
+        division: agent.division,
+        unit: agent.unit,
+        status: agent.status,
+        fieldOfficeId: agent.fieldOfficeId,
+        fieldOfficeName: agent.fieldOffice?.name ?? null,
+        permissionGrants: agent.permissionGrants,
+        permissionRevokes: agent.permissionRevokes,
+      },
+    }),
+  ).sort();
+
+  return (
+    <div>
+      <Breadcrumbs items={[{ label: "Agents", href: "/agent/agents" }, { label: agent.user.name }]} />
+      <PageTitle
+        title={agent.user.name}
+        subtitle={`${RANK_LABELS[agent.rank as Rank]} · ${agent.badgeNumber}`}
+        action={<Badge tone={agent.status === "ACTIVE" ? "green" : "amber"}>{agent.status}</Badge>}
+      />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader title="Assignment" />
+          <CardBody className="space-y-2 text-sm">
+            <Row label="Title" value={agent.title} />
+            <Row label="Division" value={agent.division} />
+            <Row label="Unit" value={agent.unit} />
+            <Row label="Field Office" value={agent.fieldOffice?.name} />
+            <Row label="Email" value={agent.user.email} />
+            <Row label="Phone" value={agent.phone} />
+            <Row label="Hire Date" value={formatDate(agent.hireDate)} />
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader title="Effective Permissions" description={`${eff.length} permissions from rank + overrides`} />
+          <CardBody>
+            <div className="flex max-h-56 flex-wrap gap-1.5 overflow-y-auto">
+              {eff.map((p) => (
+                <span key={p} className="rounded bg-navy-100 px-1.5 py-0.5 font-mono text-[11px] text-navy-600">
+                  {p}
+                </span>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+
+        {canManageRank ? (
+          <Card>
+            <CardHeader title="Rank Management" />
+            <CardBody>
+              <RankControl agentId={agent.id} currentRank={agent.rank as Rank} maxLevel={maxLevel} />
+            </CardBody>
+          </Card>
+        ) : null}
+
+        {can(actor, "system.manage") ? (
+          <Card>
+            <CardHeader title="Permission Overrides (Admin)" />
+            <CardBody>
+              <PermissionOverrides
+                agentId={agent.id}
+                grants={agent.permissionGrants}
+                revokes={agent.permissionRevokes}
+              />
+            </CardBody>
+          </Card>
+        ) : null}
+
+        <Card className="lg:col-span-2">
+          <CardHeader title="Rank History" />
+          <CardBody className="p-0">
+            {agent.rankChanges.length === 0 ? (
+              <p className="px-5 py-4 text-sm text-navy-500">No rank changes recorded.</p>
+            ) : (
+              <ul className="divide-y divide-navy-100 text-sm">
+                {agent.rankChanges.map((rc) => (
+                  <li key={rc.id} className="px-5 py-3">
+                    <p className="text-navy-800">
+                      {RANK_LABELS[rc.oldRank as Rank]} → {RANK_LABELS[rc.newRank as Rank]}
+                    </p>
+                    <p className="text-xs text-navy-400">
+                      {formatDateTime(rc.createdAt)} · by {rc.changedBy?.user.name ?? "system"}
+                      {rc.reason ? ` · ${rc.reason}` : ""}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardBody>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div className="flex justify-between gap-3">
+      <span className="text-xs uppercase tracking-wide text-navy-400">{label}</span>
+      <span className="text-right text-navy-800">{value || "—"}</span>
+    </div>
+  );
+}

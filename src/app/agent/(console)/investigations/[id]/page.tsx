@@ -1,0 +1,440 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireAgent } from "@/lib/auth";
+import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { RbacError, can } from "@/lib/rbac";
+import { Breadcrumbs } from "@/components/ui/misc";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { Tabs } from "@/components/ui/tabs";
+import { PageTitle } from "@/components/agent/ui";
+import {
+  CaseStatusControl,
+  AddNote,
+  AddEvidence,
+  AddTimelineEntry,
+} from "@/components/agent/case-actions";
+import { CreateMostWanted } from "@/components/agent/create-most-wanted";
+import { formatDate, formatDateTime } from "@/lib/format";
+import {
+  INVESTIGATION_STATUS,
+  PRIORITY,
+  CLASSIFICATION,
+  PERSON_ROLE,
+  EVIDENCE_TYPE,
+} from "@/lib/constants";
+
+export default async function InvestigationDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const actor = await requireAgent();
+  let inv;
+  try {
+    inv = await getInvestigationOr404(params.id, actor);
+  } catch (e) {
+    if (e instanceof RbacError) notFound();
+    throw e;
+  }
+
+  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
+  const editable = canEditInvestigation(actor, {
+    leadAgentId: inv.leadAgentId,
+    assignedAgentIds,
+  });
+  const persons = inv.persons.map((p) => ({
+    id: p.person.id,
+    label: `${p.person.fullName} (${PERSON_ROLE[p.role]})`,
+  }));
+
+  const perms = {
+    edit: editable,
+    close: can(actor, "investigation.close"),
+    publish: can(actor, "investigation.publish"),
+    createMostWanted: can(actor, "mostwanted.create"),
+    addNote: can(actor, "note.create"),
+    addEvidence: editable && can(actor, "evidence.create"),
+    addTimeline: can(actor, "timeline.create"),
+  };
+
+  return (
+    <div>
+      <Breadcrumbs
+        items={[
+          { label: "Investigations", href: "/agent/investigations" },
+          { label: inv.caseNumber },
+        ]}
+      />
+      <PageTitle
+        title={inv.title}
+        subtitle={`${inv.caseNumber} · Opened ${formatDate(inv.openedAt)}`}
+      />
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Badge tone={INVESTIGATION_STATUS[inv.status]?.tone}>
+          {INVESTIGATION_STATUS[inv.status]?.label}
+        </Badge>
+        <Badge tone={PRIORITY[inv.priority]?.tone}>{PRIORITY[inv.priority]?.label} Priority</Badge>
+        <Badge tone={CLASSIFICATION[inv.classification]?.tone}>
+          {CLASSIFICATION[inv.classification]?.label}
+        </Badge>
+        {inv.isPublic ? <Badge tone="green">Public</Badge> : null}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+        <div>
+          <Tabs
+            tabs={[
+              {
+                id: "overview",
+                label: "Overview",
+                content: (
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader title="Description" />
+                      <CardBody>
+                        <p className="prose-fia whitespace-pre-line">{inv.description}</p>
+                      </CardBody>
+                    </Card>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <Card>
+                        <CardHeader title="Charges" />
+                        <CardBody>
+                          {inv.charges.length ? (
+                            <ul className="list-disc space-y-1 pl-5 text-sm">
+                              {inv.charges.map((c) => (
+                                <li key={c.id}>
+                                  {c.charge.title}
+                                  {c.person ? ` — ${c.person.fullName}` : ""}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-sm text-navy-500">No charges recorded.</p>
+                          )}
+                        </CardBody>
+                      </Card>
+                      <Card>
+                        <CardHeader title="Assigned Agents" />
+                        <CardBody>
+                          <ul className="space-y-1 text-sm">
+                            {inv.leadAgent ? (
+                              <li>
+                                <span className="font-medium">{inv.leadAgent.user.name}</span>{" "}
+                                <span className="text-navy-400">— Lead Agent</span>
+                              </li>
+                            ) : null}
+                            {inv.assignedAgents.map((a) => (
+                              <li key={a.id}>
+                                {a.agent.user.name}{" "}
+                                <span className="text-navy-400">— {a.role}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardBody>
+                      </Card>
+                    </div>
+                    {(inv.vehicles.length > 0 || inv.organizations.length > 0 || inv.locations.length > 0) && (
+                      <Card>
+                        <CardHeader title="Linked Entities" />
+                        <CardBody className="space-y-3 text-sm">
+                          {inv.vehicles.length > 0 && (
+                            <div>
+                              <p className="font-semibold text-navy-700">Vehicles</p>
+                              {inv.vehicles.map((v) => (
+                                <p key={v.vehicleId} className="text-navy-600">
+                                  {[v.vehicle.color, v.vehicle.make, v.vehicle.model, v.vehicle.plate]
+                                    .filter(Boolean)
+                                    .join(" · ")}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                          {inv.organizations.length > 0 && (
+                            <div>
+                              <p className="font-semibold text-navy-700">Organizations</p>
+                              {inv.organizations.map((o) => (
+                                <p key={o.organizationId} className="text-navy-600">
+                                  {o.organization.name}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                          {inv.locations.length > 0 && (
+                            <div>
+                              <p className="font-semibold text-navy-700">Locations</p>
+                              {inv.locations.map((l) => (
+                                <p key={l.id} className="text-navy-600">
+                                  {l.label} {l.address ? `— ${l.address}` : ""}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                        </CardBody>
+                      </Card>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                id: "persons",
+                label: "Persons",
+                count: inv.persons.length,
+                content: (
+                  <div className="space-y-2">
+                    {inv.persons.length === 0 ? (
+                      <p className="text-sm text-navy-500">No persons linked.</p>
+                    ) : (
+                      inv.persons.map((p) => (
+                        <Link
+                          key={p.id}
+                          href={`/agent/suspects/${p.person.id}`}
+                          className="flex items-center justify-between rounded-lg border border-navy-200 bg-white px-4 py-3 hover:bg-navy-50"
+                        >
+                          <div>
+                            <p className="font-medium text-navy-900">{p.person.fullName}</p>
+                            {p.person.alias ? (
+                              <p className="text-xs text-navy-500">“{p.person.alias}”</p>
+                            ) : null}
+                          </div>
+                          <Badge>{PERSON_ROLE[p.role]}</Badge>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                ),
+              },
+              {
+                id: "evidence",
+                label: "Evidence",
+                count: inv.evidence.length,
+                content: (
+                  <div className="space-y-4">
+                    {inv.evidence.length === 0 ? (
+                      <p className="text-sm text-navy-500">No evidence logged.</p>
+                    ) : (
+                      <div className="overflow-x-auto rounded-lg border border-navy-200 bg-white">
+                        <table className="w-full text-sm">
+                          <tbody className="divide-y divide-navy-100">
+                            {inv.evidence.map((e) => (
+                              <tr key={e.id}>
+                                <td className="px-4 py-2 font-mono text-xs text-navy-500">
+                                  #{e.evidenceNumber}
+                                </td>
+                                <td className="px-4 py-2">
+                                  <p className="font-medium text-navy-900">{e.title}</p>
+                                  <p className="text-xs text-navy-500">
+                                    {EVIDENCE_TYPE[e.type]} · {formatDate(e.collectedAt)}
+                                    {e.collectedBy ? ` · ${e.collectedBy.user.name}` : ""}
+                                  </p>
+                                </td>
+                                <td className="px-4 py-2 text-right">
+                                  {e.file && can(actor, "evidence.download") ? (
+                                    <a
+                                      href={e.file.url}
+                                      target="_blank"
+                                      className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                                    >
+                                      Download
+                                    </a>
+                                  ) : null}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    {perms.addEvidence ? (
+                      <Card>
+                        <CardHeader title="Log New Evidence" />
+                        <CardBody>
+                          <AddEvidence investigationId={inv.id} persons={persons} />
+                        </CardBody>
+                      </Card>
+                    ) : null}
+                  </div>
+                ),
+              },
+              {
+                id: "timeline",
+                label: "Timeline",
+                count: inv.timeline.length,
+                content: (
+                  <div className="space-y-4">
+                    {perms.addTimeline ? <AddTimelineEntry investigationId={inv.id} /> : null}
+                    <ol className="space-y-4 border-l-2 border-navy-200 pl-5">
+                      {inv.timeline.map((t) => (
+                        <li key={t.id} className="relative">
+                          <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-navy-400" />
+                          <p className="text-xs font-semibold text-navy-500">
+                            {formatDateTime(t.occurredAt)}
+                          </p>
+                          <p className="text-sm text-navy-800">{t.message}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ),
+              },
+              {
+                id: "notes",
+                label: "Notes",
+                count: inv.notes.length,
+                content: (
+                  <div className="space-y-4">
+                    {perms.addNote ? <AddNote investigationId={inv.id} /> : null}
+                    {inv.notes.map((n) => (
+                      <div key={n.id} className="rounded-lg border border-navy-200 bg-white p-4">
+                        <p className="whitespace-pre-line text-sm text-navy-800">{n.body}</p>
+                        <p className="mt-2 text-xs text-navy-400">
+                          {n.author?.user.name ?? "Unknown"} · {formatDateTime(n.createdAt)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ),
+              },
+              {
+                id: "warrants",
+                label: "Warrants & Arrests",
+                count: inv.warrants.length + inv.arrests.length,
+                content: (
+                  <div className="space-y-4 text-sm">
+                    <Card>
+                      <CardHeader title="Warrants" />
+                      <CardBody className="p-0">
+                        {inv.warrants.length === 0 ? (
+                          <p className="px-5 py-4 text-navy-500">No warrants.</p>
+                        ) : (
+                          <ul className="divide-y divide-navy-100">
+                            {inv.warrants.map((w) => (
+                              <li key={w.id} className="flex justify-between px-5 py-3">
+                                <span>
+                                  {w.warrantNumber} · {w.type}
+                                  {w.person ? ` · ${w.person.fullName}` : ""}
+                                </span>
+                                <Badge>{w.status}</Badge>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </CardBody>
+                    </Card>
+                    <Card>
+                      <CardHeader title="Arrests" />
+                      <CardBody className="p-0">
+                        {inv.arrests.length === 0 ? (
+                          <p className="px-5 py-4 text-navy-500">No arrests.</p>
+                        ) : (
+                          <ul className="divide-y divide-navy-100">
+                            {inv.arrests.map((a) => (
+                              <li key={a.id} className="px-5 py-3">
+                                {a.person.fullName} · {formatDate(a.arrestDate)}
+                                {a.arrestingAgent ? ` · ${a.arrestingAgent.user.name}` : ""}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </CardBody>
+                    </Card>
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader title="Case Management" />
+            <CardBody className="space-y-4">
+              {perms.edit || perms.close || perms.publish ? (
+                <CaseStatusControl
+                  investigationId={inv.id}
+                  currentStatus={inv.status}
+                  isPublic={inv.isPublic}
+                  perms={perms}
+                  persons={persons}
+                />
+              ) : (
+                <p className="text-sm text-navy-500">You have read-only access to this case.</p>
+              )}
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader title="Case Information" />
+            <CardBody className="space-y-2 text-sm">
+              <Info label="Case Number" value={inv.caseNumber} mono />
+              <Info label="Field Office" value={inv.fieldOffice?.name} />
+              <Info label="Division" value={inv.division} />
+              <Info label="Unit" value={inv.unit} />
+              <Info label="Task Force" value={inv.taskForce} />
+              <Info label="Jurisdiction" value={inv.jurisdiction} />
+              <Info label="Incident Date" value={inv.incidentDate ? formatDate(inv.incidentDate) : null} />
+              <Info label="Incident Location" value={inv.incidentLocation} />
+              <Info label="Lead Agent" value={inv.leadAgent?.user.name} />
+              <Info label="Last Updated" value={formatDateTime(inv.updatedAt)} />
+              {inv.closedAt ? <Info label="Closed" value={formatDate(inv.closedAt)} /> : null}
+            </CardBody>
+          </Card>
+
+          {perms.createMostWanted ? (
+            <Card>
+              <CardHeader title="Most Wanted" />
+              <CardBody className="space-y-3">
+                {inv.mostWanted.length > 0 ? (
+                  <ul className="space-y-1 text-sm">
+                    {inv.mostWanted.map((mw) => (
+                      <li key={mw.id}>
+                        <Link href={`/agent/most-wanted/${mw.id}`} className="link-underline">
+                          {mw.publicId} · {mw.fullName} ({mw.status})
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <CreateMostWanted
+                  investigationId={inv.id}
+                  persons={persons}
+                  defaults={{
+                    charges: inv.charges.map((c) => c.charge.title),
+                    leadAgent: inv.leadAgent?.user.name ?? null,
+                    caseNumber: inv.caseNumber,
+                  }}
+                />
+              </CardBody>
+            </Card>
+          ) : null}
+
+          {(inv.relatedFrom.length > 0 || inv.relatedTo.length > 0) && (
+            <Card>
+              <CardHeader title="Related Cases" />
+              <CardBody className="space-y-1 text-sm">
+                {[...inv.relatedFrom.map((r) => r.to), ...inv.relatedTo.map((r) => r.from)].map((r) => (
+                  <Link key={r.id} href={`/agent/investigations/${r.id}`} className="link-underline block">
+                    {r.caseNumber} — {r.title}
+                  </Link>
+                ))}
+              </CardBody>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Info({ label, value, mono }: { label: string; value?: string | null; mono?: boolean }) {
+  return (
+    <div className="flex justify-between gap-3">
+      <span className="text-xs uppercase tracking-wide text-navy-400">{label}</span>
+      <span className={mono ? "font-mono text-navy-900" : "text-right text-navy-800"}>
+        {value || "—"}
+      </span>
+    </div>
+  );
+}
