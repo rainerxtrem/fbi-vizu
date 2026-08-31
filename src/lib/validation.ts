@@ -118,6 +118,75 @@ export const personSchema = z.object({
   notes: optionalStr(8000),
 });
 
+const PERSON_ROLE_ENUM = z.enum([
+  "SUSPECT",
+  "VICTIM",
+  "WITNESS",
+  "ASSOCIATE",
+  "PERSON_OF_INTEREST",
+]);
+
+export const investigationPersonSchema = z
+  .object({
+    personId: optionalStr(40),
+    fullName: optionalStr(200),
+    role: PERSON_ROLE_ENUM.default("SUSPECT"),
+    notes: optionalStr(2000),
+  })
+  .refine((d) => d.personId || (d.fullName && d.fullName.length >= 2), {
+    message: "Sélectionnez une personne existante ou saisissez un nom.",
+  });
+
+const WARRANT_TYPE_ENUM = z.enum(["ARREST", "SEARCH", "SURVEILLANCE", "SEIZURE"]);
+const WARRANT_STATUS_ENUM = z.enum([
+  "REQUESTED",
+  "APPROVED",
+  "ACTIVE",
+  "EXECUTED",
+  "EXPIRED",
+  "DENIED",
+]);
+
+export const warrantCreateSchema = z.object({
+  investigationId: str(40).min(1),
+  type: WARRANT_TYPE_ENUM.default("ARREST"),
+  status: WARRANT_STATUS_ENUM.default("REQUESTED"),
+  personId: optionalStr(40),
+  description: optionalStr(4000),
+  issuingJudge: optionalStr(200),
+  issuedDate: optionalStr(40),
+  expiryDate: optionalStr(40),
+});
+
+export const warrantUpdateSchema = z.object({
+  type: WARRANT_TYPE_ENUM.optional(),
+  status: WARRANT_STATUS_ENUM.optional(),
+  personId: optionalStr(40),
+  description: optionalStr(4000),
+  issuingJudge: optionalStr(200),
+  issuedDate: optionalStr(40),
+  expiryDate: optionalStr(40),
+});
+
+export const arrestCreateSchema = z.object({
+  investigationId: str(40).min(1),
+  personId: str(40).min(1),
+  arrestDate: optionalStr(40),
+  location: optionalStr(300),
+  charges: optionalStr(2000),
+  notes: optionalStr(4000),
+  arrestingAgentId: optionalStr(40),
+});
+
+export const arrestUpdateSchema = z.object({
+  personId: optionalStr(40),
+  arrestDate: optionalStr(40),
+  location: optionalStr(300),
+  charges: optionalStr(2000),
+  notes: optionalStr(4000),
+  arrestingAgentId: optionalStr(40),
+});
+
 export const evidenceSchema = z.object({
   investigationId: str(40).min(1),
   title: str(200).min(1),

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAgent } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
-import { RbacError, can } from "@/lib/rbac";
+import { RbacError, can, RANK_ABBR, type Rank } from "@/lib/rbac";
 import { Breadcrumbs } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
@@ -15,6 +16,11 @@ import {
   AddTimelineEntry,
 } from "@/components/agent/case-actions";
 import { CreateMostWanted } from "@/components/agent/create-most-wanted";
+import {
+  InvestigationPersons,
+  InvestigationWarrants,
+  InvestigationArrests,
+} from "@/components/agent/case-relations";
 import { formatDate, formatDateTime } from "@/lib/format";
 import {
   INVESTIGATION_STATUS,
@@ -22,16 +28,8 @@ import {
   CLASSIFICATION,
   PERSON_ROLE,
   EVIDENCE_TYPE,
-  WARRANT_STATUS,
   MOST_WANTED_STATUS,
 } from "@/lib/constants";
-
-const WARRANT_TYPE_FR: Record<string, string> = {
-  ARREST: "Arrestation",
-  SEARCH: "Perquisition",
-  SURVEILLANCE: "Surveillance",
-  SEIZURE: "Saisie",
-};
 
 export default async function InvestigationDetailPage({
   params,
@@ -65,7 +63,73 @@ export default async function InvestigationDetailPage({
     addNote: can(actor, "note.create"),
     addEvidence: editable && can(actor, "evidence.create"),
     addTimeline: can(actor, "timeline.create"),
+    linkPerson: editable && can(actor, "person.link"),
+    createPerson: can(actor, "suspect.create"),
+    warrantCreate: editable && can(actor, "warrant.request"),
+    warrantEdit: editable && can(actor, "warrant.edit"),
+    warrantApprove: can(actor, "warrant.approve"),
+    warrantDelete: can(actor, "warrant.delete"),
+    arrestCreate: editable && can(actor, "arrest.create"),
+    arrestEdit: editable && can(actor, "arrest.edit"),
+    arrestDelete: can(actor, "arrest.delete"),
   };
+
+  const canManageRelations =
+    perms.linkPerson || perms.warrantCreate || perms.warrantEdit || perms.arrestCreate;
+  const [allPersons, activeAgents] = canManageRelations
+    ? await Promise.all([
+        prisma.person.findMany({
+          orderBy: { fullName: "asc" },
+          take: 1000,
+          select: { id: true, fullName: true, alias: true },
+        }),
+        prisma.agent.findMany({
+          where: { status: "ACTIVE" },
+          include: { user: true },
+          orderBy: { rank: "desc" },
+        }),
+      ])
+    : [[], []];
+
+  const linkedPersons = inv.persons.map((p) => ({
+    linkId: p.id,
+    personId: p.person.id,
+    name: p.person.fullName,
+    alias: p.person.alias,
+    role: p.role,
+  }));
+  const personPickList = persons; // {id,label} — persons already on the case
+  const allPersonPickList = allPersons.map((p) => ({
+    id: p.id,
+    label: p.alias ? `${p.fullName} « ${p.alias} »` : p.fullName,
+  }));
+  const agentPickList = activeAgents.map((a) => ({
+    id: a.id,
+    label: `${a.user.name} · ${RANK_ABBR[a.rank as Rank]} · ${a.badgeNumber}`,
+  }));
+  const warrantList = inv.warrants.map((w) => ({
+    id: w.id,
+    warrantNumber: w.warrantNumber,
+    type: w.type,
+    status: w.status,
+    personId: w.personId,
+    personName: w.person?.fullName ?? null,
+    issuingJudge: w.issuingJudge,
+    description: w.description,
+    issuedDate: w.issuedDate ? w.issuedDate.toISOString().slice(0, 10) : null,
+    expiryDate: w.expiryDate ? w.expiryDate.toISOString().slice(0, 10) : null,
+  }));
+  const arrestList = inv.arrests.map((a) => ({
+    id: a.id,
+    personId: a.personId,
+    personName: a.person.fullName,
+    date: a.arrestDate.toISOString().slice(0, 10),
+    location: a.location,
+    charges: a.charges,
+    notes: a.notes,
+    agentId: a.arrestingAgentId,
+    agentName: a.arrestingAgent?.user.name ?? null,
+  }));
 
   return (
     <div>
@@ -191,27 +255,12 @@ export default async function InvestigationDetailPage({
                 label: "Personnes",
                 count: inv.persons.length,
                 content: (
-                  <div className="space-y-2">
-                    {inv.persons.length === 0 ? (
-                      <p className="text-sm text-navy-500">Aucune personne liée.</p>
-                    ) : (
-                      inv.persons.map((p) => (
-                        <Link
-                          key={p.id}
-                          href={`/agent/suspects/${p.person.id}`}
-                          className="flex items-center justify-between rounded-lg border border-navy-200 bg-white px-4 py-3 hover:bg-navy-50"
-                        >
-                          <div>
-                            <p className="font-medium text-navy-900">{p.person.fullName}</p>
-                            {p.person.alias ? (
-                              <p className="text-xs text-navy-500">“{p.person.alias}”</p>
-                            ) : null}
-                          </div>
-                          <Badge>{PERSON_ROLE[p.role]}</Badge>
-                        </Link>
-                      ))
-                    )}
-                  </div>
+                  <InvestigationPersons
+                    investigationId={inv.id}
+                    linked={linkedPersons}
+                    allPersons={allPersonPickList}
+                    caps={{ link: perms.linkPerson, createNew: perms.createPerson }}
+                  />
                 ),
               },
               {
@@ -310,44 +359,37 @@ export default async function InvestigationDetailPage({
                 label: "Mandats et arrestations",
                 count: inv.warrants.length + inv.arrests.length,
                 content: (
-                  <div className="space-y-4 text-sm">
+                  <div className="space-y-6 text-sm">
                     <Card>
                       <CardHeader title="Mandats" />
-                      <CardBody className="p-0">
-                        {inv.warrants.length === 0 ? (
-                          <p className="px-5 py-4 text-navy-500">Aucun mandat.</p>
-                        ) : (
-                          <ul className="divide-y divide-navy-100">
-                            {inv.warrants.map((w) => (
-                              <li key={w.id} className="flex justify-between px-5 py-3">
-                                <span>
-                                  {w.warrantNumber} · {WARRANT_TYPE_FR[w.type] ?? w.type}
-                                  {w.person ? ` · ${w.person.fullName}` : ""}
-                                </span>
-                                <Badge tone={WARRANT_STATUS[w.status]?.tone}>
-                                  {WARRANT_STATUS[w.status]?.label ?? w.status}
-                                </Badge>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                      <CardBody>
+                        <InvestigationWarrants
+                          investigationId={inv.id}
+                          warrants={warrantList}
+                          casePersons={personPickList}
+                          caps={{
+                            create: perms.warrantCreate,
+                            edit: perms.warrantEdit,
+                            approve: perms.warrantApprove,
+                            del: perms.warrantDelete,
+                          }}
+                        />
                       </CardBody>
                     </Card>
                     <Card>
                       <CardHeader title="Arrestations" />
-                      <CardBody className="p-0">
-                        {inv.arrests.length === 0 ? (
-                          <p className="px-5 py-4 text-navy-500">Aucune arrestation.</p>
-                        ) : (
-                          <ul className="divide-y divide-navy-100">
-                            {inv.arrests.map((a) => (
-                              <li key={a.id} className="px-5 py-3">
-                                {a.person.fullName} · {formatDate(a.arrestDate)}
-                                {a.arrestingAgent ? ` · ${a.arrestingAgent.user.name}` : ""}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                      <CardBody>
+                        <InvestigationArrests
+                          investigationId={inv.id}
+                          arrests={arrestList}
+                          casePersons={personPickList}
+                          agents={agentPickList}
+                          caps={{
+                            create: perms.arrestCreate,
+                            edit: perms.arrestEdit,
+                            del: perms.arrestDelete,
+                          }}
+                        />
                       </CardBody>
                     </Card>
                   </div>

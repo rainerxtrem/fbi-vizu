@@ -60,6 +60,44 @@ export const PATCH = handle(
   },
 );
 
+export const DELETE = handle(
+  async (_req: Request, { params }: { params: { id: string } }) => {
+    const actor = await requireApiPermission("suspect.delete");
+    const person = await prisma.person.findUnique({
+      where: { id: params.id },
+      include: { _count: { select: { investigations: true, arrests: true, mostWanted: true } } },
+    });
+    if (!person) return fail("Introuvable.", 404);
+
+    // Detach optional references, then remove the person and its dependent rows.
+    await prisma.$transaction([
+      prisma.evidence.updateMany({ where: { personId: person.id }, data: { personId: null } }),
+      prisma.warrant.updateMany({ where: { personId: person.id }, data: { personId: null } }),
+      prisma.mostWanted.updateMany({ where: { personId: person.id }, data: { personId: null } }),
+      prisma.investigationCharge.updateMany({
+        where: { personId: person.id },
+        data: { personId: null },
+      }),
+      prisma.arrest.deleteMany({ where: { personId: person.id } }),
+      prisma.person.delete({ where: { id: person.id } }),
+    ]);
+
+    await audit(actor, {
+      action: "suspect.delete",
+      entityType: "person",
+      entityId: person.id,
+      summary: `${actor.name} a supprimé la fiche de ${person.fullName}`,
+      meta: {
+        investigations: person._count.investigations,
+        arrests: person._count.arrests,
+        mostWanted: person._count.mostWanted,
+      },
+    });
+
+    return ok({ deleted: true });
+  },
+);
+
 export const POST = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
     // link actions: { action: "link-investigation", investigationId, role }

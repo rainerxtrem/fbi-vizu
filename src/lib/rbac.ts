@@ -103,9 +103,11 @@ export const PERMISSIONS = [
   "person.view",
   "person.create",
   "person.edit",
+  "person.link", // link/unlink a person to an investigation
   "suspect.view",
   "suspect.create",
   "suspect.edit",
+  "suspect.delete",
 
   "evidence.view",
   "evidence.create",
@@ -118,9 +120,13 @@ export const PERMISSIONS = [
 
   "warrant.view",
   "warrant.request",
+  "warrant.edit",
   "warrant.approve",
+  "warrant.delete",
 
   "arrest.create",
+  "arrest.edit",
+  "arrest.delete",
 
   "mostwanted.view",
   "mostwanted.create",
@@ -188,13 +194,16 @@ const RANK_ADDITIONS: Record<Rank, Permission[]> = {
     "investigation.edit",
     "person.create",
     "person.edit",
+    "person.link",
     "suspect.create",
     "suspect.edit",
     "evidence.create",
     "evidence.download",
     "document.create",
     "warrant.request",
+    "warrant.edit",
     "arrest.create",
+    "arrest.edit",
     "mostwanted.create", // propose / submit for review
     "tips.view", // tips linked to own cases
     "reports.view",
@@ -209,6 +218,9 @@ const RANK_ADDITIONS: Record<Rank, Permission[]> = {
     "investigation.edit.any",
     "investigation.close",
     "investigation.publish",
+    "suspect.delete",
+    "warrant.delete",
+    "arrest.delete",
     "mostwanted.edit",
     "mostwanted.publish",
     "applications.view",
@@ -297,6 +309,12 @@ const ADMIN_PERMISSIONS: Permission[] = [
 ];
 
 export function effectivePermissions(actor: Actor): Set<Permission> {
+  // The Director has unrestricted access to the entire platform — every
+  // operational permission AND every technical/admin permission, no exception.
+  if (actor.agent && actor.agent.status === "ACTIVE" && actor.agent.rank === "DIRECTOR") {
+    return new Set(PERMISSIONS);
+  }
+
   const set = new Set<Permission>();
 
   if (actor.isAdmin) {
@@ -312,6 +330,12 @@ export function effectivePermissions(actor: Actor): Set<Permission> {
   }
 
   return set;
+}
+
+/** True when the actor has platform-admin authority (rank Director OR isAdmin). */
+export function isPlatformAdmin(actor: Actor | null | undefined): boolean {
+  if (!actor) return false;
+  return actor.isAdmin || actor.agent?.rank === "DIRECTOR";
 }
 
 export function can(actor: Actor | null | undefined, permission: Permission): boolean {

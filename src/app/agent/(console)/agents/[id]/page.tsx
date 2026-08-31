@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { RankControl } from "@/components/agent/rank-control";
 import { PermissionOverrides } from "@/components/agent/permission-overrides";
+import { AgentEditForm } from "@/components/agent/agent-edit-form";
 import { formatDate, formatDateTime } from "@/lib/format";
 
 export default async function AgentDetailPage({ params }: { params: { id: string } }) {
@@ -25,6 +26,11 @@ export default async function AgentDetailPage({ params }: { params: { id: string
     },
   });
   if (!agent) notFound();
+
+  const canManageAgent = can(actor, "agents.manage");
+  const offices = canManageAgent
+    ? await prisma.fieldOffice.findMany({ orderBy: { isHq: "desc" } })
+    : [];
 
   const canManageRank =
     (can(actor, "agents.promote") || can(actor, "agents.demote")) &&
@@ -90,6 +96,26 @@ export default async function AgentDetailPage({ params }: { params: { id: string
             </div>
           </CardBody>
         </Card>
+
+        {canManageAgent ? (
+          <Card className="lg:col-span-2">
+            <CardHeader title="Modifier l'agent" description="Affectation, statut et coordonnées" />
+            <CardBody>
+              <AgentEditForm
+                agentId={agent.id}
+                offices={offices.map((o) => ({ id: o.id, label: o.name }))}
+                initial={{
+                  title: agent.title,
+                  division: agent.division,
+                  unit: agent.unit,
+                  status: agent.status,
+                  fieldOfficeId: agent.fieldOfficeId,
+                  phone: agent.phone,
+                }}
+              />
+            </CardBody>
+          </Card>
+        ) : null}
 
         {canManageRank ? (
           <Card>

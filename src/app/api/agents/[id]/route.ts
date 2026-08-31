@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { handle, ok, fail } from "@/lib/api";
 import { agentUpdateSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
-import { can, PERMISSIONS } from "@/lib/rbac";
+import { can, PERMISSIONS, rankLevel, type Rank } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 
 export const PATCH = handle(
@@ -18,14 +18,33 @@ export const PATCH = handle(
     });
     if (!agent) return fail("Agent introuvable.", 404);
 
-    // Permission overrides are a technical (Admin) capability.
+    // Permission overrides are a technical (Admin / Director) capability.
     const touchingOverrides =
       d.permissionGrants !== undefined || d.permissionRevokes !== undefined;
     if (touchingOverrides && !can(actor, "system.manage")) {
-      return fail("Seul un Admin de la plateforme peut modifier les dérogations de permissions.", 403);
+      return fail(
+        "Seul un Admin de la plateforme ou le Director peut modifier les dérogations de permissions.",
+        403,
+      );
     }
     if (!touchingOverrides && !can(actor, "agents.manage")) {
       return fail("Permission manquante : agents.manage", 403);
+    }
+
+    // A non-Director may only manage agents strictly below their own rank, and
+    // may never lock themselves out.
+    const me = actor.agent;
+    const isDirector = me?.rank === "DIRECTOR";
+    if (me && !isDirector) {
+      if (agent.id === me.id && (d.status && d.status !== "ACTIVE")) {
+        return fail("Vous ne pouvez pas modifier votre propre statut.", 403);
+      }
+      if (rankLevel(agent.rank as Rank) >= rankLevel(me.rank as Rank) && agent.id !== me.id) {
+        return fail(
+          "Vous ne pouvez gérer que des Agents d'un grade inférieur au vôtre.",
+          403,
+        );
+      }
     }
 
     const validPerm = (p: string) => (PERMISSIONS as readonly string[]).includes(p);

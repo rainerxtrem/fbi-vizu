@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
 import { SuspectForm } from "@/components/agent/suspect-form";
+import { SuspectDelete } from "@/components/agent/suspect-delete";
 import { RISK_LEVEL, PERSON_ROLE } from "@/lib/constants";
 import { ageFromDob, formatDate } from "@/lib/format";
 
@@ -29,11 +30,13 @@ export default async function SuspectDetailPage({
       vehicles: { include: { vehicle: true } },
       organizations: { include: { organization: true } },
       createdBy: { include: { user: true } },
+      _count: { select: { investigations: true, arrests: true, mostWanted: true } },
     },
   });
   if (!p) notFound();
 
   const editable = can(actor, "suspect.edit");
+  const deletable = can(actor, "suspect.delete");
 
   return (
     <div>
@@ -189,6 +192,23 @@ export default async function SuspectDetailPage({
               <Row label="Most Wanted" value={p.mostWanted.length.toString()} />
             </CardBody>
           </Card>
+
+          {deletable ? (
+            <Card>
+              <CardHeader title="Zone de danger" />
+              <CardBody>
+                <SuspectDelete
+                  suspectId={p.id}
+                  name={p.fullName}
+                  linkedCounts={{
+                    investigations: p._count.investigations,
+                    arrests: p._count.arrests,
+                    mostWanted: p._count.mostWanted,
+                  }}
+                />
+              </CardBody>
+            </Card>
+          ) : null}
         </div>
       </div>
     </div>
