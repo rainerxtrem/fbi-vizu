@@ -8,8 +8,8 @@ import { formatDate } from "@/lib/format";
 import { INVESTIGATION_STATUS, PRIORITY } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Investigations",
-  description: "Public updates on Federal Investigative Agency cases.",
+  title: "Enquêtes",
+  description: "Mises à jour publiques sur les enquêtes du Federal Bureau of Investigation.",
 };
 
 export default async function PublicInvestigationsPage() {
@@ -26,16 +26,16 @@ export default async function PublicInvestigationsPage() {
   return (
     <div>
       <PageHeader
-        title="Investigations"
-        intro="The FIA investigates complex threats across every jurisdiction in San Andreas. The cases below have been released for public awareness."
-        crumbs={[{ label: "Home", href: "/" }, { label: "Investigations" }]}
+        title="Enquêtes"
+        intro="Le FBI enquête sur les menaces complexes dans toutes les juridictions de San Andreas. Les affaires ci-dessous ont été rendues publiques à des fins d'information."
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "Enquêtes" }]}
       />
       <div className="container-fia py-10">
         <div className="mb-8 grid gap-4 sm:grid-cols-3 text-sm">
           {[
-            ["Criminal Investigations", "Organized crime, violent crime, and criminal enterprises."],
-            ["Cyber", "Network intrusions, fraud, and digital extortion."],
-            ["Financial Crimes", "Money laundering, public corruption, and fraud."],
+            ["Enquêtes criminelles", "Crime organisé, crime violent et entreprises criminelles."],
+            ["Cybercriminalité", "Intrusions réseau, fraudes et extorsion numérique."],
+            ["Criminalité financière", "Blanchiment d'argent, corruption publique et fraude."],
           ].map(([t, d]) => (
             <div key={t} className="rounded-lg border border-navy-200 bg-navy-50 p-4">
               <h3 className="font-semibold text-navy-900">{t}</h3>
@@ -46,8 +46,8 @@ export default async function PublicInvestigationsPage() {
 
         {cases.length === 0 ? (
           <EmptyState
-            title="No public case updates at this time"
-            description="Check the Newsroom for the latest press releases."
+            title="Aucune mise à jour publique pour le moment"
+            description="Consultez la salle de presse pour les derniers communiqués."
           />
         ) : (
           <div className="divide-y divide-navy-100 rounded-lg border border-navy-200 bg-white">

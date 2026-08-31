@@ -65,8 +65,8 @@ export function TrendLine({
         <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="opened" stroke="#1d3a66" strokeWidth={2} name="Opened" />
-        <Line type="monotone" dataKey="closed" stroke="#b31942" strokeWidth={2} name="Closed" />
+        <Line type="monotone" dataKey="opened" stroke="#1d3a66" strokeWidth={2} name="Ouvertes" />
+        <Line type="monotone" dataKey="closed" stroke="#b31942" strokeWidth={2} name="Clôturées" />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -75,7 +75,7 @@ export function TrendLine({
 function Empty() {
   return (
     <div className="flex h-[240px] items-center justify-center text-sm text-navy-400">
-      No data yet
+      Aucune donnée pour le moment
     </div>
   );
 }

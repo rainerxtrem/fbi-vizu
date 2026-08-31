@@ -37,39 +37,39 @@ export default async function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={HERO_IMG}
-          alt="San Andreas skyline at dusk"
+          alt="Silhouette de San Andreas au crépuscule"
           className="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-950 via-navy-950/80 to-navy-950/30" />
         <div className="container-fia py-24 sm:py-32">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-navy-300">
-            Federal Investigative Agency
+            Federal Bureau of Investigation
           </p>
           <h1 className="mt-4 max-w-3xl text-5xl font-bold leading-[1.05] sm:text-6xl">
-            MISSION FIRST
+            LA MISSION D'ABORD
           </h1>
           <p className="mt-4 max-w-xl text-lg text-navy-200">
-            Protecting San Andreas. Pursuing Justice.
+            Protéger San Andreas. Poursuivre la justice.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <ButtonLink href="/most-wanted" size="lg">
-              View Most Wanted <ArrowRight className="h-4 w-4" />
+              Voir les Most Wanted <ArrowRight className="h-4 w-4" />
             </ButtonLink>
             <ButtonLink href="/apply" size="lg" variant="outline">
-              Apply to Join
+              Candidater
             </ButtonLink>
           </div>
         </div>
       </section>
 
-      {/* QUICK STATS */}
+      {/* STATS RAPIDES */}
       <section className="border-b border-navy-200 bg-navy-50">
         <div className="container-fia grid grid-cols-2 divide-navy-200 py-8 sm:grid-cols-4 sm:divide-x">
           {[
-            { n: wantedCount, l: "Published Most Wanted" },
-            { n: caseCount, l: "Investigations on Record" },
-            { n: activeCount, l: "Active Cases" },
-            { n: "24/7", l: "Tip Line Coverage" },
+            { n: wantedCount, l: "Most Wanted publiés" },
+            { n: caseCount, l: "Enquêtes enregistrées" },
+            { n: activeCount, l: "Enquêtes actives" },
+            { n: "24/7", l: "Ligne de renseignement" },
           ].map((s, i) => (
             <div key={i} className="px-4 py-2 text-center">
               <p className="text-3xl font-bold text-navy-900">{s.n}</p>
@@ -85,19 +85,20 @@ export default async function HomePage() {
           <div>
             <h2 className="text-3xl font-bold">MOST WANTED</h2>
             <p className="mt-1 max-w-xl text-navy-600">
-              Help us locate individuals wanted for serious federal offenses.
+              Aidez-nous à localiser des individus recherchés pour des infractions
+              fédérales graves.
             </p>
           </div>
           <Link
             href="/most-wanted"
             className="inline-flex items-center gap-1 text-sm font-semibold uppercase text-navy-700 hover:text-federal-accent"
           >
-            View all <ArrowRight className="h-4 w-4" />
+            Voir tout <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
         {mostWanted.length === 0 ? (
-          <p className="mt-8 text-navy-500">No individuals are currently published.</p>
+          <p className="mt-8 text-navy-500">Aucun individu n'est actuellement publié.</p>
         ) : (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {mostWanted.map((mw) => (
@@ -107,32 +108,34 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* MISSION / HOW WE HELP */}
+      {/* MISSION / AIDE */}
       <section className="bg-navy-900 text-white">
         <div className="container-fia grid gap-10 py-16 lg:grid-cols-2">
           <div>
-            <h2 className="text-3xl font-bold text-white">Our Mission</h2>
+            <h2 className="text-3xl font-bold text-white">Notre mission</h2>
             <p className="mt-4 text-navy-200">
-              The Federal Investigative Agency is the principal federal law
-              enforcement and domestic intelligence service of the State of San
-              Andreas. We investigate the most complex threats facing our
-              communities — from organized criminal enterprises and violent
-              fugitives to cyber intrusions, public corruption, and terrorism.
+              Le Federal Bureau of Investigation est le principal service fédéral
+              de police judiciaire et de renseignement intérieur de l'État de San
+              Andreas. Nous enquêtons sur les menaces les plus complexes qui
+              pèsent sur nos communautés — des entreprises criminelles organisées
+              et des fugitifs violents aux intrusions informatiques, à la
+              corruption publique et au terrorisme.
             </p>
             <p className="mt-4 text-navy-200">
-              We operate across every jurisdiction in the state, partnering with
-              local, county, and federal agencies to bring offenders to justice.
+              Nous intervenons dans toutes les juridictions de l'État, en
+              partenariat avec les services locaux, de comté et fédéraux, afin de
+              traduire les auteurs en justice.
             </p>
             <ButtonLink href="/about" variant="outline" className="mt-6">
-              About the FIA
+              À propos du FBI
             </ButtonLink>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { icon: Shield, t: "Report a Crime", d: "Contact your nearest field office or submit a tip online." , href: "/submit-tip"},
-              { icon: FileSearch, t: "Track Investigations", d: "Follow public case updates and press releases.", href: "/investigations" },
-              { icon: Users, t: "Join the FIA", d: "Explore special agent and analyst careers.", href: "/apply" },
-              { icon: Scale, t: "Victim Services", d: "Learn how we support victims of federal crime.", href: "/how-we-can-help" },
+              { icon: Shield, t: "Signaler un crime", d: "Contactez votre Field Office le plus proche ou soumettez un renseignement en ligne.", href: "/submit-tip" },
+              { icon: FileSearch, t: "Suivre les enquêtes", d: "Consultez les mises à jour publiques et les communiqués de presse.", href: "/investigations" },
+              { icon: Users, t: "Rejoindre le FBI", d: "Découvrez les carrières de Special Agent et d'analyste.", href: "/apply" },
+              { icon: Scale, t: "Aide aux victimes", d: "Découvrez comment nous accompagnons les victimes de crimes fédéraux.", href: "/how-we-can-help" },
             ].map((c, i) => (
               <Link
                 key={i}
@@ -148,19 +151,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* NEWS */}
+      {/* ACTUALITÉS */}
       <section className="container-fia py-16">
         <div className="flex items-end justify-between">
-          <h2 className="text-3xl font-bold">Latest News</h2>
+          <h2 className="text-3xl font-bold">Dernières actualités</h2>
           <Link
             href="/news"
             className="inline-flex items-center gap-1 text-sm font-semibold uppercase text-navy-700 hover:text-federal-accent"
           >
-            Newsroom <ArrowRight className="h-4 w-4" />
+            Salle de presse <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         {news.length === 0 ? (
-          <p className="mt-8 text-navy-500">No news at this time.</p>
+          <p className="mt-8 text-navy-500">Aucune actualité pour le moment.</p>
         ) : (
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {news.map((a) => (
@@ -197,15 +200,15 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* TIP CTA */}
+      {/* CTA RENSEIGNEMENT */}
       <section className="bg-federal-accent">
         <div className="container-fia flex flex-col items-center justify-between gap-4 py-10 text-center text-white sm:flex-row sm:text-left">
           <div className="flex items-center gap-4">
             <Phone className="h-8 w-8" />
             <div>
-              <h2 className="text-xl font-bold text-white">Have information about a crime?</h2>
+              <h2 className="text-xl font-bold text-white">Vous avez des informations sur un crime ?</h2>
               <p className="text-red-100">
-                Your tip could be the one that solves a case. Reports may be anonymous.
+                Votre renseignement pourrait être celui qui résout une affaire. Les signalements peuvent être anonymes.
               </p>
             </div>
           </div>

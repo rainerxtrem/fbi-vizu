@@ -1,5 +1,6 @@
 import { requireAgent } from "@/lib/auth";
 import { effectivePermissions, RANK_LABELS, type Rank } from "@/lib/rbac";
+import { AGENT_STATUS } from "@/lib/constants";
 import { PageTitle } from "@/components/agent/ui";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 
@@ -9,29 +10,29 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-3xl">
-      <PageTitle title="Settings" subtitle="Your account and access" />
+      <PageTitle title="Paramètres" subtitle="Votre compte et vos accès" />
       <div className="space-y-6">
         <Card>
-          <CardHeader title="Account" />
+          <CardHeader title="Compte" />
           <CardBody className="space-y-2 text-sm">
-            <Row label="Name" value={actor.name} />
-            <Row label="Email" value={actor.email} />
-            <Row label="Platform Role" value={actor.isAdmin ? "Administrator" : "Standard"} />
+            <Row label="Nom" value={actor.name} />
+            <Row label="E-mail" value={actor.email} />
+            <Row label="Rôle sur la plateforme" value={actor.isAdmin ? "Administrateur" : "Standard"} />
             {actor.agent ? (
               <>
-                <Row label="Badge Number" value={actor.agent.badgeNumber} />
-                <Row label="Rank" value={RANK_LABELS[actor.agent.rank as Rank]} />
-                <Row label="Title" value={actor.agent.title} />
+                <Row label="Matricule" value={actor.agent.badgeNumber} />
+                <Row label="Grade" value={RANK_LABELS[actor.agent.rank as Rank]} />
+                <Row label="Fonction" value={actor.agent.title} />
                 <Row label="Division" value={actor.agent.division} />
-                <Row label="Field Office" value={actor.agent.fieldOfficeName ?? "Headquarters"} />
-                <Row label="Status" value={actor.agent.status} />
+                <Row label="Field Office" value={actor.agent.fieldOfficeName ?? "Quartier général"} />
+                <Row label="Statut" value={AGENT_STATUS[actor.agent.status] ?? actor.agent.status} />
               </>
             ) : null}
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader title="Your Permissions" description={`${perms.length} effective permissions`} />
+          <CardHeader title="Vos permissions" description={`${perms.length} permissions effectives`} />
           <CardBody>
             <div className="flex flex-wrap gap-1.5">
               {perms.map((p) => (
@@ -44,12 +45,13 @@ export default async function SettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Security" />
+          <CardHeader title="Sécurité" />
           <CardBody className="text-sm text-navy-600">
             <p>
-              All activity in this console is logged. Sessions expire after 8 hours of
-              inactivity. If you believe your account has been compromised, contact the
-              platform administrator immediately.
+              Toute activité dans cette console est enregistrée. Les sessions
+              expirent après 8 heures d&apos;inactivité. Si vous pensez que votre
+              compte a été compromis, contactez immédiatement l&apos;administrateur
+              de la plateforme.
             </p>
           </CardBody>
         </Card>

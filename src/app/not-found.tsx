@@ -8,13 +8,13 @@ export default function NotFound() {
       <Shield className="h-10 w-10 text-navy-400" />
       <p className="mt-6 text-6xl font-bold">404</p>
       <p className="mt-3 text-lg text-navy-200">
-        The page you are looking for could not be found.
+        La page que vous recherchez est introuvable.
       </p>
       <Link
         href="/"
         className="mt-8 rounded-md bg-white px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-navy-900 hover:bg-navy-100"
       >
-        Return to {AGENCY.domain}
+        Retour à {AGENCY.domain}
       </Link>
     </div>
   );

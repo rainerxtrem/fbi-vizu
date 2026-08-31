@@ -51,7 +51,7 @@ export const POST = handle(async (req: Request) => {
     action: "news.create",
     entityType: "news",
     entityId: article.id,
-    summary: `${actor.name} created news article "${d.title}"${publish ? " (published)" : " (draft)"}`,
+    summary: `${actor.name} a créé l'article « ${d.title} »${publish ? " (publié)" : " (brouillon)"}`,
   });
 
   return created(article);

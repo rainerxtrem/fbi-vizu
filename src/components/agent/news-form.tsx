@@ -30,22 +30,22 @@ export function NewsForm({ canPublish }: { canPublish: boolean }) {
     });
     const json = await res.json();
     setBusy(false);
-    if (!res.ok) return toast("error", json.error ?? "Failed.");
-    toast("success", "Article saved.");
+    if (!res.ok) return toast("error", json.error ?? "Échec.");
+    toast("success", "Article enregistré.");
     router.push("/agent/news");
     router.refresh();
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <Field label="Title" required>
+      <Field label="Titre" required>
         <Input name="title" required />
       </Field>
-      <Field label="Subtitle">
+      <Field label="Sous-titre">
         <Input name="subtitle" />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Category">
+        <Field label="Catégorie">
           <Select name="category" defaultValue="PRESS_RELEASE">
             {Object.entries(NEWS_CATEGORY).map(([k, v]) => (
               <option key={k} value={k}>
@@ -54,21 +54,21 @@ export function NewsForm({ canPublish }: { canPublish: boolean }) {
             ))}
           </Select>
         </Field>
-        <Field label="Status">
+        <Field label="Statut">
           <Select name="status" defaultValue="DRAFT">
-            <option value="DRAFT">Draft</option>
-            {canPublish ? <option value="PUBLISHED">Published</option> : null}
+            <option value="DRAFT">Brouillon</option>
+            {canPublish ? <option value="PUBLISHED">Publié</option> : null}
           </Select>
         </Field>
       </div>
-      <Field label="Image URL">
+      <Field label="URL de l'image">
         <Input name="imageUrl" placeholder="https://…" />
       </Field>
-      <Field label="Content" required>
+      <Field label="Contenu" required>
         <Textarea name="content" rows={12} required />
       </Field>
       <Button type="submit" disabled={busy}>
-        {busy ? "Saving…" : "Save Article"}
+        {busy ? "Enregistrement…" : "Enregistrer l'article"}
       </Button>
     </form>
   );

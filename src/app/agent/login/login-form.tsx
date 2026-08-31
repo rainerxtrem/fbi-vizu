@@ -26,7 +26,7 @@ export function LoginForm() {
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(json.error ?? "Sign in failed.");
+      setError(json.error ?? "Échec de la connexion.");
       return;
     }
     router.push("/agent");
@@ -40,10 +40,10 @@ export function LoginForm() {
           {error}
         </p>
       ) : null}
-      <Field label="Email" htmlFor="email">
+      <Field label="Adresse e-mail" htmlFor="email">
         <Input id="email" name="email" type="email" required autoComplete="username" autoFocus />
       </Field>
-      <Field label="Password" htmlFor="password">
+      <Field label="Mot de passe" htmlFor="password">
         <Input
           id="password"
           name="password"
@@ -53,7 +53,7 @@ export function LoginForm() {
         />
       </Field>
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Signing in…" : "Sign In"}
+        {loading ? "Connexion…" : "Se connecter"}
       </Button>
     </form>
   );

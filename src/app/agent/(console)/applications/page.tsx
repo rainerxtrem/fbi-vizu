@@ -29,11 +29,11 @@ export default async function ApplicationsPage() {
 
   return (
     <div>
-      <PageTitle title="Applications" subtitle={`${rows.length} candidate applications`} />
+      <PageTitle title="Candidatures" subtitle={`${rows.length} candidatures`} />
       {rows.length === 0 ? (
-        <EmptyState title="No applications received yet" />
+        <EmptyState title="Aucune candidature reçue pour le moment" />
       ) : (
-        <DataTable head={["Ref", "Applicant", "Position", "Submitted", "Recruiter", "Status"]}>
+        <DataTable head={["Réf", "Candidat", "Poste", "Soumise le", "Recruteur", "Statut"]}>
           {rows.map((a) => (
             <tr key={a.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{a.publicId}</td>

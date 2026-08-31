@@ -36,17 +36,21 @@ export function MostWantedCard({ mw }: { mw: MostWantedCardData }) {
           />
         ) : (
           <div className="flex h-full items-center justify-center text-navy-300">
-            No Photograph
+            Aucune photographie
           </div>
         )}
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           <Badge tone={captured ? "green" : "red"}>
-            {captured ? mw.status : "At Large"}
+            {mw.status === "CAPTURED"
+              ? "Captured"
+              : mw.status === "LOCATED"
+                ? "Localisé"
+                : "At Large"}
           </Badge>
         </div>
         <div className="absolute right-2 top-2">
           <Badge tone={DANGER_LEVEL[mw.dangerLevel]?.tone ?? "amber"}>
-            {DANGER_LEVEL[mw.dangerLevel]?.label ?? mw.dangerLevel} Risk
+            Risque {DANGER_LEVEL[mw.dangerLevel]?.label ?? mw.dangerLevel}
           </Badge>
         </div>
       </div>
@@ -58,27 +62,27 @@ export function MostWantedCard({ mw }: { mw: MostWantedCardData }) {
           {mw.fullName}
         </h3>
         {mw.aliases ? (
-          <p className="text-xs text-navy-500">Alias: {mw.aliases}</p>
+          <p className="text-xs text-navy-500">Alias : {mw.aliases}</p>
         ) : null}
         <p className="mt-2 text-xs text-navy-500">
-          {mw.age ? `Age ${mw.age} · ` : ""}
+          {mw.age ? `${mw.age} ans · ` : ""}
           <span className="inline-flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            {mw.lastKnownLocation ?? "Unknown"}
+            {mw.lastKnownLocation ?? "Inconnue"}
           </span>
         </p>
         <div className="mt-3 line-clamp-2 text-sm text-navy-700">
-          Wanted for: {mw.charges.slice(0, 3).join(", ") || "Federal offenses"}
+          Recherché pour : {mw.charges.slice(0, 3).join(", ") || "infractions fédérales"}
         </div>
         <div className="mt-auto flex items-center justify-between pt-4">
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-navy-400">Reward</p>
+            <p className="text-[10px] uppercase tracking-wide text-navy-400">Récompense</p>
             <p className="text-sm font-bold text-navy-900">
-              {mw.reward > 0 ? `Up to ${formatMoney(mw.reward)}` : "—"}
+              {mw.reward > 0 ? `Jusqu'à ${formatMoney(mw.reward)}` : "—"}
             </p>
           </div>
           <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase text-navy-700 group-hover:text-federal-accent">
-            View Case <ArrowRight className="h-3 w-3" />
+            Voir le dossier <ArrowRight className="h-3 w-3" />
           </span>
         </div>
       </div>

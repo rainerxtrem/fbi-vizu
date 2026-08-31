@@ -2,37 +2,37 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/public/page-header";
 
-export const metadata: Metadata = { title: "How We Can Help" };
+export const metadata: Metadata = { title: "Comment nous pouvons vous aider" };
 
 const SERVICES = [
   {
-    t: "Report a Crime",
-    d: "Submit information about criminal activity, threats, or wanted individuals through our online tip system or your nearest field office.",
+    t: "Signaler un crime",
+    d: "Transmettez des informations sur une activité criminelle, une menace ou un individu recherché via notre système de renseignement en ligne ou votre Field Office le plus proche.",
     href: "/submit-tip",
   },
   {
-    t: "Victim Services",
-    d: "The FIA Office for Victim Assistance ensures that victims of federal crime are treated with fairness, dignity, and respect throughout the investigative process.",
+    t: "Aide aux victimes",
+    d: "Le bureau d'aide aux victimes du FBI veille à ce que les victimes de crimes fédéraux soient traitées avec équité, dignité et respect tout au long de la procédure d'enquête.",
     href: "/contact",
   },
   {
     t: "Seeking Information",
-    d: "Review cases where the FIA is seeking the public's help identifying suspects, locating missing persons, or gathering evidence.",
+    d: "Consultez les affaires pour lesquelles le FBI sollicite l'aide du public afin d'identifier des suspects, localiser des personnes disparues ou recueillir des preuves.",
     href: "/most-wanted?category=SEEKING_INFORMATION",
   },
   {
-    t: "Missing Persons",
-    d: "Access FIA missing-person bulletins and submit information that may help bring someone home.",
+    t: "Personnes disparues",
+    d: "Accédez aux bulletins de personnes disparues du FBI et transmettez des informations susceptibles d'aider à retrouver quelqu'un.",
     href: "/most-wanted?category=MISSING_PERSON",
   },
   {
-    t: "For Law Enforcement Partners",
-    d: "The FIA coordinates task forces and shares intelligence with local, county, and state agencies across San Andreas.",
+    t: "Pour les partenaires des forces de l'ordre",
+    d: "Le FBI coordonne des groupes d'intervention et partage du renseignement avec les services locaux, de comté et de l'État à travers San Andreas.",
     href: "/about",
   },
   {
-    t: "Press & Media",
-    d: "Members of the press can find official statements, case updates, and public notices in the FIA Newsroom.",
+    t: "Presse et médias",
+    d: "Les membres de la presse peuvent consulter les déclarations officielles, les mises à jour d'enquête et les avis au public dans la salle de presse du FBI.",
     href: "/news",
   },
 ];
@@ -41,9 +41,9 @@ export default function HowWeCanHelpPage() {
   return (
     <div>
       <PageHeader
-        title="How We Can Help"
-        intro="The FIA serves the people of San Andreas. Find the resource you need below."
-        crumbs={[{ label: "Home", href: "/" }, { label: "How We Can Help" }]}
+        title="Comment nous pouvons vous aider"
+        intro="Le FBI est au service de la population de San Andreas. Trouvez la ressource dont vous avez besoin ci-dessous."
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "Comment nous pouvons vous aider" }]}
       />
       <div className="container-fia grid gap-5 py-12 sm:grid-cols-2 lg:grid-cols-3">
         {SERVICES.map((s) => (

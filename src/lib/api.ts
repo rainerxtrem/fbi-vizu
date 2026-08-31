@@ -23,13 +23,13 @@ export function handle<T extends unknown[]>(
       return await fn(...args);
     } catch (err) {
       if (err instanceof ZodError) {
-        return fail("Validation failed", 422, { issues: err.flatten() });
+        return fail("Échec de la validation", 422, { issues: err.flatten() });
       }
       if (err instanceof RbacError) {
         return fail(err.message, err.status);
       }
       console.error("API error:", err);
-      return fail("Internal server error", 500);
+      return fail("Erreur interne du serveur", 500);
     }
   };
 }
@@ -62,7 +62,7 @@ export function clientIp(req: Request): string {
 export function assertRateLimit(req: Request, name: string, limit = 20, windowMs = 60_000) {
   const key = `${name}:${clientIp(req)}`;
   if (!rateLimit(key, limit, windowMs)) {
-    const e = new RbacError("Too many requests. Please slow down.");
+    const e = new RbacError("Trop de requêtes. Merci de ralentir.");
     e.status = 429;
     throw e;
   }

@@ -27,7 +27,7 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const c = await load(params.id);
-  if (!c) return { title: "Case not found" };
+  if (!c) return { title: "Dossier introuvable" };
   return { title: `${c.caseNumber} — ${c.title}` };
 }
 
@@ -44,8 +44,8 @@ export default async function PublicInvestigationDetail({
       <PageHeader
         title={c.title}
         crumbs={[
-          { label: "Home", href: "/" },
-          { label: "Investigations", href: "/investigations" },
+          { label: "Accueil", href: "/" },
+          { label: "Enquêtes", href: "/investigations" },
           { label: c.caseNumber },
         ]}
       />
@@ -56,13 +56,13 @@ export default async function PublicInvestigationDetail({
               {INVESTIGATION_STATUS[c.status]?.label}
             </Badge>
             <Badge tone={PRIORITY[c.priority]?.tone}>
-              {PRIORITY[c.priority]?.label} Priority
+              Priorité {PRIORITY[c.priority]?.label}
             </Badge>
           </div>
 
           <section>
             <h2 className="border-b-2 border-navy-900 pb-1 text-lg font-bold uppercase">
-              Overview
+              Présentation
             </h2>
             <p className="prose-fia mt-4 whitespace-pre-line">{c.description}</p>
           </section>
@@ -70,7 +70,7 @@ export default async function PublicInvestigationDetail({
           {c.charges.length > 0 ? (
             <section>
               <h2 className="border-b-2 border-navy-900 pb-1 text-lg font-bold uppercase">
-                Charges
+                Chefs d'accusation
               </h2>
               <ul className="mt-4 list-disc space-y-1 pl-5">
                 {c.charges.map((ic) => (
@@ -83,7 +83,7 @@ export default async function PublicInvestigationDetail({
           {c.timeline.length > 0 ? (
             <section>
               <h2 className="border-b-2 border-navy-900 pb-1 text-lg font-bold uppercase">
-                Case Timeline
+                Chronologie du dossier
               </h2>
               <ol className="mt-4 space-y-4 border-l-2 border-navy-200 pl-5">
                 {c.timeline.map((t) => (
@@ -102,22 +102,22 @@ export default async function PublicInvestigationDetail({
 
         <aside className="space-y-4 text-sm">
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-            <h3 className="font-semibold text-navy-800">Case Information</h3>
+            <h3 className="font-semibold text-navy-800">Informations sur le dossier</h3>
             <dl className="mt-2 space-y-1 text-navy-600">
               <div>
                 <dt className="text-xs uppercase text-navy-400">Case Number</dt>
                 <dd className="font-mono">{c.caseNumber}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase text-navy-400">Lead Agency</dt>
-                <dd>Federal Investigative Agency</dd>
+                <dt className="text-xs uppercase text-navy-400">Agence responsable</dt>
+                <dd>Federal Bureau of Investigation</dd>
               </div>
               <div>
                 <dt className="text-xs uppercase text-navy-400">Field Office</dt>
                 <dd>{c.fieldOffice?.name ?? "—"}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase text-navy-400">Opened</dt>
+                <dt className="text-xs uppercase text-navy-400">Ouvert le</dt>
                 <dd>{formatDate(c.openedAt)}</dd>
               </div>
             </dl>
@@ -125,7 +125,7 @@ export default async function PublicInvestigationDetail({
 
           {c.mostWanted.length > 0 ? (
             <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-              <h3 className="font-semibold text-navy-800">Wanted in this case</h3>
+              <h3 className="font-semibold text-navy-800">Recherché dans ce dossier</h3>
               <ul className="mt-2 space-y-1">
                 {c.mostWanted.map((mw) => (
                   <li key={mw.id}>
@@ -139,9 +139,9 @@ export default async function PublicInvestigationDetail({
           ) : null}
 
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-            <h3 className="font-semibold text-navy-800">Have information?</h3>
+            <h3 className="font-semibold text-navy-800">Vous avez des informations ?</h3>
             <Link href="/submit-tip" className="link-underline mt-1 block">
-              Submit a tip
+              Soumettre un renseignement
             </Link>
           </div>
         </aside>

@@ -8,8 +8,8 @@ export default async function NewNewsPage() {
   const actor = await requirePermission("news.create");
   return (
     <div className="max-w-3xl">
-      <Breadcrumbs items={[{ label: "Newsroom", href: "/agent/news" }, { label: "Create" }]} />
-      <PageTitle title="Create News Article" />
+      <Breadcrumbs items={[{ label: "Salle de presse", href: "/agent/news" }, { label: "Créer" }]} />
+      <PageTitle title="Créer un article" />
       <NewsForm canPublish={can(actor, "news.publish")} />
     </div>
   );

@@ -34,9 +34,9 @@ export function InlineStatus({
     if (!r.ok) {
       const j = await r.json();
       setVal(value);
-      return toast("error", j.error ?? "Update failed.");
+      return toast("error", j.error ?? "Échec de la mise à jour.");
     }
-    toast("success", "Updated.");
+    toast("success", "Mis à jour.");
     router.refresh();
   }
 
@@ -49,9 +49,31 @@ export function InlineStatus({
     >
       {options.map((o) => (
         <option key={o} value={o}>
-          {o.replace(/_/g, " ")}
+          {STATUS_TR[o] ?? o.replace(/_/g, " ")}
         </option>
       ))}
     </select>
   );
 }
+
+const STATUS_TR: Record<string, string> = {
+  // Candidatures
+  SUBMITTED: "Soumise",
+  UNDER_REVIEW: "En cours d'examen",
+  INTERVIEW: "Entretien",
+  BACKGROUND_CHECK: "Enquête de moralité",
+  APPROVED: "Approuvée",
+  REJECTED: "Refusée",
+  WITHDRAWN: "Retirée",
+  // Renseignements
+  NEW: "Nouveau",
+  REVIEWING: "En cours d'examen",
+  ASSIGNED: "Assigné",
+  ACTIONED: "Traité",
+  // Actualités
+  DRAFT: "Brouillon",
+  PUBLISHED: "Publié",
+  // Commun
+  CLOSED: "Clôturé",
+  ARCHIVED: "Archivé",
+};

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/public/page-header";
 import { AGENCY } from "@/lib/constants";
 import { RANK_LABELS, type Rank } from "@/lib/rbac";
 
-export const metadata: Metadata = { title: "About the FIA" };
+export const metadata: Metadata = { title: "À propos du FBI" };
 
 const LEADERSHIP_RANKS: Rank[] = ["DIRECTOR", "DD", "ADD", "EAD"];
 
@@ -21,22 +21,23 @@ export default async function AboutPage() {
   return (
     <div>
       <PageHeader
-        title="About the FIA"
-        intro={`The ${AGENCY.name} is the lead federal law enforcement and domestic intelligence agency of the State of San Andreas.`}
-        crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
+        title="À propos du FBI"
+        intro={`Le ${AGENCY.name} est la principale agence fédérale de police judiciaire et de renseignement intérieur de l'État de San Andreas.`}
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "À propos" }]}
       />
 
       <div className="container-fia space-y-16 py-12">
         <section id="mission">
           <h2 className="text-2xl font-bold">Mission</h2>
           <p className="prose-fia mt-4 max-w-3xl">
-            To protect the people of San Andreas from criminal enterprises,
-            violent offenders, corruption, and threats to public institutions —
-            and to uphold the Constitution and the rule of law. We pursue justice
-            with integrity, in service of the communities we protect.
+            Protéger la population de San Andreas contre les entreprises
+            criminelles, les auteurs de violences, la corruption et les menaces
+            visant les institutions — et faire respecter la Constitution et
+            l'État de droit. Nous poursuivons la justice avec intégrité, au
+            service des communautés que nous protégeons.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {["Justice", "Integrity", "Service"].map((v) => (
+            {["Justice", "Intégrité", "Service"].map((v) => (
               <div key={v} className="rounded-lg border border-navy-200 bg-navy-50 p-5">
                 <h3 className="text-lg font-bold text-navy-900">{v}</h3>
               </div>
@@ -45,30 +46,32 @@ export default async function AboutPage() {
         </section>
 
         <section id="history">
-          <h2 className="text-2xl font-bold">History</h2>
+          <h2 className="text-2xl font-bold">Histoire</h2>
           <p className="prose-fia mt-4 max-w-3xl">
-            Established to consolidate fragmented investigative functions across
-            San Andreas, the FIA has grown into a full-service federal agency
-            with field offices in Los Santos, Blaine County, Sandy Shores, and
-            Paleto Bay. Its Cyber Division, Criminal Investigative Division, and
-            Counterterrorism Division coordinate operations statewide.
+            Créé pour regrouper des fonctions d'enquête jusque-là dispersées à
+            travers San Andreas, le FBI est devenu une agence fédérale à part
+            entière, avec des Field Offices à Los Santos, dans le comté de
+            Blaine, à Sandy Shores et à Paleto Bay. Sa Cyber Division, sa
+            Criminal Investigative Division et sa Counterterrorism Division
+            coordonnent les opérations à l'échelle de l'État.
           </p>
         </section>
 
         <section id="organization">
-          <h2 className="text-2xl font-bold">Organization</h2>
+          <h2 className="text-2xl font-bold">Organisation</h2>
           <p className="prose-fia mt-4 max-w-3xl">
-            The FIA is led by the Director and Deputy Director, supported by
-            Executive Assistant Directors for major branches. Field operations
-            are managed by Special Agents in Charge at each field office, with
-            Supervisory Special Agents leading individual squads and task forces.
+            Le FBI est dirigé par le Director et le Deputy Director, assistés
+            d'Executive Assistant Directors pour les grandes branches. Les
+            opérations de terrain sont pilotées par des Special Agents in Charge
+            dans chaque Field Office, les Supervisory Special Agents encadrant
+            chaque brigade et groupe d'intervention.
           </p>
         </section>
 
         <section id="leadership">
-          <h2 className="text-2xl font-bold">Leadership</h2>
+          <h2 className="text-2xl font-bold">Direction</h2>
           {leaders.length === 0 ? (
-            <p className="mt-4 text-navy-500">Leadership roster is being updated.</p>
+            <p className="mt-4 text-navy-500">L'organigramme de direction est en cours de mise à jour.</p>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {leaders.map((l) => (
@@ -76,7 +79,7 @@ export default async function AboutPage() {
                   <p className="font-semibold text-navy-900">{l.user.name}</p>
                   <p className="text-sm text-navy-600">{RANK_LABELS[l.rank as Rank]}</p>
                   <p className="mt-1 text-xs text-navy-400">
-                    {l.fieldOffice?.name ?? "Headquarters"} · {l.badgeNumber}
+                    {l.fieldOffice?.name ?? "Quartier général"} · {l.badgeNumber}
                   </p>
                 </div>
               ))}
@@ -90,7 +93,7 @@ export default async function AboutPage() {
             {offices.map((o) => (
               <div key={o.id} className="rounded-lg border border-navy-200 bg-white p-5">
                 <p className="font-semibold text-navy-900">
-                  {o.name} {o.isHq ? "· HQ" : ""}
+                  {o.name} {o.isHq ? "· QG" : ""}
                 </p>
                 <p className="mt-1 text-sm text-navy-600">{o.address}</p>
                 <p className="text-sm text-navy-600">{o.phone}</p>

@@ -20,20 +20,20 @@ export default async function AgentNewsPage() {
   return (
     <div>
       <PageTitle
-        title="Newsroom"
+        title="Salle de presse"
         subtitle={`${rows.length} articles`}
         action={
           can(actor, "news.create") ? (
             <ButtonLink href="/agent/news/new" size="sm">
-              + Create News Article
+              + Créer un article
             </ButtonLink>
           ) : null
         }
       />
       {rows.length === 0 ? (
-        <EmptyState title="No articles yet" />
+        <EmptyState title="Aucun article pour le moment" />
       ) : (
-        <DataTable head={["Title", "Category", "Author", "Created", "Status"]}>
+        <DataTable head={["Titre", "Catégorie", "Auteur", "Créé le", "Statut"]}>
           {rows.map((a) => (
             <tr key={a.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5">

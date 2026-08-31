@@ -16,16 +16,16 @@ export const PATCH = handle(
       where: { id: params.id },
       include: { user: true },
     });
-    if (!agent) return fail("Agent not found.", 404);
+    if (!agent) return fail("Agent introuvable.", 404);
 
     // Permission overrides are a technical (Admin) capability.
     const touchingOverrides =
       d.permissionGrants !== undefined || d.permissionRevokes !== undefined;
     if (touchingOverrides && !can(actor, "system.manage")) {
-      return fail("Only a platform Admin may edit permission overrides.", 403);
+      return fail("Seul un Admin de la plateforme peut modifier les dérogations de permissions.", 403);
     }
     if (!touchingOverrides && !can(actor, "agents.manage")) {
-      return fail("Missing permission: agents.manage", 403);
+      return fail("Permission manquante : agents.manage", 403);
     }
 
     const validPerm = (p: string) => (PERMISSIONS as readonly string[]).includes(p);
@@ -52,7 +52,7 @@ export const PATCH = handle(
       action: "agent.update",
       entityType: "agent",
       entityId: agent.id,
-      summary: `${actor.name} updated agent ${agent.user.name} (${agent.badgeNumber})`,
+      summary: `${actor.name} a mis à jour l'Agent ${agent.user.name} (${agent.badgeNumber})`,
       meta: { fields: Object.keys(d) },
     });
 

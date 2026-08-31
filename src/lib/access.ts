@@ -45,7 +45,7 @@ export async function getInvestigationOr404(id: string, actor: Actor | null) {
   });
 
   if (!inv) {
-    const e = new RbacError("Investigation not found");
+    const e = new RbacError("Enquête introuvable");
     e.status = 404;
     throw e;
   }
@@ -60,7 +60,7 @@ export async function getInvestigationOr404(id: string, actor: Actor | null) {
   });
 
   if (!allowed) {
-    const e = new RbacError("Investigation not found");
+    const e = new RbacError("Enquête introuvable");
     e.status = 404;
     throw e;
   }

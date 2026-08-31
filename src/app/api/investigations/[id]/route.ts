@@ -24,7 +24,7 @@ export const PATCH = handle(
     const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
 
     if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds })) {
-      return fail("You are not authorized to edit this investigation.", 403);
+      return fail("Vous n'êtes pas autorisé à modifier cette enquête.", 403);
     }
 
     const d = investigationUpdateSchema.parse(await req.json());
@@ -36,11 +36,11 @@ export const PATCH = handle(
       inv.status !== d.status &&
       !can(actor, "investigation.close")
     ) {
-      return fail("You are not authorized to close this investigation.", 403);
+      return fail("Vous n'êtes pas autorisé à clôturer cette enquête.", 403);
     }
     // Public visibility toggle requires investigation.publish
     if (d.isPublic !== undefined && d.isPublic !== inv.isPublic && !can(actor, "investigation.publish")) {
-      return fail("You are not authorized to change public visibility.", 403);
+      return fail("Vous n'êtes pas autorisé à modifier la visibilité publique.", 403);
     }
 
     const updated = await prisma.investigation.update({
@@ -73,14 +73,14 @@ export const PATCH = handle(
       await addTimelineEvent(
         inv.id,
         "STATUS_CHANGED",
-        `Status changed from ${inv.status} to ${d.status} by ${actor.name}`,
+        `Statut modifié de ${inv.status} à ${d.status} par ${actor.name}`,
         actor,
       );
     } else {
       await addTimelineEvent(
         inv.id,
         "INVESTIGATION_UPDATED",
-        `Case details updated by ${actor.name}`,
+        `Détails du dossier mis à jour par ${actor.name}`,
         actor,
       );
     }
@@ -89,7 +89,7 @@ export const PATCH = handle(
       action: "investigation.update",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} updated ${inv.caseNumber}${d.status ? ` (status → ${d.status})` : ""}`,
+      summary: `${actor.name} a mis à jour ${inv.caseNumber}${d.status ? ` (statut → ${d.status})` : ""}`,
       meta: { changes: Object.keys(d) },
     });
 
@@ -101,14 +101,14 @@ export const DELETE = handle(
   async (_req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("investigation.delete");
     const inv = await prisma.investigation.findUnique({ where: { id: params.id } });
-    if (!inv) return fail("Investigation not found.", 404);
+    if (!inv) return fail("Enquête introuvable.", 404);
 
     await prisma.investigation.delete({ where: { id: inv.id } });
     await audit(actor, {
       action: "investigation.delete",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} deleted investigation ${inv.caseNumber}`,
+      summary: `${actor.name} a supprimé l'enquête ${inv.caseNumber}`,
     });
     return ok({ deleted: true });
   },

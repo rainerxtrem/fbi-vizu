@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/public/page-header";
 import { EmptyState } from "@/components/ui/misc";
 import { NEWS_CATEGORY } from "@/lib/constants";
 
-export const metadata: Metadata = { title: "Search" };
+export const metadata: Metadata = { title: "Rechercher" };
 
 export default async function SearchPage({
   searchParams,
@@ -58,13 +58,13 @@ export default async function SearchPage({
   return (
     <div>
       <PageHeader
-        title="Search Results"
-        intro={q ? `Showing results for “${q}”` : "Enter a search term."}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Search" }]}
+        title="Résultats de recherche"
+        intro={q ? `Résultats pour « ${q} »` : "Saisissez un terme de recherche."}
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "Rechercher" }]}
       />
       <div className="container-fia space-y-10 py-10">
         {!q ? null : total === 0 ? (
-          <EmptyState title="No results found" description="Try different keywords." />
+          <EmptyState title="Aucun résultat" description="Essayez d'autres mots-clés." />
         ) : (
           <>
             {mostWanted.length > 0 && (
@@ -80,7 +80,7 @@ export default async function SearchPage({
               </Group>
             )}
             {investigations.length > 0 && (
-              <Group title="Investigations">
+              <Group title="Enquêtes">
                 {investigations.map((i) => (
                   <Result
                     key={i.id}
@@ -92,7 +92,7 @@ export default async function SearchPage({
               </Group>
             )}
             {news.length > 0 && (
-              <Group title="News">
+              <Group title="Actualités">
                 {news.map((n) => (
                   <Result
                     key={n.id}

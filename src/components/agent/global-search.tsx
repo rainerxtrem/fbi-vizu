@@ -53,7 +53,7 @@ export function GlobalSearch() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         onFocus={() => groups.length && setOpen(true)}
-        placeholder="Search investigations, suspects, evidence, agents…"
+        placeholder="Rechercher enquêtes, suspects, preuves, Agents…"
         className="field-input pl-9"
       />
       {open && groups.length > 0 ? (

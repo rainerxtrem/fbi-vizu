@@ -59,16 +59,18 @@ export default async function InvestigationsListPage({
   };
 
   const statusTabs = ["ALL", "OPEN", "ACTIVE", "SUSPENDED", "CLOSED", "ARCHIVED"];
+  const tabLabel = (s: string) =>
+    s === "ALL" ? "Toutes" : INVESTIGATION_STATUS[s].label;
 
   return (
     <div>
       <PageTitle
-        title="All Investigations"
-        subtitle={`${total} case${total === 1 ? "" : "s"} visible to you`}
+        title="Toutes les enquêtes"
+        subtitle={`${total} dossier${total === 1 ? "" : "s"} visible${total === 1 ? "" : "s"} pour vous`}
         action={
           can(actor, "investigation.create") ? (
             <ButtonLink href="/agent/investigations/new" size="sm">
-              + Create Investigation
+              + Créer une enquête
             </ButtonLink>
           ) : null
         }
@@ -86,7 +88,7 @@ export default async function InvestigationsListPage({
                 : "border-navy-200 text-navy-600 hover:bg-navy-50",
             )}
           >
-            {s === "ALL" ? "All" : INVESTIGATION_STATUS[s].label}
+            {tabLabel(s)}
           </Link>
         ))}
       </div>
@@ -96,16 +98,16 @@ export default async function InvestigationsListPage({
         <input
           name="q"
           defaultValue={q}
-          placeholder="Search by title, case number, description…"
+          placeholder="Rechercher par titre, Case Number, description…"
           className="field-input max-w-md"
         />
       </form>
 
       {rows.length === 0 ? (
-        <EmptyState title="No investigations found" description="Adjust your filters or create a new case." />
+        <EmptyState title="Aucune enquête trouvée" description="Ajustez vos filtres ou créez un nouveau dossier." />
       ) : (
         <>
-          <DataTable head={["Case", "Title", "Lead", "Priority", "Status", "Class.", "Updated"]}>
+          <DataTable head={["Case", "Titre", "Responsable", "Priorité", "Statut", "Class.", "Maj"]}>
             {rows.map((r) => (
               <tr key={r.id} className="hover:bg-navy-50">
                 <td className="px-4 py-2.5 font-mono text-xs text-navy-500">

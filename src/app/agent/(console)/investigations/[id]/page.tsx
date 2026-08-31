@@ -22,7 +22,16 @@ import {
   CLASSIFICATION,
   PERSON_ROLE,
   EVIDENCE_TYPE,
+  WARRANT_STATUS,
+  MOST_WANTED_STATUS,
 } from "@/lib/constants";
+
+const WARRANT_TYPE_FR: Record<string, string> = {
+  ARREST: "Arrestation",
+  SEARCH: "Perquisition",
+  SURVEILLANCE: "Surveillance",
+  SEIZURE: "Saisie",
+};
 
 export default async function InvestigationDetailPage({
   params,
@@ -62,20 +71,20 @@ export default async function InvestigationDetailPage({
     <div>
       <Breadcrumbs
         items={[
-          { label: "Investigations", href: "/agent/investigations" },
+          { label: "Enquêtes", href: "/agent/investigations" },
           { label: inv.caseNumber },
         ]}
       />
       <PageTitle
         title={inv.title}
-        subtitle={`${inv.caseNumber} · Opened ${formatDate(inv.openedAt)}`}
+        subtitle={`${inv.caseNumber} · Ouverte le ${formatDate(inv.openedAt)}`}
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
         <Badge tone={INVESTIGATION_STATUS[inv.status]?.tone}>
           {INVESTIGATION_STATUS[inv.status]?.label}
         </Badge>
-        <Badge tone={PRIORITY[inv.priority]?.tone}>{PRIORITY[inv.priority]?.label} Priority</Badge>
+        <Badge tone={PRIORITY[inv.priority]?.tone}>Priorité {PRIORITY[inv.priority]?.label}</Badge>
         <Badge tone={CLASSIFICATION[inv.classification]?.tone}>
           {CLASSIFICATION[inv.classification]?.label}
         </Badge>
@@ -88,7 +97,7 @@ export default async function InvestigationDetailPage({
             tabs={[
               {
                 id: "overview",
-                label: "Overview",
+                label: "Présentation",
                 content: (
                   <div className="space-y-6">
                     <Card>
@@ -99,7 +108,7 @@ export default async function InvestigationDetailPage({
                     </Card>
                     <div className="grid gap-6 sm:grid-cols-2">
                       <Card>
-                        <CardHeader title="Charges" />
+                        <CardHeader title="Chefs d'accusation" />
                         <CardBody>
                           {inv.charges.length ? (
                             <ul className="list-disc space-y-1 pl-5 text-sm">
@@ -111,18 +120,18 @@ export default async function InvestigationDetailPage({
                               ))}
                             </ul>
                           ) : (
-                            <p className="text-sm text-navy-500">No charges recorded.</p>
+                            <p className="text-sm text-navy-500">Aucun chef d'accusation enregistré.</p>
                           )}
                         </CardBody>
                       </Card>
                       <Card>
-                        <CardHeader title="Assigned Agents" />
+                        <CardHeader title="Agents affectés" />
                         <CardBody>
                           <ul className="space-y-1 text-sm">
                             {inv.leadAgent ? (
                               <li>
                                 <span className="font-medium">{inv.leadAgent.user.name}</span>{" "}
-                                <span className="text-navy-400">— Lead Agent</span>
+                                <span className="text-navy-400">— Agent responsable</span>
                               </li>
                             ) : null}
                             {inv.assignedAgents.map((a) => (
@@ -137,11 +146,11 @@ export default async function InvestigationDetailPage({
                     </div>
                     {(inv.vehicles.length > 0 || inv.organizations.length > 0 || inv.locations.length > 0) && (
                       <Card>
-                        <CardHeader title="Linked Entities" />
+                        <CardHeader title="Entités liées" />
                         <CardBody className="space-y-3 text-sm">
                           {inv.vehicles.length > 0 && (
                             <div>
-                              <p className="font-semibold text-navy-700">Vehicles</p>
+                              <p className="font-semibold text-navy-700">Véhicules</p>
                               {inv.vehicles.map((v) => (
                                 <p key={v.vehicleId} className="text-navy-600">
                                   {[v.vehicle.color, v.vehicle.make, v.vehicle.model, v.vehicle.plate]
@@ -153,7 +162,7 @@ export default async function InvestigationDetailPage({
                           )}
                           {inv.organizations.length > 0 && (
                             <div>
-                              <p className="font-semibold text-navy-700">Organizations</p>
+                              <p className="font-semibold text-navy-700">Organisations</p>
                               {inv.organizations.map((o) => (
                                 <p key={o.organizationId} className="text-navy-600">
                                   {o.organization.name}
@@ -163,7 +172,7 @@ export default async function InvestigationDetailPage({
                           )}
                           {inv.locations.length > 0 && (
                             <div>
-                              <p className="font-semibold text-navy-700">Locations</p>
+                              <p className="font-semibold text-navy-700">Lieux</p>
                               {inv.locations.map((l) => (
                                 <p key={l.id} className="text-navy-600">
                                   {l.label} {l.address ? `— ${l.address}` : ""}
@@ -179,12 +188,12 @@ export default async function InvestigationDetailPage({
               },
               {
                 id: "persons",
-                label: "Persons",
+                label: "Personnes",
                 count: inv.persons.length,
                 content: (
                   <div className="space-y-2">
                     {inv.persons.length === 0 ? (
-                      <p className="text-sm text-navy-500">No persons linked.</p>
+                      <p className="text-sm text-navy-500">Aucune personne liée.</p>
                     ) : (
                       inv.persons.map((p) => (
                         <Link
@@ -207,12 +216,12 @@ export default async function InvestigationDetailPage({
               },
               {
                 id: "evidence",
-                label: "Evidence",
+                label: "Preuves",
                 count: inv.evidence.length,
                 content: (
                   <div className="space-y-4">
                     {inv.evidence.length === 0 ? (
-                      <p className="text-sm text-navy-500">No evidence logged.</p>
+                      <p className="text-sm text-navy-500">Aucune preuve enregistrée.</p>
                     ) : (
                       <div className="overflow-x-auto rounded-lg border border-navy-200 bg-white">
                         <table className="w-full text-sm">
@@ -236,7 +245,7 @@ export default async function InvestigationDetailPage({
                                       target="_blank"
                                       className="text-xs font-semibold uppercase text-navy-600 hover:underline"
                                     >
-                                      Download
+                                      Télécharger
                                     </a>
                                   ) : null}
                                 </td>
@@ -248,7 +257,7 @@ export default async function InvestigationDetailPage({
                     )}
                     {perms.addEvidence ? (
                       <Card>
-                        <CardHeader title="Log New Evidence" />
+                        <CardHeader title="Enregistrer une nouvelle preuve" />
                         <CardBody>
                           <AddEvidence investigationId={inv.id} persons={persons} />
                         </CardBody>
@@ -259,7 +268,7 @@ export default async function InvestigationDetailPage({
               },
               {
                 id: "timeline",
-                label: "Timeline",
+                label: "Chronologie",
                 count: inv.timeline.length,
                 content: (
                   <div className="space-y-4">
@@ -289,7 +298,7 @@ export default async function InvestigationDetailPage({
                       <div key={n.id} className="rounded-lg border border-navy-200 bg-white p-4">
                         <p className="whitespace-pre-line text-sm text-navy-800">{n.body}</p>
                         <p className="mt-2 text-xs text-navy-400">
-                          {n.author?.user.name ?? "Unknown"} · {formatDateTime(n.createdAt)}
+                          {n.author?.user.name ?? "Inconnu"} · {formatDateTime(n.createdAt)}
                         </p>
                       </div>
                     ))}
@@ -298,24 +307,26 @@ export default async function InvestigationDetailPage({
               },
               {
                 id: "warrants",
-                label: "Warrants & Arrests",
+                label: "Mandats et arrestations",
                 count: inv.warrants.length + inv.arrests.length,
                 content: (
                   <div className="space-y-4 text-sm">
                     <Card>
-                      <CardHeader title="Warrants" />
+                      <CardHeader title="Mandats" />
                       <CardBody className="p-0">
                         {inv.warrants.length === 0 ? (
-                          <p className="px-5 py-4 text-navy-500">No warrants.</p>
+                          <p className="px-5 py-4 text-navy-500">Aucun mandat.</p>
                         ) : (
                           <ul className="divide-y divide-navy-100">
                             {inv.warrants.map((w) => (
                               <li key={w.id} className="flex justify-between px-5 py-3">
                                 <span>
-                                  {w.warrantNumber} · {w.type}
+                                  {w.warrantNumber} · {WARRANT_TYPE_FR[w.type] ?? w.type}
                                   {w.person ? ` · ${w.person.fullName}` : ""}
                                 </span>
-                                <Badge>{w.status}</Badge>
+                                <Badge tone={WARRANT_STATUS[w.status]?.tone}>
+                                  {WARRANT_STATUS[w.status]?.label ?? w.status}
+                                </Badge>
                               </li>
                             ))}
                           </ul>
@@ -323,10 +334,10 @@ export default async function InvestigationDetailPage({
                       </CardBody>
                     </Card>
                     <Card>
-                      <CardHeader title="Arrests" />
+                      <CardHeader title="Arrestations" />
                       <CardBody className="p-0">
                         {inv.arrests.length === 0 ? (
-                          <p className="px-5 py-4 text-navy-500">No arrests.</p>
+                          <p className="px-5 py-4 text-navy-500">Aucune arrestation.</p>
                         ) : (
                           <ul className="divide-y divide-navy-100">
                             {inv.arrests.map((a) => (
@@ -349,7 +360,7 @@ export default async function InvestigationDetailPage({
         {/* Sidebar */}
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Case Management" />
+            <CardHeader title="Gestion du dossier" />
             <CardBody className="space-y-4">
               {perms.edit || perms.close || perms.publish ? (
                 <CaseStatusControl
@@ -360,25 +371,25 @@ export default async function InvestigationDetailPage({
                   persons={persons}
                 />
               ) : (
-                <p className="text-sm text-navy-500">You have read-only access to this case.</p>
+                <p className="text-sm text-navy-500">Vous avez un accès en lecture seule à ce dossier.</p>
               )}
             </CardBody>
           </Card>
 
           <Card>
-            <CardHeader title="Case Information" />
+            <CardHeader title="Informations sur le dossier" />
             <CardBody className="space-y-2 text-sm">
               <Info label="Case Number" value={inv.caseNumber} mono />
               <Info label="Field Office" value={inv.fieldOffice?.name} />
               <Info label="Division" value={inv.division} />
-              <Info label="Unit" value={inv.unit} />
-              <Info label="Task Force" value={inv.taskForce} />
-              <Info label="Jurisdiction" value={inv.jurisdiction} />
-              <Info label="Incident Date" value={inv.incidentDate ? formatDate(inv.incidentDate) : null} />
-              <Info label="Incident Location" value={inv.incidentLocation} />
-              <Info label="Lead Agent" value={inv.leadAgent?.user.name} />
-              <Info label="Last Updated" value={formatDateTime(inv.updatedAt)} />
-              {inv.closedAt ? <Info label="Closed" value={formatDate(inv.closedAt)} /> : null}
+              <Info label="Unité" value={inv.unit} />
+              <Info label="Groupe d'intervention" value={inv.taskForce} />
+              <Info label="Juridiction" value={inv.jurisdiction} />
+              <Info label="Date de l'incident" value={inv.incidentDate ? formatDate(inv.incidentDate) : null} />
+              <Info label="Lieu de l'incident" value={inv.incidentLocation} />
+              <Info label="Agent responsable" value={inv.leadAgent?.user.name} />
+              <Info label="Dernière mise à jour" value={formatDateTime(inv.updatedAt)} />
+              {inv.closedAt ? <Info label="Clôturée le" value={formatDate(inv.closedAt)} /> : null}
             </CardBody>
           </Card>
 
@@ -391,7 +402,7 @@ export default async function InvestigationDetailPage({
                     {inv.mostWanted.map((mw) => (
                       <li key={mw.id}>
                         <Link href={`/agent/most-wanted/${mw.id}`} className="link-underline">
-                          {mw.publicId} · {mw.fullName} ({mw.status})
+                          {mw.publicId} · {mw.fullName} ({MOST_WANTED_STATUS[mw.status]?.label ?? mw.status})
                         </Link>
                       </li>
                     ))}
@@ -412,7 +423,7 @@ export default async function InvestigationDetailPage({
 
           {(inv.relatedFrom.length > 0 || inv.relatedTo.length > 0) && (
             <Card>
-              <CardHeader title="Related Cases" />
+              <CardHeader title="Dossiers liés" />
               <CardBody className="space-y-1 text-sm">
                 {[...inv.relatedFrom.map((r) => r.to), ...inv.relatedTo.map((r) => r.from)].map((r) => (
                   <Link key={r.id} href={`/agent/investigations/${r.id}`} className="link-underline block">

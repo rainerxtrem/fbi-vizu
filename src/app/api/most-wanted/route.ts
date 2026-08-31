@@ -84,7 +84,7 @@ export const POST = handle(async (req: Request) => {
     await addTimelineEvent(
       d.investigationId,
       "MOST_WANTED_CREATED",
-      `${actor.name} drafted Most Wanted bulletin ${publicId} for ${d.fullName}`,
+      `${actor.name} a rédigé le bulletin Most Wanted ${publicId} pour ${d.fullName}`,
       actor,
     );
   }
@@ -92,7 +92,7 @@ export const POST = handle(async (req: Request) => {
     action: "mostwanted.create",
     entityType: "most_wanted",
     entityId: mw.id,
-    summary: `${actor.name} created Most Wanted draft ${publicId} (${d.fullName})`,
+    summary: `${actor.name} a créé le brouillon Most Wanted ${publicId} (${d.fullName})`,
   });
 
   return created({ id: mw.id, publicId: mw.publicId });

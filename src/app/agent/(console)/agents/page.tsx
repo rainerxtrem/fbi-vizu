@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { PageTitle, DataTable } from "@/components/agent/ui";
 import { Badge } from "@/components/ui/badge";
 import { RANK_LABELS, RANK_ORDER, type Rank } from "@/lib/rbac";
+import { AGENT_STATUS } from "@/lib/constants";
 
 export default async function AgentsPage() {
   await requirePermission("agents.view");
@@ -15,8 +16,8 @@ export default async function AgentsPage() {
 
   return (
     <div>
-      <PageTitle title="Agents" subtitle={`${agents.length} personnel on the roster`} />
-      <DataTable head={["Name", "Badge", "Rank", "Field Office", "Status", "Cases Led"]}>
+      <PageTitle title="Agents" subtitle={`${agents.length} membres du personnel`} />
+      <DataTable head={["Nom", "Matricule", "Grade", "Field Office", "Statut", "Dossiers dirigés"]}>
         {agents.map((a) => (
           <tr key={a.id} className="hover:bg-navy-50">
             <td className="px-4 py-2.5">
@@ -27,9 +28,9 @@ export default async function AgentsPage() {
             </td>
             <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{a.badgeNumber}</td>
             <td className="px-4 py-2.5 text-navy-700">{RANK_LABELS[a.rank as Rank]}</td>
-            <td className="px-4 py-2.5 text-navy-600">{a.fieldOffice?.name ?? "HQ"}</td>
+            <td className="px-4 py-2.5 text-navy-600">{a.fieldOffice?.name ?? "QG"}</td>
             <td className="px-4 py-2.5">
-              <Badge tone={a.status === "ACTIVE" ? "green" : "amber"}>{a.status}</Badge>
+              <Badge tone={a.status === "ACTIVE" ? "green" : "amber"}>{AGENT_STATUS[a.status] ?? a.status}</Badge>
             </td>
             <td className="px-4 py-2.5 text-navy-600">{a._count.ledInvestigations}</td>
           </tr>

@@ -19,7 +19,7 @@ export const GET = handle(
         person: true,
       },
     });
-    if (!mw) return fail("Not found.", 404);
+    if (!mw) return fail("Introuvable.", 404);
     return ok(mw);
   },
 );
@@ -28,7 +28,7 @@ export const PATCH = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiActor();
     const mw = await prisma.mostWanted.findUnique({ where: { id: params.id } });
-    if (!mw) return fail("Not found.", 404);
+    if (!mw) return fail("Introuvable.", 404);
 
     const d = mostWantedUpdateSchema.parse(await req.json());
     const isCreator = mw.createdById && mw.createdById === actor.agent?.id;
@@ -37,7 +37,7 @@ export const PATCH = handle(
     // Field edits
     const fieldKeys = Object.keys(d).filter((k) => k !== "status");
     if (fieldKeys.length > 0 && !canEdit) {
-      return fail("You are not authorized to edit this bulletin.", 403);
+      return fail("Vous n'êtes pas autorisé à modifier ce bulletin.", 403);
     }
 
     // Workflow transition guards
@@ -55,7 +55,7 @@ export const PATCH = handle(
         (t === "PUBLISHED->LOCATED" && (can(actor, "mostwanted.edit") || publishPerms)) ||
         ((d.status === "ARCHIVED") && can(actor, "mostwanted.archive"));
 
-      if (!allowed) return fail(`Transition not permitted: ${t}`, 403);
+      if (!allowed) return fail(`Transition non autorisée : ${t}`, 403);
 
       data.status = d.status;
       if (d.status === "PUBLISHED") {
@@ -81,7 +81,7 @@ export const PATCH = handle(
       entityType: "most_wanted",
       entityId: mw.id,
       summary: `${actor.name} ${
-        d.status ? `moved ${mw.publicId} to ${d.status}` : `updated ${mw.publicId}`
+        d.status ? `a fait passer ${mw.publicId} au statut ${d.status}` : `a mis à jour ${mw.publicId}`
       }`,
       meta: { from: mw.status, to: d.status },
     });
@@ -94,13 +94,13 @@ export const DELETE = handle(
   async (_req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("mostwanted.delete");
     const mw = await prisma.mostWanted.findUnique({ where: { id: params.id } });
-    if (!mw) return fail("Not found.", 404);
+    if (!mw) return fail("Introuvable.", 404);
     await prisma.mostWanted.delete({ where: { id: mw.id } });
     await audit(actor, {
       action: "mostwanted.delete",
       entityType: "most_wanted",
       entityId: mw.id,
-      summary: `${actor.name} deleted Most Wanted ${mw.publicId}`,
+      summary: `${actor.name} a supprimé le Most Wanted ${mw.publicId}`,
     });
     return ok({ deleted: true });
   },

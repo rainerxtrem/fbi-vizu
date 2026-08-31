@@ -44,34 +44,39 @@ export default async function SuspectsPage({
   return (
     <div>
       <PageTitle
-        title="Suspects & Persons"
-        subtitle={`${total} person records`}
+        title="Suspects et personnes"
+        subtitle={`${total} fiches de personnes`}
         action={
           can(actor, "suspect.create") ? (
             <ButtonLink href="/agent/suspects/new" size="sm">
-              + Create Suspect
+              + Créer un suspect
             </ButtonLink>
           ) : null
         }
       />
 
       <form className="mb-4 flex gap-2" action="/agent/suspects">
-        <input name="q" defaultValue={q} placeholder="Search name, alias, description…" className="field-input max-w-sm" />
+        <input name="q" defaultValue={q} placeholder="Rechercher nom, alias, description…" className="field-input max-w-sm" />
         <select name="risk" defaultValue={risk ?? ""} className="field-input w-auto">
-          <option value="">Any risk</option>
-          {["LOW", "MEDIUM", "HIGH", "EXTREME"].map((r) => (
+          <option value="">Tout risque</option>
+          {[
+            ["LOW", "Faible"],
+            ["MEDIUM", "Moyen"],
+            ["HIGH", "Élevé"],
+            ["EXTREME", "Extrême"],
+          ].map(([r, l]) => (
             <option key={r} value={r}>
-              {r}
+              {l}
             </option>
           ))}
         </select>
       </form>
 
       {rows.length === 0 ? (
-        <EmptyState title="No person records found" />
+        <EmptyState title="Aucune fiche de personne trouvée" />
       ) : (
         <>
-          <DataTable head={["Name", "Alias", "Age", "Risk", "Cases", "Updated"]}>
+          <DataTable head={["Nom", "Alias", "Âge", "Risque", "Dossiers", "Maj"]}>
             {rows.map((p) => (
               <tr key={p.id} className="hover:bg-navy-50">
                 <td className="px-4 py-2.5">

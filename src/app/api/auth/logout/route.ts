@@ -8,7 +8,7 @@ import { audit } from "@/lib/audit";
 export async function POST() {
   const actor = await getActor();
   if (actor) {
-    await audit(actor, { action: "auth.logout", summary: `${actor.name} signed out` });
+    await audit(actor, { action: "auth.logout", summary: `${actor.name} s'est déconnecté` });
   }
   destroySession();
   return NextResponse.json({ ok: true });

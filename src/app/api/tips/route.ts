@@ -40,7 +40,7 @@ export const POST = handle(async (req: Request) => {
     action: "tip.submitted",
     entityType: "tip",
     entityId: tip.id,
-    summary: `Public tip ${publicId} submitted${data.anonymous ? " (anonymous)" : ""}`,
+    summary: `Renseignement public ${publicId} soumis${data.anonymous ? " (anonyme)" : ""}`,
     ip: clientIp(req),
   });
 

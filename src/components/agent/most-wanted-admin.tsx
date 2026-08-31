@@ -9,18 +9,18 @@ import { useConfirm } from "@/components/ui/confirm";
 import { MOST_WANTED_STATUS_FLOW } from "@/lib/constants";
 
 const NEXT: Record<string, { to: string; label: string; danger?: boolean }[]> = {
-  DRAFT: [{ to: "REVIEW", label: "Submit for Review" }],
+  DRAFT: [{ to: "REVIEW", label: "Soumettre pour révision" }],
   REVIEW: [
-    { to: "PUBLISHED", label: "Approve & Publish" },
-    { to: "DRAFT", label: "Send back to Draft" },
+    { to: "PUBLISHED", label: "Approuver et publier" },
+    { to: "DRAFT", label: "Renvoyer en brouillon" },
   ],
   PUBLISHED: [
-    { to: "CAPTURED", label: "Mark Captured" },
-    { to: "LOCATED", label: "Mark Located" },
-    { to: "ARCHIVED", label: "Archive", danger: true },
+    { to: "CAPTURED", label: "Marquer Captured" },
+    { to: "LOCATED", label: "Marquer localisé" },
+    { to: "ARCHIVED", label: "Archiver", danger: true },
   ],
-  CAPTURED: [{ to: "ARCHIVED", label: "Archive" }],
-  LOCATED: [{ to: "ARCHIVED", label: "Archive" }],
+  CAPTURED: [{ to: "ARCHIVED", label: "Archiver" }],
+  LOCATED: [{ to: "ARCHIVED", label: "Archiver" }],
   ARCHIVED: [],
 };
 
@@ -32,6 +32,27 @@ async function patch(id: string, body: unknown) {
   });
   return { ok: r.ok, json: await r.json() };
 }
+
+const CATEGORY_LABELS: [string, string][] = [
+  ["MOST_WANTED", "Most Wanted"],
+  ["FUGITIVE", "Fugitifs"],
+  ["ORGANIZED_CRIME", "Crime organisé"],
+  ["VIOLENT_CRIME", "Crime violent"],
+  ["TERRORISM", "Terrorisme"],
+  ["CYBER_CRIME", "Cybercriminalité"],
+  ["DRUG_TRAFFICKING", "Trafic de stupéfiants"],
+  ["WEAPONS", "Trafic d'armes"],
+  ["FINANCIAL_CRIME", "Criminalité financière"],
+  ["MISSING_PERSON", "Personnes disparues"],
+  ["SEEKING_INFORMATION", "Seeking Information"],
+];
+
+const DANGER_LABELS: [string, string][] = [
+  ["LOW", "Faible"],
+  ["MODERATE", "Modéré"],
+  ["HIGH", "Élevé"],
+  ["EXTREME", "Extrême"],
+];
 
 export function MostWantedWorkflow({
   id,
@@ -59,12 +80,12 @@ export function MostWantedWorkflow({
     const needsConfirm = to === "PUBLISHED" || danger;
     if (needsConfirm) {
       const ok = await confirm({
-        title: to === "PUBLISHED" ? "Publish this bulletin to FIA.gov?" : `Move bulletin to ${to}?`,
+        title: to === "PUBLISHED" ? "Publier ce bulletin sur FBI.gov ?" : `Passer le bulletin au statut ${to} ?`,
         message:
           to === "PUBLISHED"
-            ? "It will immediately be visible to the public on the Most Wanted page."
-            : "This changes the bulletin's workflow state.",
-        confirmLabel: to === "PUBLISHED" ? "Publish" : "Confirm",
+            ? "Il sera immédiatement visible par le public sur la page Most Wanted."
+            : "Cela modifie l'état du bulletin dans le flux de validation.",
+        confirmLabel: to === "PUBLISHED" ? "Publier" : "Confirmer",
         danger,
       });
       if (!ok) return;
@@ -72,25 +93,25 @@ export function MostWantedWorkflow({
     setBusy(true);
     const { ok, json } = await patch(id, { status: to });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Transition failed.");
-    toast("success", `Bulletin moved to ${to}.`);
+    if (!ok) return toast("error", json.error ?? "Échec de la transition.");
+    toast("success", `Bulletin passé au statut ${to}.`);
     router.refresh();
   }
 
   async function del() {
     const ok = await confirm({
-      title: "Delete this bulletin?",
-      message: "This permanently removes the Most Wanted record.",
-      confirmLabel: "Delete",
+      title: "Supprimer ce bulletin ?",
+      message: "Cela supprime définitivement la fiche Most Wanted.",
+      confirmLabel: "Supprimer",
       danger: true,
     });
     if (!ok) return;
     const r = await fetch(`/api/most-wanted/${id}`, { method: "DELETE" });
     if (!r.ok) {
       const j = await r.json();
-      return toast("error", j.error ?? "Delete failed.");
+      return toast("error", j.error ?? "Échec de la suppression.");
     }
-    toast("success", "Bulletin deleted.");
+    toast("success", "Bulletin supprimé.");
     router.push("/agent/most-wanted");
   }
 
@@ -118,7 +139,7 @@ export function MostWantedWorkflow({
         ))}
         {caps.del ? (
           <Button size="sm" variant="ghost" onClick={del}>
-            Delete
+            Supprimer
           </Button>
         ) : null}
       </div>
@@ -161,8 +182,8 @@ export function MostWantedEditor({
         .filter(Boolean),
     });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Save failed.");
-    toast("success", "Bulletin updated.");
+    if (!ok) return toast("error", json.error ?? "Échec de l'enregistrement.");
+    toast("success", "Bulletin mis à jour.");
     router.refresh();
   }
 
@@ -170,59 +191,63 @@ export function MostWantedEditor({
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
-      <Field label="Full Name" required>
+      <Field label="Nom complet" required>
         <Input name="fullName" defaultValue={s("fullName")} required />
       </Field>
-      <Field label="Aliases">
+      <Field label="Alias">
         <Input name="aliases" defaultValue={s("aliases")} />
       </Field>
-      <Field label="Age">
+      <Field label="Âge">
         <Input name="age" type="number" defaultValue={s("age")} />
       </Field>
-      <Field label="Reward (USD)">
+      <Field label="Récompense (USD)">
         <Input name="reward" type="number" defaultValue={s("reward")} />
       </Field>
-      <Field label="Photo URL" className="sm:col-span-2">
+      <Field label="URL de la photo" className="sm:col-span-2">
         <Input name="photoUrl" defaultValue={s("photoUrl")} />
       </Field>
-      <Field label="Category">
+      <Field label="Catégorie">
         <Select name="category" defaultValue={s("category") || "MOST_WANTED"}>
-          {["MOST_WANTED", "FUGITIVE", "ORGANIZED_CRIME", "VIOLENT_CRIME", "TERRORISM", "CYBER_CRIME", "DRUG_TRAFFICKING", "WEAPONS", "FINANCIAL_CRIME", "MISSING_PERSON", "SEEKING_INFORMATION"].map((c) => (
-            <option key={c}>{c}</option>
+          {CATEGORY_LABELS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
           ))}
         </Select>
       </Field>
-      <Field label="Danger Level">
+      <Field label="Niveau de dangerosité">
         <Select name="dangerLevel" defaultValue={s("dangerLevel") || "MODERATE"}>
-          {["LOW", "MODERATE", "HIGH", "EXTREME"].map((c) => (
-            <option key={c}>{c}</option>
+          {DANGER_LABELS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
           ))}
         </Select>
       </Field>
-      <Field label="Last Known Location">
+      <Field label="Dernière localisation connue">
         <Input name="lastKnownLocation" defaultValue={s("lastKnownLocation")} />
       </Field>
-      <Field label="Vehicle">
+      <Field label="Véhicule">
         <Input name="vehicle" defaultValue={s("vehicle")} />
       </Field>
-      <Field label="Date Last Seen">
+      <Field label="Date de dernière observation">
         <Input name="dateLastSeen" type="date" defaultValue={s("dateLastSeen")} />
       </Field>
-      <Field label="Associates">
+      <Field label="Complices">
         <Input name="associates" defaultValue={s("associates")} />
       </Field>
-      <Field label="Known Organizations" className="sm:col-span-2">
+      <Field label="Organisations connues" className="sm:col-span-2">
         <Input name="knownOrganizations" defaultValue={s("knownOrganizations")} />
       </Field>
-      <Field label="Charges (one per line)" className="sm:col-span-2">
+      <Field label="Chefs d'accusation (un par ligne)" className="sm:col-span-2">
         <Textarea name="charges" rows={4} defaultValue={s("charges")} />
       </Field>
-      <Field label="Public Description" className="sm:col-span-2">
+      <Field label="Description publique" className="sm:col-span-2">
         <Textarea name="description" rows={5} defaultValue={s("description")} required />
       </Field>
       <div className="sm:col-span-2">
         <Button type="submit" disabled={busy}>
-          {busy ? "Saving…" : "Save Bulletin"}
+          {busy ? "Enregistrement…" : "Enregistrer le bulletin"}
         </Button>
       </div>
     </form>

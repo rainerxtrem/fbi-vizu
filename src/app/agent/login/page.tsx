@@ -7,7 +7,7 @@ import { LoginForm } from "./login-form";
 import { AGENCY } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Agent Login", robots: { index: false } };
+export const metadata: Metadata = { title: "Espace Agent", robots: { index: false } };
 
 export default async function LoginPage({
   searchParams,
@@ -30,10 +30,11 @@ export default async function LoginPage({
           </div>
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Investigative Portal</h1>
+          <h1 className="text-3xl font-bold">Portail d&apos;enquête</h1>
           <p className="mt-3 max-w-sm text-navy-300">
-            Authorized personnel only. All activity in this system is monitored
-            and recorded. Unauthorized access is a federal offense.
+            Réservé au personnel autorisé. Toute activité sur ce système est
+            surveillée et enregistrée. Tout accès non autorisé constitue une
+            infraction fédérale.
           </p>
         </div>
         <p className="text-xs text-navy-500">{AGENCY.baseline}</p>
@@ -44,22 +45,22 @@ export default async function LoginPage({
           <div className="mb-8 lg:hidden">
             <Shield className="h-8 w-8 text-navy-900" />
           </div>
-          <h2 className="text-2xl font-bold text-navy-900">Agent Sign In</h2>
+          <h2 className="text-2xl font-bold text-navy-900">Connexion Agent</h2>
           <p className="mt-1 text-sm text-navy-500">
-            Access the FIA investigative console.
+            Accédez à la console d&apos;enquête du FBI.
           </p>
           {searchParams.error === "not_an_agent" ? (
             <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-              That account does not have console access.
+              Ce compte n&apos;a pas accès à la console.
             </p>
           ) : null}
           <div className="mt-6">
             <LoginForm />
           </div>
           <p className="mt-6 text-xs text-navy-400">
-            Not an agent?{" "}
+            Vous n&apos;êtes pas Agent ?{" "}
             <Link href="/" className="link-underline">
-              Return to the public site
+              Retour au site public
             </Link>
             .
           </p>

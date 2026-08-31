@@ -5,7 +5,7 @@ const YEAR = () => new Date().getFullYear();
 export async function nextCaseNumber(): Promise<string> {
   const count = await prisma.investigation.count();
   const seq = String(count + 1).padStart(5, "0");
-  return `FIA-${YEAR()}-${seq}`;
+  return `FBI-${YEAR()}-${seq}`;
 }
 
 export async function nextEvidenceNumber(): Promise<string> {
@@ -36,6 +36,8 @@ export async function nextMostWantedPublicId(): Promise<string> {
 export function slugify(input: string): string {
   return input
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 80);

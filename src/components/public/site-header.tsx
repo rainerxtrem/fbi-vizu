@@ -9,11 +9,11 @@ import { AGENCY } from "@/lib/constants";
 
 const NAV = [
   { href: "/most-wanted", label: "Most Wanted" },
-  { href: "/investigations", label: "Investigations" },
-  { href: "/news", label: "News" },
-  { href: "/how-we-can-help", label: "How We Can Help" },
-  { href: "/careers", label: "Careers" },
-  { href: "/about", label: "About" },
+  { href: "/investigations", label: "Enquêtes" },
+  { href: "/news", label: "Actualités" },
+  { href: "/how-we-can-help", label: "Comment nous pouvons vous aider" },
+  { href: "/careers", label: "Carrières" },
+  { href: "/about", label: "À propos" },
 ];
 
 export function SiteHeader() {
@@ -36,7 +36,7 @@ export function SiteHeader() {
       <div className="bg-navy-900 text-white">
         <div className="container-fia flex h-9 items-center justify-between text-xs">
           <span className="hidden sm:block">
-            An official portal of the {AGENCY.division}
+            Un portail officiel de la {AGENCY.division}
           </span>
           <div className="flex items-center gap-4">
             <Link href="/submit-tip" className="hover:text-navy-200">
@@ -46,7 +46,7 @@ export function SiteHeader() {
               Contact
             </Link>
             <Link href="/agent/login" className="font-semibold hover:text-navy-200">
-              Agent Login
+              Espace Agent
             </Link>
           </div>
         </div>
@@ -84,7 +84,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <button
-            aria-label="Search"
+            aria-label="Rechercher"
             onClick={() => setSearchOpen((s) => !s)}
             className="flex h-10 w-10 items-center justify-center rounded-md text-navy-700 hover:bg-navy-100"
           >
@@ -113,11 +113,11 @@ export function SiteHeader() {
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search FIA.gov — Most Wanted, news, cases…"
+              placeholder="Rechercher sur FBI.gov — Most Wanted, actualités, dossiers…"
               className="field-input"
             />
             <button className="rounded-md bg-navy-800 px-4 text-sm font-semibold uppercase text-white">
-              Search
+              Rechercher
             </button>
           </form>
         </div>
@@ -141,7 +141,7 @@ export function SiteHeader() {
               onClick={() => setOpen(false)}
               className="mt-3 rounded-md bg-federal-accent px-4 py-2 text-center text-sm font-semibold uppercase text-white"
             >
-              Apply to Join
+              Candidater
             </Link>
           </nav>
         </div>

@@ -12,7 +12,7 @@ export const POST = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("note.create");
     const inv = await getInvestigationOr404(params.id, actor);
-    if (!actor.agent) return fail("Agents only.", 403);
+    if (!actor.agent) return fail("Réservé aux Agents.", 403);
     const { body } = noteSchema.parse(await req.json());
 
     const note = await prisma.investigationNote.create({
@@ -20,12 +20,12 @@ export const POST = handle(
       include: { author: { include: { user: true } } },
     });
 
-    await addTimelineEvent(inv.id, "NOTE_ADDED", `${actor.name} added a note`, actor);
+    await addTimelineEvent(inv.id, "NOTE_ADDED", `${actor.name} a ajouté une note`, actor);
     await audit(actor, {
       action: "note.create",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} added a note to ${inv.caseNumber}`,
+      summary: `${actor.name} a ajouté une note à ${inv.caseNumber}`,
     });
 
     return created(note);

@@ -1,42 +1,43 @@
-// UI-facing labels, colors and option lists for enums.
+// Libellés, couleurs et listes d'options pour l'interface (français).
+// Les intitulés de grades et certains termes institutionnels restent en anglais.
 
 export const AGENCY = {
-  name: "Federal Investigative Agency",
-  abbr: "FIA",
-  baseline: "Justice. Integrity. Service.",
-  division: "San Andreas Division",
-  domain: "FIA.gov",
+  name: "Federal Bureau of Investigation",
+  abbr: "FBI",
+  baseline: "Justice. Intégrité. Service.",
+  division: "Division de San Andreas",
+  domain: "FBI.gov",
 } as const;
 
 export const INVESTIGATION_STATUS: Record<string, { label: string; tone: string }> = {
-  OPEN: { label: "Open", tone: "blue" },
+  OPEN: { label: "Ouverte", tone: "blue" },
   ACTIVE: { label: "Active", tone: "green" },
-  SUSPENDED: { label: "Suspended", tone: "amber" },
-  CLOSED: { label: "Closed", tone: "slate" },
-  ARCHIVED: { label: "Archived", tone: "slate" },
+  SUSPENDED: { label: "Suspendue", tone: "amber" },
+  CLOSED: { label: "Clôturée", tone: "slate" },
+  ARCHIVED: { label: "Archivée", tone: "slate" },
 };
 
 export const PRIORITY: Record<string, { label: string; tone: string }> = {
-  LOW: { label: "Low", tone: "slate" },
-  MEDIUM: { label: "Medium", tone: "blue" },
-  HIGH: { label: "High", tone: "amber" },
-  CRITICAL: { label: "Critical", tone: "red" },
+  LOW: { label: "Faible", tone: "slate" },
+  MEDIUM: { label: "Moyenne", tone: "blue" },
+  HIGH: { label: "Élevée", tone: "amber" },
+  CRITICAL: { label: "Critique", tone: "red" },
 };
 
 export const CLASSIFICATION: Record<string, { label: string; tone: string }> = {
-  UNCLASSIFIED: { label: "Unclassified", tone: "slate" },
-  RESTRICTED: { label: "Restricted", tone: "blue" },
-  CONFIDENTIAL: { label: "Confidential", tone: "amber" },
+  UNCLASSIFIED: { label: "Non classifié", tone: "slate" },
+  RESTRICTED: { label: "Restreint", tone: "blue" },
+  CONFIDENTIAL: { label: "Confidentiel", tone: "amber" },
   SECRET: { label: "Secret", tone: "red" },
 };
 
 export const MOST_WANTED_STATUS: Record<string, { label: string; tone: string }> = {
-  DRAFT: { label: "Draft", tone: "slate" },
-  REVIEW: { label: "In Review", tone: "amber" },
-  PUBLISHED: { label: "Published", tone: "green" },
+  DRAFT: { label: "Brouillon", tone: "slate" },
+  REVIEW: { label: "En révision", tone: "amber" },
+  PUBLISHED: { label: "Publié", tone: "green" },
   CAPTURED: { label: "Captured", tone: "blue" },
-  LOCATED: { label: "Located", tone: "blue" },
-  ARCHIVED: { label: "Archived", tone: "slate" },
+  LOCATED: { label: "Localisé", tone: "blue" },
+  ARCHIVED: { label: "Archivé", tone: "slate" },
 };
 
 export const MOST_WANTED_STATUS_FLOW = [
@@ -49,136 +50,143 @@ export const MOST_WANTED_STATUS_FLOW = [
 ] as const;
 
 export const DANGER_LEVEL: Record<string, { label: string; tone: string }> = {
-  LOW: { label: "Low", tone: "slate" },
-  MODERATE: { label: "Moderate", tone: "amber" },
-  HIGH: { label: "High", tone: "red" },
-  EXTREME: { label: "Extreme", tone: "red" },
+  LOW: { label: "Faible", tone: "slate" },
+  MODERATE: { label: "Modéré", tone: "amber" },
+  HIGH: { label: "Élevé", tone: "red" },
+  EXTREME: { label: "Extrême", tone: "red" },
 };
 
 export const MOST_WANTED_CATEGORY: Record<string, string> = {
   MOST_WANTED: "Most Wanted",
-  FUGITIVE: "Fugitives",
-  ORGANIZED_CRIME: "Organized Crime",
-  VIOLENT_CRIME: "Violent Crime",
-  TERRORISM: "Terrorism",
-  CYBER_CRIME: "Cyber Crime",
-  DRUG_TRAFFICKING: "Drug Trafficking",
-  WEAPONS: "Weapons",
-  FINANCIAL_CRIME: "Financial Crime",
-  MISSING_PERSON: "Missing Persons",
+  FUGITIVE: "Fugitifs",
+  ORGANIZED_CRIME: "Crime organisé",
+  VIOLENT_CRIME: "Crime violent",
+  TERRORISM: "Terrorisme",
+  CYBER_CRIME: "Cybercriminalité",
+  DRUG_TRAFFICKING: "Trafic de stupéfiants",
+  WEAPONS: "Trafic d'armes",
+  FINANCIAL_CRIME: "Criminalité financière",
+  MISSING_PERSON: "Personnes disparues",
   SEEKING_INFORMATION: "Seeking Information",
 };
 
 export const MOST_WANTED_FILTERS: { key: string; label: string }[] = [
-  { key: "ALL", label: "All" },
+  { key: "ALL", label: "Tous" },
   { key: "MOST_WANTED", label: "Most Wanted" },
-  { key: "FUGITIVE", label: "Fugitives" },
-  { key: "ORGANIZED_CRIME", label: "Organized Crime" },
-  { key: "VIOLENT_CRIME", label: "Violent Crime" },
-  { key: "TERRORISM", label: "Terrorism" },
-  { key: "CYBER_CRIME", label: "Cyber Crime" },
-  { key: "DRUG_TRAFFICKING", label: "Drug Trafficking" },
-  { key: "WEAPONS", label: "Weapons" },
-  { key: "FINANCIAL_CRIME", label: "Financial Crime" },
-  { key: "MISSING_PERSON", label: "Missing Persons" },
+  { key: "FUGITIVE", label: "Fugitifs" },
+  { key: "ORGANIZED_CRIME", label: "Crime organisé" },
+  { key: "VIOLENT_CRIME", label: "Crime violent" },
+  { key: "TERRORISM", label: "Terrorisme" },
+  { key: "CYBER_CRIME", label: "Cybercriminalité" },
+  { key: "DRUG_TRAFFICKING", label: "Trafic de stupéfiants" },
+  { key: "WEAPONS", label: "Trafic d'armes" },
+  { key: "FINANCIAL_CRIME", label: "Criminalité financière" },
+  { key: "MISSING_PERSON", label: "Personnes disparues" },
   { key: "SEEKING_INFORMATION", label: "Seeking Information" },
 ];
 
 export const APPLICATION_STATUS: Record<string, { label: string; tone: string }> = {
-  SUBMITTED: { label: "Submitted", tone: "blue" },
-  UNDER_REVIEW: { label: "Under Review", tone: "amber" },
-  INTERVIEW: { label: "Interview", tone: "amber" },
-  BACKGROUND_CHECK: { label: "Background Check", tone: "amber" },
-  APPROVED: { label: "Approved", tone: "green" },
-  REJECTED: { label: "Rejected", tone: "red" },
-  WITHDRAWN: { label: "Withdrawn", tone: "slate" },
+  SUBMITTED: { label: "Soumise", tone: "blue" },
+  UNDER_REVIEW: { label: "En cours d'examen", tone: "amber" },
+  INTERVIEW: { label: "Entretien", tone: "amber" },
+  BACKGROUND_CHECK: { label: "Enquête de moralité", tone: "amber" },
+  APPROVED: { label: "Approuvée", tone: "green" },
+  REJECTED: { label: "Refusée", tone: "red" },
+  WITHDRAWN: { label: "Retirée", tone: "slate" },
 };
 
 export const APPLICATION_POSITION: Record<string, string> = {
   SPECIAL_AGENT: "Special Agent",
-  INTELLIGENCE_ANALYST: "Intelligence Analyst",
-  CRIME_ANALYST: "Crime Analyst",
-  TACTICAL_AGENT: "Tactical Agent",
-  CYBERCRIME_SPECIALIST: "Cybercrime Specialist",
-  FORENSIC_SPECIALIST: "Forensic Specialist",
-  ADMINISTRATIVE_STAFF: "Administrative Staff",
+  INTELLIGENCE_ANALYST: "Analyste du renseignement",
+  CRIME_ANALYST: "Analyste criminel",
+  TACTICAL_AGENT: "Agent tactique",
+  CYBERCRIME_SPECIALIST: "Spécialiste cybercriminalité",
+  FORENSIC_SPECIALIST: "Spécialiste médico-légal",
+  ADMINISTRATIVE_STAFF: "Personnel administratif",
 };
 
 export const TIP_STATUS: Record<string, { label: string; tone: string }> = {
-  NEW: { label: "New", tone: "red" },
-  REVIEWING: { label: "Reviewing", tone: "amber" },
-  ASSIGNED: { label: "Assigned", tone: "blue" },
-  ACTIONED: { label: "Actioned", tone: "green" },
-  CLOSED: { label: "Closed", tone: "slate" },
-  ARCHIVED: { label: "Archived", tone: "slate" },
+  NEW: { label: "Nouveau", tone: "red" },
+  REVIEWING: { label: "En cours d'examen", tone: "amber" },
+  ASSIGNED: { label: "Assigné", tone: "blue" },
+  ACTIONED: { label: "Traité", tone: "green" },
+  CLOSED: { label: "Clôturé", tone: "slate" },
+  ARCHIVED: { label: "Archivé", tone: "slate" },
 };
 
 export const NEWS_CATEGORY: Record<string, string> = {
-  PRESS_RELEASE: "Press Releases",
-  CASE_UPDATE: "Case Updates",
-  PUBLIC_NOTICE: "Public Notices",
-  AGENCY_NEWS: "Agency News",
-  RECRUITMENT: "Recruitment",
-  COMMUNITY: "Community",
+  PRESS_RELEASE: "Communiqués de presse",
+  CASE_UPDATE: "Mises à jour d'enquête",
+  PUBLIC_NOTICE: "Avis au public",
+  AGENCY_NEWS: "Actualités de l'agence",
+  RECRUITMENT: "Recrutement",
+  COMMUNITY: "Communauté",
 };
 
 export const EVIDENCE_TYPE: Record<string, string> = {
-  PHYSICAL: "Physical",
-  DIGITAL: "Digital",
+  PHYSICAL: "Physique",
+  DIGITAL: "Numérique",
   DOCUMENT: "Document",
-  PHOTO: "Photograph",
-  VIDEO: "Video",
+  PHOTO: "Photographie",
+  VIDEO: "Vidéo",
   AUDIO: "Audio",
-  FIREARM: "Firearm",
-  NARCOTIC: "Narcotic",
-  FINANCIAL: "Financial",
-  BIOLOGICAL: "Biological",
-  OTHER: "Other",
+  FIREARM: "Arme à feu",
+  NARCOTIC: "Stupéfiant",
+  FINANCIAL: "Financier",
+  BIOLOGICAL: "Biologique",
+  OTHER: "Autre",
 };
 
 export const WARRANT_STATUS: Record<string, { label: string; tone: string }> = {
-  REQUESTED: { label: "Requested", tone: "amber" },
-  APPROVED: { label: "Approved", tone: "blue" },
-  ACTIVE: { label: "Active", tone: "green" },
-  EXECUTED: { label: "Executed", tone: "slate" },
-  EXPIRED: { label: "Expired", tone: "slate" },
-  DENIED: { label: "Denied", tone: "red" },
+  REQUESTED: { label: "Demandé", tone: "amber" },
+  APPROVED: { label: "Approuvé", tone: "blue" },
+  ACTIVE: { label: "Actif", tone: "green" },
+  EXECUTED: { label: "Exécuté", tone: "slate" },
+  EXPIRED: { label: "Expiré", tone: "slate" },
+  DENIED: { label: "Refusé", tone: "red" },
 };
 
 export const RISK_LEVEL: Record<string, { label: string; tone: string }> = {
-  LOW: { label: "Low", tone: "slate" },
-  MEDIUM: { label: "Medium", tone: "blue" },
-  HIGH: { label: "High", tone: "amber" },
-  EXTREME: { label: "Extreme", tone: "red" },
+  LOW: { label: "Faible", tone: "slate" },
+  MEDIUM: { label: "Moyen", tone: "blue" },
+  HIGH: { label: "Élevé", tone: "amber" },
+  EXTREME: { label: "Extrême", tone: "red" },
+};
+
+export const AGENT_STATUS: Record<string, string> = {
+  ACTIVE: "Actif",
+  ON_LEAVE: "En congé",
+  SUSPENDED: "Suspendu",
+  INACTIVE: "Inactif",
 };
 
 export const PERSON_ROLE: Record<string, string> = {
   SUSPECT: "Suspect",
-  VICTIM: "Victim",
-  WITNESS: "Witness",
-  ASSOCIATE: "Associate",
-  PERSON_OF_INTEREST: "Person of Interest",
+  VICTIM: "Victime",
+  WITNESS: "Témoin",
+  ASSOCIATE: "Associé",
+  PERSON_OF_INTEREST: "Personne d'intérêt",
 };
 
 export const FEDERAL_CRIMES = [
-  "Organized Crime",
-  "First Degree Murder",
-  "Second Degree Murder",
-  "Kidnapping",
-  "Armed Robbery",
-  "Drug Trafficking",
-  "Weapons Trafficking",
-  "Public Corruption",
-  "Money Laundering",
-  "Cybercrime",
-  "Terrorism",
-  "Financial Fraud",
-  "Racketeering",
-  "Extortion",
-  "Conspiracy",
-  "Obstruction of Justice",
-  "Human Trafficking",
-  "Bank Robbery",
-  "Wire Fraud",
-  "Bribery",
+  "Crime organisé",
+  "Meurtre au premier degré",
+  "Meurtre au second degré",
+  "Enlèvement",
+  "Vol à main armée",
+  "Trafic de stupéfiants",
+  "Trafic d'armes",
+  "Corruption publique",
+  "Blanchiment d'argent",
+  "Cybercriminalité",
+  "Terrorisme",
+  "Fraude financière",
+  "Racket",
+  "Extorsion",
+  "Association de malfaiteurs",
+  "Entrave à la justice",
+  "Traite d'êtres humains",
+  "Braquage de banque",
+  "Fraude électronique",
+  "Corruption",
 ];

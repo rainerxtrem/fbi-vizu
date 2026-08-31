@@ -12,7 +12,7 @@ export const PATCH = handle(
     const data = tipUpdateSchema.parse(await req.json());
 
     const tip = await prisma.tip.findUnique({ where: { id: params.id } });
-    if (!tip) return fail("Tip not found.", 404);
+    if (!tip) return fail("Renseignement introuvable.", 404);
 
     const updated = await prisma.tip.update({
       where: { id: params.id },
@@ -27,7 +27,7 @@ export const PATCH = handle(
       action: "tip.updated",
       entityType: "tip",
       entityId: tip.id,
-      summary: `${actor.name} updated tip ${tip.publicId}`,
+      summary: `${actor.name} a mis à jour le renseignement ${tip.publicId}`,
       meta: { status: data.status, assignedToId: data.assignedToId },
     });
 

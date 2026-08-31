@@ -7,8 +7,8 @@ export default async function NewSuspectPage() {
   await requirePermission("suspect.create");
   return (
     <div className="max-w-3xl">
-      <Breadcrumbs items={[{ label: "Suspects", href: "/agent/suspects" }, { label: "Create" }]} />
-      <PageTitle title="Create Person Record" subtitle="Add a suspect, witness or person of interest" />
+      <Breadcrumbs items={[{ label: "Suspects", href: "/agent/suspects" }, { label: "Créer" }]} />
+      <PageTitle title="Créer une fiche de personne" subtitle="Ajouter un suspect, un témoin ou une personne d'intérêt" />
       <SuspectForm mode="create" />
     </div>
   );

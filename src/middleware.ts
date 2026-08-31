@@ -15,10 +15,10 @@ export function middleware(req: NextRequest) {
     if (origin) {
       try {
         if (new URL(origin).host !== host) {
-          return NextResponse.json({ ok: false, error: "Cross-origin request blocked." }, { status: 403 });
+          return NextResponse.json({ ok: false, error: "Requête cross-origin bloquée." }, { status: 403 });
         }
       } catch {
-        return NextResponse.json({ ok: false, error: "Invalid origin." }, { status: 403 });
+        return NextResponse.json({ ok: false, error: "Origine invalide." }, { status: 403 });
       }
     }
   }

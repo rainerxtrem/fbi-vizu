@@ -62,11 +62,11 @@ export const POST = handle(async (req: Request) => {
   const actor = await requireApiPermission("investigation.create");
   const d = investigationCreateSchema.parse(await req.json());
 
-  if (!actor.agent) return fail("Only agents can create investigations.", 403);
+  if (!actor.agent) return fail("Seuls les Agents peuvent créer des enquêtes.", 403);
 
   const caseNumber = d.caseNumber || (await nextCaseNumber());
   const existing = await prisma.investigation.findUnique({ where: { caseNumber } });
-  if (existing) return fail("Case number already exists.", 409);
+  if (existing) return fail("Ce Case Number existe déjà.", 409);
 
   const inv = await prisma.investigation.create({
     data: {
@@ -122,14 +122,14 @@ export const POST = handle(async (req: Request) => {
   await addTimelineEvent(
     inv.id,
     "INVESTIGATION_OPENED",
-    `Investigation opened by ${actor.name}`,
+    `Enquête ouverte par ${actor.name}`,
     actor,
   );
   await audit(actor, {
     action: "investigation.create",
     entityType: "investigation",
     entityId: inv.id,
-    summary: `${actor.name} created investigation ${inv.caseNumber}`,
+    summary: `${actor.name} a créé l'enquête ${inv.caseNumber}`,
   });
 
   return created({ id: inv.id, caseNumber: inv.caseNumber });

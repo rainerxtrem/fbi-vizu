@@ -29,13 +29,13 @@ export function RankControl({
     const fd = new FormData(e.currentTarget);
     const newRank = String(fd.get("newRank")) as Rank;
     const reason = String(fd.get("reason") ?? "");
-    if (newRank === currentRank) return toast("error", "Select a different rank.");
+    if (newRank === currentRank) return toast("error", "Sélectionnez un grade différent.");
 
     const promote = RANK_ORDER.indexOf(newRank) > RANK_ORDER.indexOf(currentRank);
     const ok = await confirm({
-      title: `${promote ? "Promote" : "Demote"} to ${RANK_LABELS[newRank]}?`,
-      message: "This change is recorded in the audit log with your name and the reason.",
-      confirmLabel: promote ? "Promote" : "Demote",
+      title: `${promote ? "Promouvoir" : "Rétrograder"} au grade ${RANK_LABELS[newRank]} ?`,
+      message: "Ce changement est enregistré dans le journal d'activité avec votre nom et le motif.",
+      confirmLabel: promote ? "Promouvoir" : "Rétrograder",
       danger: !promote,
     });
     if (!ok) return;
@@ -48,14 +48,14 @@ export function RankControl({
     });
     const j = await r.json();
     setBusy(false);
-    if (!r.ok) return toast("error", j.error ?? "Failed.");
-    toast("success", `Rank changed to ${RANK_LABELS[newRank]}.`);
+    if (!r.ok) return toast("error", j.error ?? "Échec.");
+    toast("success", `Grade changé en ${RANK_LABELS[newRank]}.`);
     router.refresh();
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <Field label="New Rank">
+      <Field label="Nouveau grade">
         <Select name="newRank" defaultValue={currentRank}>
           {allowed.map((r) => (
             <option key={r} value={r}>
@@ -65,10 +65,10 @@ export function RankControl({
         </Select>
       </Field>
       <Field label="Justification">
-        <Textarea name="reason" rows={2} placeholder="Reason for the change (recorded)" />
+        <Textarea name="reason" rows={2} placeholder="Motif du changement (enregistré)" />
       </Field>
       <Button type="submit" size="sm" disabled={busy}>
-        {busy ? "Saving…" : "Apply Rank Change"}
+        {busy ? "Enregistrement…" : "Appliquer le changement de grade"}
       </Button>
     </form>
   );

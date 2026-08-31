@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     template: `%s | ${AGENCY.abbr}`,
   },
   description:
-    "The Federal Investigative Agency (FIA) protects the State of San Andreas and pursues justice across every jurisdiction. Official portal.",
+    "Le Federal Bureau of Investigation (FBI) protège l'État de San Andreas et poursuit la justice dans toutes les juridictions. Portail officiel.",
   openGraph: {
     title: `${AGENCY.name}`,
-    description: "Protecting San Andreas. Pursuing Justice.",
+    description: "Protéger San Andreas. Poursuivre la justice.",
     siteName: AGENCY.name,
     type: "website",
   },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-US">
+    <html lang="fr">
       <body>
         <ToastProvider>{children}</ToastProvider>
       </body>

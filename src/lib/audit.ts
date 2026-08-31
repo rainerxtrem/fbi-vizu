@@ -12,7 +12,7 @@ interface AuditInput {
 }
 
 export function actorLabel(actor: Actor | null | undefined): string {
-  if (!actor) return "anonymous";
+  if (!actor) return "anonyme";
   if (actor.agent) {
     return `${RANK_ABBR[actor.agent.rank as Rank]} ${actor.name} (${actor.agent.badgeNumber})`;
   }

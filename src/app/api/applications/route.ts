@@ -47,7 +47,7 @@ export const POST = handle(async (req: Request) => {
     action: "application.submitted",
     entityType: "application",
     entityId: app.id,
-    summary: `Application ${publicId} submitted by ${d.firstName} ${d.lastName} (${d.position})`,
+    summary: `Candidature ${publicId} soumise par ${d.firstName} ${d.lastName} (${d.position})`,
     ip: clientIp(req),
   });
 

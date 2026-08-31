@@ -3,19 +3,19 @@ import { PageHeader } from "@/components/public/page-header";
 import { ApplicationForm } from "@/components/public/application-form";
 
 export const metadata: Metadata = {
-  title: "Join the FIA",
-  description: "Apply to become a Special Agent, analyst, or professional staff member of the FIA.",
+  title: "Apply",
+  description: "Candidatez pour devenir Special Agent, analyste ou personnel du FBI.",
 };
 
 export default function ApplyPage() {
   return (
     <div>
       <PageHeader
-        title="Join the FIA"
-        intro="Build your career. Serve your community. Make a difference."
+        title="Apply"
+        intro="Rejoignez le Federal Bureau of Investigation. Développez votre carrière. Servez votre communauté. Rendez justice."
         crumbs={[
-          { label: "Home", href: "/" },
-          { label: "Careers", href: "/careers" },
+          { label: "Accueil", href: "/" },
+          { label: "Carrières", href: "/careers" },
           { label: "Apply" },
         ]}
       />
@@ -25,20 +25,20 @@ export default function ApplyPage() {
         </div>
         <aside className="space-y-4 text-sm text-navy-600 lg:sticky lg:top-32 lg:self-start">
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-            <h3 className="font-semibold text-navy-800">Eligibility</h3>
+            <h3 className="font-semibold text-navy-800">Conditions d'éligibilité</h3>
             <ul className="mt-2 list-disc space-y-1 pl-4">
-              <li>Resident of the State of San Andreas</li>
-              <li>Minimum age 21</li>
-              <li>Valid driver&apos;s license</li>
-              <li>No felony convictions</li>
-              <li>Able to pass a background investigation</li>
+              <li>Résident de l'État de San Andreas</li>
+              <li>Âge minimum : 21 ans</li>
+              <li>Permis de conduire valide</li>
+              <li>Aucune condamnation pour crime</li>
+              <li>Capacité à réussir une enquête de moralité</li>
             </ul>
           </div>
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-            <h3 className="font-semibold text-navy-800">Hiring process</h3>
+            <h3 className="font-semibold text-navy-800">Processus de recrutement</h3>
             <p className="mt-1">
-              Application → Review → Interview → Background Check → Conditional
-              Offer → Academy.
+              Candidature → Examen → Entretien → Enquête de moralité → Offre
+              conditionnelle → Académie.
             </p>
           </div>
         </aside>

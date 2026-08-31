@@ -327,13 +327,13 @@ export function canAny(actor: Actor | null | undefined, perms: Permission[]): bo
 
 export function assertCan(actor: Actor | null | undefined, permission: Permission): void {
   if (!can(actor, permission)) {
-    throw new RbacError(`Missing permission: ${permission}`);
+    throw new RbacError(`Permission manquante : ${permission}`);
   }
 }
 
 export class RbacError extends Error {
   status = 403;
-  constructor(message = "Forbidden") {
+  constructor(message = "Accès refusé") {
     super(message);
     this.name = "RbacError";
   }

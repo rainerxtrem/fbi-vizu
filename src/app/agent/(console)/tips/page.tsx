@@ -35,11 +35,11 @@ export default async function TipsPage() {
 
   return (
     <div>
-      <PageTitle title="Tips" subtitle={`${rows.length} tips in your queue`} />
+      <PageTitle title="Renseignements" subtitle={`${rows.length} renseignements dans votre file`} />
       {rows.length === 0 ? (
-        <EmptyState title="No tips" description="Public tips will appear here as they are submitted." />
+        <EmptyState title="Aucun renseignement" description="Les renseignements du public apparaîtront ici au fur et à mesure." />
       ) : (
-        <DataTable head={["Ref", "Subject", "From", "Related", "Received", "Status"]}>
+        <DataTable head={["Réf", "Objet", "De", "Lié à", "Reçu le", "Statut"]}>
           {rows.map((t) => (
             <tr key={t.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{t.publicId}</td>
@@ -48,12 +48,12 @@ export default async function TipsPage() {
                 <p className="line-clamp-1 max-w-md text-xs text-navy-500">{t.description}</p>
                 {t.file ? (
                   <a href={t.file.url} target="_blank" className="text-xs text-navy-600 underline">
-                    Attachment
+                    Pièce jointe
                   </a>
                 ) : null}
               </td>
               <td className="px-4 py-2.5 text-xs text-navy-600">
-                {t.anonymous ? "Anonymous" : t.name || t.email || "—"}
+                {t.anonymous ? "Anonyme" : t.name || t.email || "—"}
               </td>
               <td className="px-4 py-2.5 text-xs">
                 {t.mostWanted ? (

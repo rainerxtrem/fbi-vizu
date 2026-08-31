@@ -72,45 +72,45 @@ export function InvestigationForm({
         for (const [k, v] of Object.entries(json.issues.fieldErrors)) fe[k] = (v as string[])[0];
         setErrors(fe);
       }
-      toast("error", json.error ?? "Could not create the investigation.");
+      toast("error", json.error ?? "Impossible de créer l'enquête.");
       return;
     }
-    toast("success", `Case ${json.data.caseNumber} created.`);
+    toast("success", `Dossier ${json.data.caseNumber} créé.`);
     router.push(`/agent/investigations/${json.data.id}`);
     router.refresh();
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-8">
-      <Section title="General Information">
+      <Section title="Informations générales">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Case Title" required error={errors.title} className="sm:col-span-2">
+          <Field label="Titre du dossier" required error={errors.title} className="sm:col-span-2">
             <Input name="title" required />
           </Field>
-          <Field label="Case Number" hint="Leave blank to auto-generate (FIA-YYYY-#####)">
-            <Input name="caseNumber" placeholder="Auto" />
+          <Field label="Case Number" hint="Laissez vide pour générer automatiquement (FBI-AAAA-#####)">
+            <Input name="caseNumber" placeholder="Automatique" />
           </Field>
           <Field label="Classification">
             <Select name="classification" defaultValue="UNCLASSIFIED">
-              <option value="UNCLASSIFIED">Unclassified</option>
-              <option value="RESTRICTED">Restricted</option>
-              <option value="CONFIDENTIAL">Confidential</option>
+              <option value="UNCLASSIFIED">Non classifié</option>
+              <option value="RESTRICTED">Restreint</option>
+              <option value="CONFIDENTIAL">Confidentiel</option>
               <option value="SECRET">Secret</option>
             </Select>
           </Field>
-          <Field label="Priority">
+          <Field label="Priorité">
             <Select name="priority" defaultValue="MEDIUM">
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="CRITICAL">Critical</option>
+              <option value="LOW">Faible</option>
+              <option value="MEDIUM">Moyenne</option>
+              <option value="HIGH">Élevée</option>
+              <option value="CRITICAL">Critique</option>
             </Select>
           </Field>
-          <Field label="Status">
+          <Field label="Statut">
             <Select name="status" defaultValue="OPEN">
-              <option value="OPEN">Open</option>
+              <option value="OPEN">Ouverte</option>
               <option value="ACTIVE">Active</option>
-              <option value="SUSPENDED">Suspended</option>
+              <option value="SUSPENDED">Suspendue</option>
             </Select>
           </Field>
           <Field label="Description" required error={errors.description} className="sm:col-span-2">
@@ -119,11 +119,11 @@ export function InvestigationForm({
         </div>
       </Section>
 
-      <Section title="Assignment">
+      <Section title="Affectation">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Lead Agent" hint="Defaults to you">
+          <Field label="Agent responsable" hint="Vous par défaut">
             <Select name="leadAgentId" defaultValue="">
-              <option value="">— You —</option>
+              <option value="">— Vous —</option>
               {agents.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.label}
@@ -144,14 +144,14 @@ export function InvestigationForm({
           <Field label="Division">
             <Input name="division" />
           </Field>
-          <Field label="Unit">
+          <Field label="Unité">
             <Input name="unit" />
           </Field>
-          <Field label="Task Force" className="sm:col-span-2">
+          <Field label="Groupe d'intervention" className="sm:col-span-2">
             <Input name="taskForce" />
           </Field>
           <div className="sm:col-span-2">
-            <p className="field-label">Assigned Agents</p>
+            <p className="field-label">Agents affectés</p>
             <div className="flex flex-wrap gap-2 rounded-md border border-navy-200 p-2">
               {agents.map((a) => (
                 <button
@@ -177,33 +177,33 @@ export function InvestigationForm({
           <Field label="Date">
             <Input name="incidentDate" type="date" />
           </Field>
-          <Field label="Jurisdiction">
-            <Input name="jurisdiction" placeholder="e.g. Los Santos County" />
+          <Field label="Juridiction">
+            <Input name="jurisdiction" placeholder="ex. comté de Los Santos" />
           </Field>
-          <Field label="Location" className="sm:col-span-2">
+          <Field label="Lieu" className="sm:col-span-2">
             <Input name="incidentLocation" />
           </Field>
         </div>
       </Section>
 
-      <Section title="Involved Persons">
+      <Section title="Personnes impliquées">
         <p className="mb-3 text-xs text-navy-500">
-          Enter one name per line. Person records are created automatically and become searchable.
+          Saisissez un nom par ligne. Les fiches de personnes sont créées automatiquement et deviennent consultables.
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Suspects">
             <Textarea name="suspects" rows={3} />
           </Field>
-          <Field label="Victims">
+          <Field label="Victimes">
             <Textarea name="victims" rows={3} />
           </Field>
-          <Field label="Witnesses">
+          <Field label="Témoins">
             <Textarea name="witnesses" rows={3} />
           </Field>
         </div>
       </Section>
 
-      <Section title="Crimes">
+      <Section title="Infractions">
         <div className="flex flex-wrap gap-2">
           {FEDERAL_CRIMES.map((c) => (
             <button
@@ -223,15 +223,15 @@ export function InvestigationForm({
       </Section>
 
       <Section title="Notes">
-        <Textarea name="notes" rows={4} placeholder="Initial case notes…" />
+        <Textarea name="notes" rows={4} placeholder="Notes initiales du dossier…" />
       </Section>
 
       <div className="flex gap-3">
         <Button type="submit" disabled={submitting}>
-          {submitting ? "Creating…" : "Create Case"}
+          {submitting ? "Création…" : "Créer le dossier"}
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.back()}>
-          Cancel
+          Annuler
         </Button>
       </div>
     </form>

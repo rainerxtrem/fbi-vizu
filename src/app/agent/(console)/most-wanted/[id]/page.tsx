@@ -57,7 +57,7 @@ export default async function AgentMostWantedDetail({
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
         <div>
           <Card className="mb-6">
-            <CardHeader title="Workflow" description="DRAFT → REVIEW → PUBLISHED → CAPTURED / LOCATED → ARCHIVED" />
+            <CardHeader title="Flux de validation" description="DRAFT → REVIEW → PUBLISHED → CAPTURED / LOCATED → ARCHIVED" />
             <CardBody>
               <MostWantedWorkflow id={mw.id} status={mw.status} caps={caps} />
             </CardBody>
@@ -67,7 +67,7 @@ export default async function AgentMostWantedDetail({
             tabs={[
               {
                 id: "public",
-                label: "Public Bulletin",
+                label: "Bulletin public",
                 content: (
                   <div className="space-y-3 text-sm">
                     {mw.photoUrl ? (
@@ -76,7 +76,7 @@ export default async function AgentMostWantedDetail({
                     ) : null}
                     <p className="prose-fia whitespace-pre-line">{mw.description}</p>
                     <div>
-                      <p className="font-semibold text-navy-700">Charges</p>
+                      <p className="font-semibold text-navy-700">Chefs d&apos;accusation</p>
                       <ul className="list-disc pl-5">
                         {mw.charges.map((c, i) => (
                           <li key={i}>{c}</li>
@@ -85,7 +85,7 @@ export default async function AgentMostWantedDetail({
                     </div>
                     {mw.status === "PUBLISHED" ? (
                       <Link href={`/most-wanted/${mw.id}`} target="_blank" className="link-underline">
-                        View live public page ↗
+                        Voir la page publique en ligne ↗
                       </Link>
                     ) : null}
                   </div>
@@ -95,7 +95,7 @@ export default async function AgentMostWantedDetail({
                 ? [
                     {
                       id: "edit",
-                      label: "Edit",
+                      label: "Modifier",
                       content: (
                         <MostWantedEditor
                           id={mw.id}
@@ -122,12 +122,12 @@ export default async function AgentMostWantedDetail({
                 : []),
               {
                 id: "tips",
-                label: "Tips",
+                label: "Renseignements",
                 count: mw.tips.length,
                 content: (
                   <div className="space-y-2 text-sm">
                     {mw.tips.length === 0 ? (
-                      <p className="text-navy-500">No tips received for this bulletin.</p>
+                      <p className="text-navy-500">Aucun renseignement reçu pour ce bulletin.</p>
                     ) : (
                       mw.tips.map((t) => (
                         <div key={t.id} className="rounded-lg border border-navy-200 bg-white p-3">
@@ -135,7 +135,7 @@ export default async function AgentMostWantedDetail({
                           <p className="text-navy-600">{t.description}</p>
                           <p className="mt-1 text-xs text-navy-400">
                             {t.publicId} · {formatDateTime(t.createdAt)} ·{" "}
-                            {t.anonymous ? "Anonymous" : t.name ?? "—"}
+                            {t.anonymous ? "Anonyme" : t.name ?? "—"}
                           </p>
                         </div>
                       ))
@@ -149,18 +149,18 @@ export default async function AgentMostWantedDetail({
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Bulletin Info" />
+            <CardHeader title="Informations du bulletin" />
             <CardBody className="space-y-2 text-sm">
-              <Row label="Reward" value={mw.reward ? formatMoney(mw.reward) : "—"} />
+              <Row label="Récompense" value={mw.reward ? formatMoney(mw.reward) : "—"} />
               <Row label="Case Number" value={mw.caseNumber} />
-              <Row label="Lead Agent" value={mw.leadAgent} />
-              <Row label="Created By" value={mw.createdBy?.user.name} />
-              <Row label="Reviewed By" value={mw.reviewedBy?.user.name} />
-              <Row label="Published" value={mw.publishedAt ? formatDate(mw.publishedAt) : null} />
+              <Row label="Agent responsable" value={mw.leadAgent} />
+              <Row label="Créé par" value={mw.createdBy?.user.name} />
+              <Row label="Révisé par" value={mw.reviewedBy?.user.name} />
+              <Row label="Publié le" value={mw.publishedAt ? formatDate(mw.publishedAt) : null} />
               {mw.investigation ? (
                 <div className="pt-1">
                   <Link href={`/agent/investigations/${mw.investigation.id}`} className="link-underline text-xs">
-                    Linked case: {mw.investigation.caseNumber}
+                    Dossier lié : {mw.investigation.caseNumber}
                   </Link>
                 </div>
               ) : null}

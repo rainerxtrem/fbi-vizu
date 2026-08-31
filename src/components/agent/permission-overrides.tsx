@@ -41,16 +41,16 @@ export function PermissionOverrides({
     });
     const j = await res.json();
     setBusy(false);
-    if (!res.ok) return toast("error", j.error ?? "Failed.");
-    toast("success", "Permission overrides saved.");
+    if (!res.ok) return toast("error", j.error ?? "Échec.");
+    toast("success", "Dérogations de permissions enregistrées.");
     router.refresh();
   }
 
   return (
     <div className="space-y-3">
       <p className="text-xs text-navy-500">
-        Click to cycle: <span className="text-emerald-600">granted</span> →{" "}
-        <span className="text-red-600">revoked</span> → default.
+        Cliquez pour alterner : <span className="text-emerald-600">accordée</span> →{" "}
+        <span className="text-red-600">révoquée</span> → par défaut.
       </p>
       <div className="flex max-h-64 flex-wrap gap-1.5 overflow-y-auto rounded-md border border-navy-200 p-2">
         {PERMISSIONS.map((p) => {
@@ -75,7 +75,7 @@ export function PermissionOverrides({
         })}
       </div>
       <Button size="sm" onClick={save} disabled={busy}>
-        {busy ? "Saving…" : "Save Overrides"}
+        {busy ? "Enregistrement…" : "Enregistrer les dérogations"}
       </Button>
     </div>
   );

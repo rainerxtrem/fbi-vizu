@@ -21,11 +21,11 @@ export default async function NewInvestigationPage() {
     <div className="max-w-4xl">
       <Breadcrumbs
         items={[
-          { label: "Investigations", href: "/agent/investigations" },
-          { label: "Create" },
+          { label: "Enquêtes", href: "/agent/investigations" },
+          { label: "Créer" },
         ]}
       />
-      <PageTitle title="Create Investigation" subtitle="Open a new federal case file" />
+      <PageTitle title="Créer une enquête" subtitle="Ouvrir un nouveau dossier fédéral" />
       <InvestigationForm
         agents={agents.map((a) => ({
           id: a.id,

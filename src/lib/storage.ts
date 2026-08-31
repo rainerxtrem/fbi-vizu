@@ -49,10 +49,10 @@ export async function storeUpload(
   description?: string,
 ): Promise<StoredFile> {
   if (file.size > MAX_BYTES) {
-    throw new Error(`File exceeds the ${MAX_BYTES / 1024 / 1024} MB limit.`);
+    throw new Error(`Le fichier dépasse la limite de ${MAX_BYTES / 1024 / 1024} Mo.`);
   }
   if (!ALLOWED_MIME.has(file.type)) {
-    throw new Error(`Unsupported file type: ${file.type || "unknown"}`);
+    throw new Error(`Type de fichier non pris en charge : ${file.type || "inconnu"}`);
   }
 
   const buf = Buffer.from(await file.arrayBuffer());

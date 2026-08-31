@@ -40,8 +40,8 @@ export default async function SuspectDetailPage({
       <Breadcrumbs items={[{ label: "Suspects", href: "/agent/suspects" }, { label: p.fullName }]} />
       <PageTitle
         title={p.fullName}
-        subtitle={p.alias ? `Alias “${p.alias}”` : undefined}
-        action={<Badge tone={RISK_LEVEL[p.riskLevel]?.tone}>{RISK_LEVEL[p.riskLevel]?.label} Risk</Badge>}
+        subtitle={p.alias ? `Alias « ${p.alias} »` : undefined}
+        action={<Badge tone={RISK_LEVEL[p.riskLevel]?.tone}>Risque {RISK_LEVEL[p.riskLevel]?.label}</Badge>}
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
@@ -50,7 +50,7 @@ export default async function SuspectDetailPage({
             tabs={[
               {
                 id: "profile",
-                label: "Profile",
+                label: "Profil",
                 content: (
                   <div className="space-y-4 text-sm">
                     {p.photoUrl ? (
@@ -64,7 +64,7 @@ export default async function SuspectDetailPage({
                       </CardBody>
                     </Card>
                     <Card>
-                      <CardHeader title="Criminal History" />
+                      <CardHeader title="Antécédents judiciaires" />
                       <CardBody>
                         <p className="whitespace-pre-line text-navy-700">{p.criminalHistory || "—"}</p>
                       </CardBody>
@@ -80,12 +80,12 @@ export default async function SuspectDetailPage({
               },
               {
                 id: "cases",
-                label: "Associated Cases",
+                label: "Dossiers associés",
                 count: p.investigations.length,
                 content: (
                   <div className="space-y-2">
                     {p.investigations.length === 0 ? (
-                      <p className="text-sm text-navy-500">Not linked to any investigations.</p>
+                      <p className="text-sm text-navy-500">Lié à aucune enquête.</p>
                     ) : (
                       p.investigations.map((ip) => (
                         <Link
@@ -108,14 +108,14 @@ export default async function SuspectDetailPage({
               },
               {
                 id: "links",
-                label: "Vehicles & Orgs",
+                label: "Véhicules et organisations",
                 content: (
                   <div className="space-y-4 text-sm">
                     <Card>
-                      <CardHeader title="Vehicles" />
+                      <CardHeader title="Véhicules" />
                       <CardBody>
                         {p.vehicles.length === 0 ? (
-                          <p className="text-navy-500">None.</p>
+                          <p className="text-navy-500">Aucun.</p>
                         ) : (
                           p.vehicles.map((v) => (
                             <p key={v.vehicleId}>
@@ -126,10 +126,10 @@ export default async function SuspectDetailPage({
                       </CardBody>
                     </Card>
                     <Card>
-                      <CardHeader title="Organizations" />
+                      <CardHeader title="Organisations" />
                       <CardBody>
                         {p.organizations.length === 0 ? (
-                          <p className="text-navy-500">None.</p>
+                          <p className="text-navy-500">Aucune.</p>
                         ) : (
                           p.organizations.map((o) => <p key={o.organizationId}>{o.organization.name}</p>)
                         )}
@@ -142,7 +142,7 @@ export default async function SuspectDetailPage({
                 ? [
                     {
                       id: "edit",
-                      label: "Edit",
+                      label: "Modifier",
                       content: (
                         <SuspectForm
                           mode={"edit" as const}
@@ -170,22 +170,22 @@ export default async function SuspectDetailPage({
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Identity" />
+            <CardHeader title="Identité" />
             <CardBody className="space-y-2 text-sm">
-              <Row label="Age" value={ageFromDob(p.dob)?.toString()} />
-              <Row label="DOB" value={p.dob ? formatDate(p.dob) : null} />
-              <Row label="Gender" value={p.gender} />
-              <Row label="Known Addresses" value={p.knownAddresses} />
-              <Row label="Record Created" value={formatDate(p.createdAt)} />
-              <Row label="Created By" value={p.createdBy?.user.name} />
+              <Row label="Âge" value={ageFromDob(p.dob)?.toString()} />
+              <Row label="Date de naissance" value={p.dob ? formatDate(p.dob) : null} />
+              <Row label="Genre" value={p.gender} />
+              <Row label="Adresses connues" value={p.knownAddresses} />
+              <Row label="Fiche créée le" value={formatDate(p.createdAt)} />
+              <Row label="Créée par" value={p.createdBy?.user.name} />
             </CardBody>
           </Card>
           <Card>
-            <CardHeader title="Enforcement" />
+            <CardHeader title="Application de la loi" />
             <CardBody className="space-y-2 text-sm">
-              <Row label="Warrants" value={p.warrants.length.toString()} />
-              <Row label="Arrests" value={p.arrests.length.toString()} />
-              <Row label="Evidence Items" value={p.evidence.length.toString()} />
+              <Row label="Mandats" value={p.warrants.length.toString()} />
+              <Row label="Arrestations" value={p.arrests.length.toString()} />
+              <Row label="Éléments de preuve" value={p.evidence.length.toString()} />
               <Row label="Most Wanted" value={p.mostWanted.length.toString()} />
             </CardBody>
           </Card>

@@ -7,6 +7,27 @@ import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 
+const CATEGORY_LABELS: [string, string][] = [
+  ["MOST_WANTED", "Most Wanted"],
+  ["FUGITIVE", "Fugitifs"],
+  ["ORGANIZED_CRIME", "Crime organisé"],
+  ["VIOLENT_CRIME", "Crime violent"],
+  ["TERRORISM", "Terrorisme"],
+  ["CYBER_CRIME", "Cybercriminalité"],
+  ["DRUG_TRAFFICKING", "Trafic de stupéfiants"],
+  ["WEAPONS", "Trafic d'armes"],
+  ["FINANCIAL_CRIME", "Criminalité financière"],
+  ["MISSING_PERSON", "Personnes disparues"],
+  ["SEEKING_INFORMATION", "Seeking Information"],
+];
+
+const DANGER_LABELS: [string, string][] = [
+  ["LOW", "Faible"],
+  ["MODERATE", "Modéré"],
+  ["HIGH", "Élevé"],
+  ["EXTREME", "Extrême"],
+];
+
 export function CreateMostWanted({
   investigationId,
   defaults,
@@ -25,10 +46,10 @@ export function CreateMostWanted({
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const ok = await confirm({
-      title: "Create Most Wanted bulletin?",
+      title: "Créer un bulletin Most Wanted ?",
       message:
-        "This creates a DRAFT bulletin pre-filled from the case. It will not be public until reviewed and published.",
-      confirmLabel: "Create Draft",
+        "Un bulletin au statut BROUILLON sera créé à partir du dossier. Il ne sera pas public tant qu'il n'aura pas été révisé et publié.",
+      confirmLabel: "Créer le brouillon",
     });
     if (!ok) return;
     setBusy(true);
@@ -55,24 +76,24 @@ export function CreateMostWanted({
     });
     const json = await res.json();
     setBusy(false);
-    if (!res.ok) return toast("error", json.error ?? "Failed.");
-    toast("success", `Draft ${json.data.publicId} created.`);
+    if (!res.ok) return toast("error", json.error ?? "Échec.");
+    toast("success", `Brouillon ${json.data.publicId} créé.`);
     router.push(`/agent/most-wanted/${json.data.id}`);
   }
 
   if (!open) {
     return (
       <Button size="sm" variant="danger" onClick={() => setOpen(true)}>
-        Create Most Wanted
+        Créer un Most Wanted
       </Button>
     );
   }
 
   return (
     <form onSubmit={submit} className="grid gap-3 rounded-lg border border-navy-200 bg-navy-50 p-4 sm:grid-cols-2">
-      <Field label="Subject (person)">
+      <Field label="Sujet (personne)">
         <Select name="personId" defaultValue="">
-          <option value="">— new —</option>
+          <option value="">— nouveau —</option>
           {persons.map((p) => (
             <option key={p.id} value={p.id}>
               {p.label}
@@ -80,47 +101,51 @@ export function CreateMostWanted({
           ))}
         </Select>
       </Field>
-      <Field label="Full Name" required>
+      <Field label="Nom complet" required>
         <Input name="fullName" required />
       </Field>
-      <Field label="Aliases">
+      <Field label="Alias">
         <Input name="aliases" />
       </Field>
-      <Field label="Age">
+      <Field label="Âge">
         <Input name="age" type="number" />
       </Field>
-      <Field label="Photo URL">
+      <Field label="URL de la photo">
         <Input name="photoUrl" placeholder="https://…" />
       </Field>
-      <Field label="Reward (USD)">
+      <Field label="Récompense (USD)">
         <Input name="reward" type="number" defaultValue={0} />
       </Field>
-      <Field label="Category">
+      <Field label="Catégorie">
         <Select name="category" defaultValue="MOST_WANTED">
-          {["MOST_WANTED", "FUGITIVE", "ORGANIZED_CRIME", "VIOLENT_CRIME", "TERRORISM", "CYBER_CRIME", "DRUG_TRAFFICKING", "WEAPONS", "FINANCIAL_CRIME", "MISSING_PERSON", "SEEKING_INFORMATION"].map((c) => (
-            <option key={c}>{c}</option>
+          {CATEGORY_LABELS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
           ))}
         </Select>
       </Field>
-      <Field label="Danger Level">
+      <Field label="Niveau de dangerosité">
         <Select name="dangerLevel" defaultValue="HIGH">
-          {["LOW", "MODERATE", "HIGH", "EXTREME"].map((c) => (
-            <option key={c}>{c}</option>
+          {DANGER_LABELS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
           ))}
         </Select>
       </Field>
-      <Field label="Last Known Location" className="sm:col-span-2">
+      <Field label="Dernière localisation connue" className="sm:col-span-2">
         <Input name="lastKnownLocation" />
       </Field>
-      <Field label="Public Description" className="sm:col-span-2">
+      <Field label="Description publique" className="sm:col-span-2">
         <Textarea name="description" rows={3} required />
       </Field>
       <div className="flex gap-2 sm:col-span-2">
         <Button size="sm" type="submit" disabled={busy}>
-          {busy ? "Creating…" : "Create Draft"}
+          {busy ? "Création…" : "Créer le brouillon"}
         </Button>
         <Button size="sm" type="button" variant="secondary" onClick={() => setOpen(false)}>
-          Cancel
+          Annuler
         </Button>
       </div>
     </form>

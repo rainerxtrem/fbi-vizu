@@ -64,11 +64,11 @@ export function TipForm({
         }
         setErrors(fe);
       }
-      toast("error", json.error ?? "Could not submit your tip.");
+      toast("error", json.error ?? "Impossible d'envoyer votre renseignement.");
       return;
     }
     setResult(json.data.publicId);
-    toast("success", "Your tip has been submitted.");
+    toast("success", "Votre renseignement a été transmis.");
   }
 
   if (result) {
@@ -76,14 +76,14 @@ export function TipForm({
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-6 text-center">
         <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
         <h3 className="mt-3 text-lg font-semibold text-navy-900">
-          Thank you. Your information has been submitted to the Federal
-          Investigative Agency.
+          Merci. Vos informations ont été transmises au Federal Bureau of
+          Investigation.
         </h3>
         <p className="mt-2 text-sm text-navy-600">
-          Reference number: <span className="font-mono font-semibold">{result}</span>
+          Numéro de référence : <span className="font-mono font-semibold">{result}</span>
         </p>
         <p className="mt-1 text-xs text-navy-500">
-          Keep this number for your records. An agent will review your submission.
+          Conservez ce numéro. Un Agent examinera votre transmission.
         </p>
       </div>
     );
@@ -98,30 +98,30 @@ export function TipForm({
           onChange={(e) => setAnon(e.target.checked)}
           className="h-4 w-4 rounded border-navy-300"
         />
-        Submit anonymously (contact fields will be omitted)
+        Envoyer de manière anonyme (les coordonnées seront omises)
       </label>
 
       {!anon ? (
         <div className={compact ? "space-y-4" : "grid gap-4 sm:grid-cols-3"}>
-          <Field label="Name" htmlFor="name" error={errors.name}>
+          <Field label="Nom" htmlFor="name" error={errors.name}>
             <Input id="name" name="name" autoComplete="name" />
           </Field>
-          <Field label="Email" htmlFor="email" error={errors.email}>
+          <Field label="Adresse e-mail" htmlFor="email" error={errors.email}>
             <Input id="email" name="email" type="email" autoComplete="email" />
           </Field>
-          <Field label="Phone" htmlFor="phone" error={errors.phone}>
+          <Field label="Numéro de téléphone" htmlFor="phone" error={errors.phone}>
             <Input id="phone" name="phone" type="tel" autoComplete="tel" />
           </Field>
         </div>
       ) : null}
 
-      <Field label="Subject" htmlFor="subject" required error={errors.subject}>
-        <Input id="subject" name="subject" required placeholder="Brief summary of your information" />
+      <Field label="Objet" htmlFor="subject" required error={errors.subject}>
+        <Input id="subject" name="subject" required placeholder="Résumé bref de votre information" />
       </Field>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Location" htmlFor="location" error={errors.location}>
-          <Input id="location" name="location" placeholder="Where did this occur / where is the subject?" />
+        <Field label="Localisation" htmlFor="location" error={errors.location}>
+          <Input id="location" name="location" placeholder="Où les faits se sont-ils produits / où se trouve la personne ?" />
         </Field>
         <Field label="Date" htmlFor="incidentDate" error={errors.incidentDate}>
           <Input id="incidentDate" name="incidentDate" type="date" />
@@ -129,16 +129,16 @@ export function TipForm({
       </div>
 
       <Field
-        label="Description of the information"
+        label="Description des faits"
         htmlFor="description"
         required
         error={errors.description}
-        hint="Include names, vehicles, dates, and anything else that may help investigators."
+        hint="Indiquez les noms, véhicules, dates et tout élément pouvant aider les enquêteurs."
       >
         <Textarea id="description" name="description" rows={6} required />
       </Field>
 
-      <Field label="Attachment" htmlFor="attachment" hint="Optional. Photo, video, PDF or audio — 25 MB max.">
+      <Field label="Pièce jointe" htmlFor="attachment" hint="Facultatif. Photo, vidéo, PDF ou audio — 25 Mo max.">
         <input
           id="attachment"
           name="attachment"
@@ -148,10 +148,10 @@ export function TipForm({
       </Field>
 
       <Button type="submit" disabled={submitting}>
-        {submitting ? "Submitting…" : "Submit a Tip"}
+        {submitting ? "Envoi…" : "Submit a Tip"}
       </Button>
       <p className="text-xs text-navy-400">
-        Providing false information to a federal agency is a criminal offense.
+        Fournir de fausses informations à une agence fédérale constitue une infraction pénale.
       </p>
     </form>
   );

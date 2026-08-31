@@ -78,11 +78,11 @@ export function ApplicationForm() {
           fe[k] = (v as string[])[0];
         setErrors(fe);
       }
-      toast("error", json.error ?? "Could not submit your application.");
+      toast("error", json.error ?? "Impossible d'envoyer votre candidature.");
       return;
     }
     setRef(json.data.publicId);
-    toast("success", "Application submitted.");
+    toast("success", "Candidature envoyée.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -90,11 +90,11 @@ export function ApplicationForm() {
     return (
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-8 text-center">
         <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-        <h3 className="mt-3 text-xl font-semibold">Application received</h3>
+        <h3 className="mt-3 text-xl font-semibold">Candidature reçue</h3>
         <p className="mt-2 text-navy-600">
-          Your application reference is{" "}
-          <span className="font-mono font-semibold">{ref}</span>. A recruiter
-          will contact you regarding next steps.
+          Votre référence de candidature est{" "}
+          <span className="font-mono font-semibold">{ref}</span>. Un recruteur
+          vous contactera au sujet des prochaines étapes.
         </p>
       </div>
     );
@@ -107,51 +107,51 @@ export function ApplicationForm() {
     <form onSubmit={onSubmit} className="space-y-10">
       <fieldset className="space-y-4">
         <legend className="text-lg font-bold uppercase tracking-wide">
-          Personal Information
+          Informations personnelles
         </legend>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="First Name" required error={errors.firstName}>
+          <Field label="Prénom" required error={errors.firstName}>
             <Input name="firstName" required />
           </Field>
-          <Field label="Last Name" required error={errors.lastName}>
+          <Field label="Nom" required error={errors.lastName}>
             <Input name="lastName" required />
           </Field>
-          <Field label="Date of Birth" error={errors.dob}>
+          <Field label="Date de naissance" error={errors.dob}>
             <Input name="dob" type="date" />
           </Field>
-          <Field label="Phone" required error={errors.phone}>
+          <Field label="Numéro de téléphone" required error={errors.phone}>
             <Input name="phone" type="tel" required />
           </Field>
-          <Field label="Email" required error={errors.email}>
+          <Field label="Adresse e-mail" required error={errors.email}>
             <Input name="email" type="email" required />
           </Field>
-          <Field label="Address" error={errors.address}>
+          <Field label="Adresse" error={errors.address}>
             <Input name="address" />
           </Field>
-          <Field label="City" error={errors.city}>
+          <Field label="Ville" error={errors.city}>
             <Input name="city" />
           </Field>
-          <Field label="State" error={errors.state}>
+          <Field label="État" error={errors.state}>
             <Input name="state" defaultValue="San Andreas" />
           </Field>
-          <Field label="ZIP Code" error={errors.zip}>
+          <Field label="Code postal" error={errors.zip}>
             <Input name="zip" />
           </Field>
         </div>
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="text-lg font-bold uppercase tracking-wide">Experience</legend>
-        <Field label="Current Occupation">
+        <legend className="text-lg font-bold uppercase tracking-wide">Expérience professionnelle</legend>
+        <Field label="Profession actuelle">
           <Input name="currentOccupation" />
         </Field>
-        <Field label="Previous Law Enforcement Experience">
+        <Field label="Expérience dans les forces de l'ordre">
           <Textarea name="priorLeExperience" />
         </Field>
-        <Field label="Military Experience">
+        <Field label="Expérience militaire">
           <Textarea name="militaryExperience" />
         </Field>
-        <Field label="Education">
+        <Field label="Formation">
           <Textarea name="education" rows={2} />
         </Field>
         <Field label="Certifications">
@@ -160,8 +160,8 @@ export function ApplicationForm() {
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="text-lg font-bold uppercase tracking-wide">Position</legend>
-        <Field label="Position Applied For" required error={errors.position}>
+        <legend className="text-lg font-bold uppercase tracking-wide">Poste souhaité</legend>
+        <Field label="Poste souhaité" required error={errors.position}>
           <Select name="position" required defaultValue="SPECIAL_AGENT">
             {Object.entries(APPLICATION_POSITION).map(([k, v]) => (
               <option key={k} value={k}>
@@ -174,46 +174,46 @@ export function ApplicationForm() {
 
       <fieldset className="space-y-4">
         <legend className="text-lg font-bold uppercase tracking-wide">Questions</legend>
-        <Field label="Why do you want to join the FIA?">
+        <Field label="Pourquoi souhaitez-vous rejoindre le FBI ?">
           <Textarea name="whyJoin" />
         </Field>
-        <Field label="What makes you a good candidate?">
+        <Field label="Qu'est-ce qui fait de vous un bon candidat ?">
           <Textarea name="whyGoodCandidate" />
         </Field>
-        <Field label="Describe a situation where you had to make a difficult decision.">
+        <Field label="Décrivez une situation où vous avez dû prendre une décision difficile.">
           <Textarea name="difficultDecision" />
         </Field>
-        <Field label="Describe your experience working under pressure.">
+        <Field label="Décrivez votre expérience du travail sous pression.">
           <Textarea name="pressureExperience" />
         </Field>
       </fieldset>
 
       <fieldset className="space-y-4">
         <legend className="text-lg font-bold uppercase tracking-wide">Documents</legend>
-        <Field label="Resume">
+        <Field label="CV">
           <input type="file" name="resume" className={fileInput} />
         </Field>
-        <Field label="Identification">
+        <Field label="Pièce d'identité">
           <input type="file" name="identification" className={fileInput} />
         </Field>
         <Field label="Certifications">
           <input type="file" name="certDoc" className={fileInput} />
         </Field>
-        <Field label="Additional Documents">
+        <Field label="Documents complémentaires">
           <input type="file" name="additional" className={fileInput} />
         </Field>
       </fieldset>
 
       <label className="flex items-start gap-2 text-sm text-navy-700">
         <input type="checkbox" name="certified" required className="mt-1 h-4 w-4" />
-        I certify that the information provided is accurate and complete.
+        Je certifie que les informations fournies sont exactes et complètes.
       </label>
       {errors.certified ? (
         <p className="text-xs text-federal-accent">{errors.certified}</p>
       ) : null}
 
       <Button type="submit" size="lg" disabled={submitting}>
-        {submitting ? "Submitting…" : "Submit Application"}
+        {submitting ? "Envoi…" : "Soumettre la candidature"}
       </Button>
     </form>
   );

@@ -63,7 +63,7 @@ export const POST = handle(async (req: Request) => {
     action: "suspect.create",
     entityType: "person",
     entityId: person.id,
-    summary: `${actor.name} created person record for ${person.fullName}`,
+    summary: `${actor.name} a créé la fiche de ${person.fullName}`,
   });
 
   return created(person);

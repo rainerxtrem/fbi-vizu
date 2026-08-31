@@ -62,7 +62,7 @@ export async function requirePermission(permission: Permission): Promise<Actor> 
 export async function requireApiActor(): Promise<Actor> {
   const actor = await getActor();
   if (!actor) {
-    const e = new RbacError("Authentication required");
+    const e = new RbacError("Authentification requise");
     e.status = 401;
     throw e;
   }
@@ -71,6 +71,6 @@ export async function requireApiActor(): Promise<Actor> {
 
 export async function requireApiPermission(permission: Permission): Promise<Actor> {
   const actor = await requireApiActor();
-  if (!can(actor, permission)) throw new RbacError(`Missing permission: ${permission}`);
+  if (!can(actor, permission)) throw new RbacError(`Permission manquante : ${permission}`);
   return actor;
 }

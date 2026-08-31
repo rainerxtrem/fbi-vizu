@@ -1,12 +1,13 @@
 import { RANK_ABBR, RANK_LABELS, type Rank } from "@/lib/rbac";
 import type { Actor } from "@/lib/rbac";
+import { AGENT_STATUS } from "@/lib/constants";
 
 export function AgentBadge({ actor }: { actor: Actor }) {
   if (!actor.agent) {
     return (
       <div className="text-right">
         <p className="text-sm font-semibold text-navy-900">{actor.name}</p>
-        <p className="text-xs text-navy-500">Platform Administrator</p>
+        <p className="text-xs text-navy-500">Administrateur de la plateforme</p>
       </div>
     );
   }
@@ -28,7 +29,7 @@ export function AgentBadge({ actor }: { actor: Actor }) {
               a.status === "ACTIVE" ? "text-emerald-600" : "text-amber-600"
             }
           >
-            {a.status}
+            {AGENT_STATUS[a.status] ?? a.status}
           </span>
         </p>
       </div>

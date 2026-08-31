@@ -27,7 +27,7 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const mw = await load(params.id);
-  if (!mw) return { title: "Case not found" };
+  if (!mw) return { title: "Dossier introuvable" };
   return {
     title: `${mw.fullName} — Most Wanted`,
     description: mw.description.slice(0, 155),
@@ -50,7 +50,7 @@ export default async function MostWantedDetail({
         <div className="container-fia py-10">
           <Breadcrumbs
             items={[
-              { label: "Home", href: "/" },
+              { label: "Accueil", href: "/" },
               { label: "Most Wanted", href: "/most-wanted" },
               { label: mw.fullName },
             ]}
@@ -63,7 +63,7 @@ export default async function MostWantedDetail({
       </div>
 
       <div className="container-fia grid gap-10 py-10 lg:grid-cols-[340px_1fr]">
-        {/* IDENTITY */}
+        {/* IDENTITÉ */}
         <div>
           <div className="overflow-hidden rounded-lg border border-navy-200 bg-navy-100">
             {mw.photoUrl ? (
@@ -75,53 +75,56 @@ export default async function MostWantedDetail({
               />
             ) : (
               <div className="flex aspect-[4/5] items-center justify-center text-navy-400">
-                No Photograph Available
+                Aucune photographie disponible
               </div>
             )}
           </div>
 
           <dl className="mt-4 divide-y divide-navy-100 rounded-lg border border-navy-200 text-sm">
-            <Row label="Status">
+            <Row label="Statut">
               <Badge tone={captured ? "green" : "red"}>
-                {captured
-                  ? MOST_WANTED_STATUS[mw.status]?.label ?? mw.status
-                  : "At Large"}
+                {mw.status === "CAPTURED"
+                  ? "Captured"
+                  : mw.status === "LOCATED"
+                    ? "Localisé"
+                    : "At Large"}
               </Badge>
             </Row>
-            <Row label="Danger Level">
+            <Row label="Niveau de dangerosité">
               <Badge tone={DANGER_LEVEL[mw.dangerLevel]?.tone ?? "amber"}>
                 {DANGER_LEVEL[mw.dangerLevel]?.label ?? mw.dangerLevel}
               </Badge>
             </Row>
-            <Row label="Reward">
+            <Row label="Récompense">
               <span className="font-bold">
-                {mw.reward > 0 ? `Up to ${formatMoney(mw.reward)}` : "—"}
+                {mw.reward > 0 ? `Jusqu'à ${formatMoney(mw.reward)}` : "—"}
               </span>
             </Row>
-            <Row label="Category">
+            <Row label="Catégorie">
               {MOST_WANTED_CATEGORY[mw.category] ?? mw.category}
             </Row>
-            {mw.aliases ? <Row label="Aliases">{mw.aliases}</Row> : null}
-            {mw.age ? <Row label="Age">{mw.age}</Row> : null}
+            {mw.aliases ? <Row label="Alias">{mw.aliases}</Row> : null}
+            {mw.age ? <Row label="Âge">{mw.age} ans</Row> : null}
           </dl>
 
           <div className="mt-4 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <p>
-              Should be considered {DANGER_LEVEL[mw.dangerLevel]?.label.toLowerCase()}{" "}
-              risk. Do not attempt to apprehend this individual. Contact the FIA
-              or your local law enforcement immediately.
+              Doit être considéré comme présentant un risque{" "}
+              {(DANGER_LEVEL[mw.dangerLevel]?.label ?? "").toLowerCase()}. N'essayez
+              pas d'appréhender cet individu. Contactez immédiatement le FBI ou les
+              forces de l'ordre locales.
             </p>
           </div>
         </div>
 
-        {/* DETAIL */}
+        {/* DÉTAIL */}
         <div className="space-y-10">
           <Section title="Description">
             <p className="prose-fia whitespace-pre-line">{mw.description}</p>
           </Section>
 
-          <Section title="Charges">
+          <Section title="Chefs d'accusation">
             {mw.charges.length ? (
               <ul className="list-disc space-y-1 pl-5 text-navy-800">
                 {mw.charges.map((c, i) => (
@@ -129,49 +132,49 @@ export default async function MostWantedDetail({
                 ))}
               </ul>
             ) : (
-              <p className="text-navy-500">Charges pending.</p>
+              <p className="text-navy-500">Chefs d'accusation en attente.</p>
             )}
           </Section>
 
-          <Section title="Last Known Information">
+          <Section title="Dernières informations connues">
             <dl className="grid gap-3 sm:grid-cols-2">
-              <Info label="Last Known Location" value={mw.lastKnownLocation} />
-              <Info label="Vehicle" value={mw.vehicle} />
-              <Info label="Associates" value={mw.associates} />
-              <Info label="Known Organizations" value={mw.knownOrganizations} />
+              <Info label="Dernière localisation connue" value={mw.lastKnownLocation} />
+              <Info label="Véhicule" value={mw.vehicle} />
+              <Info label="Complices" value={mw.associates} />
+              <Info label="Organisations connues" value={mw.knownOrganizations} />
               <Info
-                label="Date Last Seen"
+                label="Date de dernière observation"
                 value={mw.dateLastSeen ? formatDate(mw.dateLastSeen) : null}
               />
             </dl>
           </Section>
 
-          <Section title="Case Information">
+          <Section title="Informations sur le dossier">
             <dl className="grid gap-3 sm:grid-cols-2">
               <Info label="Case Number" value={mw.caseNumber ?? mw.publicId} mono />
-              <Info label="Lead Agency" value={mw.leadAgency} />
-              <Info label="Lead Agent" value={mw.leadAgent} />
+              <Info label="Agence responsable" value={mw.leadAgency} />
+              <Info label="Agent responsable" value={mw.leadAgent} />
               <Info
-                label="Opened"
+                label="Ouvert le"
                 value={mw.openedDate ? formatDate(mw.openedDate) : null}
               />
               <Info
-                label="Published"
+                label="Publié le"
                 value={mw.publishedAt ? formatDate(mw.publishedAt) : null}
               />
-              <Info label="Status" value={MOST_WANTED_STATUS[mw.status]?.label} />
+              <Info label="Statut" value={MOST_WANTED_STATUS[mw.status]?.label} />
             </dl>
           </Section>
 
-          {/* PUBLIC TIP */}
+          {/* RENSEIGNEMENT PUBLIC */}
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-6" id="tip">
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-navy-700" />
-              <h2 className="text-lg font-bold">Have Information?</h2>
+              <h2 className="text-lg font-bold">Vous avez des informations ?</h2>
             </div>
             <p className="mt-1 text-sm text-navy-600">
-              If you have information concerning this individual, submit a tip to
-              the FIA. You may submit anonymously.
+              Si vous détenez des informations concernant cet individu, soumettez
+              un renseignement au FBI. Vous pouvez le faire de manière anonyme.
             </p>
             <div className="mt-5">
               <TipForm mostWantedId={mw.id} compact />

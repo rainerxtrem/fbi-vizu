@@ -27,7 +27,7 @@ export default async function AgentMostWantedPage({
 
   return (
     <div>
-      <PageTitle title="Most Wanted Bulletins" subtitle={`${rows.length} records`} />
+      <PageTitle title="Bulletins Most Wanted" subtitle={`${rows.length} fiches`} />
       <div className="mb-4 flex flex-wrap gap-2">
         {tabs.map((t) => (
           <Link
@@ -40,15 +40,15 @@ export default async function AgentMostWantedPage({
                 : "border-navy-200 text-navy-600 hover:bg-navy-50",
             )}
           >
-            {t === "ALL" ? "All" : MOST_WANTED_STATUS[t].label}
+            {t === "ALL" ? "Tous" : MOST_WANTED_STATUS[t].label}
           </Link>
         ))}
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState title="No bulletins" description="Create one from an investigation." />
+        <EmptyState title="Aucun bulletin" description="Créez-en un à partir d'une enquête." />
       ) : (
-        <DataTable head={["ID", "Name", "Category", "Danger", "Reward", "Status", "Updated"]}>
+        <DataTable head={["ID", "Nom", "Catégorie", "Danger", "Récompense", "Statut", "Maj"]}>
           {rows.map((mw) => (
             <tr key={mw.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5 font-mono text-xs text-navy-500">

@@ -19,10 +19,10 @@ export const tipSchema = z.object({
   name: optionalStr(200),
   email: z.string().trim().email().max(200).optional().or(z.literal("").transform(() => undefined)),
   phone: optionalStr(50),
-  subject: str(200).min(3, "Subject is required"),
+  subject: str(200).min(3, "L'objet est requis"),
   location: optionalStr(300),
   incidentDate: optionalStr(40),
-  description: str(8000).min(10, "Please describe the information you have"),
+  description: str(8000).min(10, "Merci de décrire les informations dont vous disposez"),
   mostWantedId: optionalStr(40),
   fileUrl: optionalStr(500),
 });
@@ -60,7 +60,7 @@ export const applicationSchema = z.object({
   certUrl: optionalStr(500),
   additionalUrl: optionalStr(500),
   certified: z.literal(true, {
-    errorMap: () => ({ message: "You must certify that the information is accurate." }),
+    errorMap: () => ({ message: "Vous devez certifier l'exactitude des informations." }),
   }),
 });
 

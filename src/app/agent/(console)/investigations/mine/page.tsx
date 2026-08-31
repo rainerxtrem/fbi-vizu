@@ -24,11 +24,11 @@ export default async function MyInvestigationsPage() {
 
   return (
     <div>
-      <PageTitle title="My Investigations" subtitle={`${rows.length} assigned to you`} />
+      <PageTitle title="Mes enquêtes" subtitle={`${rows.length} qui vous sont affectées`} />
       {rows.length === 0 ? (
-        <EmptyState title="You have no assigned investigations" />
+        <EmptyState title="Vous n'avez aucune enquête affectée" />
       ) : (
-        <DataTable head={["Case", "Title", "Role", "Priority", "Status", "Updated"]}>
+        <DataTable head={["Case", "Titre", "Rôle", "Priorité", "Statut", "Maj"]}>
           {rows.map((r) => (
             <tr key={r.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5 font-mono text-xs text-navy-500">
@@ -42,7 +42,7 @@ export default async function MyInvestigationsPage() {
                 </Link>
               </td>
               <td className="px-4 py-2.5 text-xs text-navy-600">
-                {r.leadAgentId === agentId ? "Lead Agent" : "Assigned Agent"}
+                {r.leadAgentId === agentId ? "Agent responsable" : "Agent affecté"}
               </td>
               <td className="px-4 py-2.5">
                 <Badge tone={PRIORITY[r.priority]?.tone}>{PRIORITY[r.priority]?.label}</Badge>

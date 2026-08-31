@@ -9,18 +9,18 @@ import { ConfirmProvider } from "@/components/ui/confirm";
 export const dynamic = "force-dynamic";
 
 const ALL_NAV: NavItem[] = [
-  { href: "/agent", label: "Dashboard", icon: "LayoutDashboard" },
-  { href: "/agent/investigations/mine", label: "My Investigations", icon: "FolderSearch" },
-  { href: "/agent/investigations", label: "All Investigations", icon: "FolderSearch", perm: "investigation.view" },
-  { href: "/agent/investigations/new", label: "Create Investigation", icon: "FolderPlus", perm: "investigation.create" },
+  { href: "/agent", label: "Tableau de bord", icon: "LayoutDashboard" },
+  { href: "/agent/investigations/mine", label: "Mes enquêtes", icon: "FolderSearch" },
+  { href: "/agent/investigations", label: "Toutes les enquêtes", icon: "FolderSearch", perm: "investigation.view" },
+  { href: "/agent/investigations/new", label: "Créer une enquête", icon: "FolderPlus", perm: "investigation.create" },
   { href: "/agent/most-wanted", label: "Most Wanted", icon: "ShieldAlert", perm: "mostwanted.view" },
   { href: "/agent/suspects", label: "Suspects", icon: "UserSquare2", perm: "suspect.view" },
-  { href: "/agent/news", label: "News", icon: "Newspaper", perm: "news.view" },
-  { href: "/agent/applications", label: "Applications", icon: "ClipboardList", perm: "applications.view" },
-  { href: "/agent/tips", label: "Tips", icon: "Inbox", perm: "tips.view" },
+  { href: "/agent/news", label: "Actualités", icon: "Newspaper", perm: "news.view" },
+  { href: "/agent/applications", label: "Candidatures", icon: "ClipboardList", perm: "applications.view" },
+  { href: "/agent/tips", label: "Renseignements", icon: "Inbox", perm: "tips.view" },
   { href: "/agent/agents", label: "Agents", icon: "UsersRound", perm: "agents.view" },
-  { href: "/agent/activity", label: "Activity Logs", icon: "ScrollText", perm: "audit.view" },
-  { href: "/agent/settings", label: "Settings", icon: "Settings" },
+  { href: "/agent/activity", label: "Journal d'activité", icon: "ScrollText", perm: "audit.view" },
+  { href: "/agent/settings", label: "Paramètres", icon: "Settings" },
 ];
 
 export default async function AgentLayout({

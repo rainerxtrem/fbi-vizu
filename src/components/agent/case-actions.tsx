@@ -32,6 +32,14 @@ async function api(url: string, method: string, body: unknown) {
   return { ok: r.ok, json: await r.json() };
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  OPEN: "Ouverte",
+  ACTIVE: "Active",
+  SUSPENDED: "Suspendue",
+  CLOSED: "Clôturée",
+  ARCHIVED: "Archivée",
+};
+
 export function CaseStatusControl({ investigationId, currentStatus, isPublic, perms }: Props) {
   const router = useRouter();
   const { toast } = useToast();
@@ -42,9 +50,9 @@ export function CaseStatusControl({ investigationId, currentStatus, isPublic, pe
     if (status === currentStatus) return;
     if (["CLOSED", "ARCHIVED"].includes(status)) {
       const ok = await confirm({
-        title: `Move case to ${status}?`,
-        message: "This updates the case status everywhere it appears.",
-        confirmLabel: status === "CLOSED" ? "Close Case" : "Archive",
+        title: `Passer le dossier au statut « ${STATUS_LABELS[status]} » ?`,
+        message: "Le statut du dossier sera mis à jour partout où il apparaît.",
+        confirmLabel: status === "CLOSED" ? "Clôturer le dossier" : "Archiver",
         danger: true,
       });
       if (!ok) return;
@@ -52,32 +60,32 @@ export function CaseStatusControl({ investigationId, currentStatus, isPublic, pe
     setBusy(true);
     const { ok, json } = await api(`/api/investigations/${investigationId}`, "PATCH", { status });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Update failed.");
-    toast("success", `Status changed to ${status}.`);
+    if (!ok) return toast("error", json.error ?? "Échec de la mise à jour.");
+    toast("success", `Statut changé en « ${STATUS_LABELS[status] ?? status} ».`);
     router.refresh();
   }
 
   async function togglePublic() {
     const next = !isPublic;
     const ok = await confirm({
-      title: next ? "Publish case to the public site?" : "Remove case from public site?",
+      title: next ? "Publier le dossier sur le site public ?" : "Retirer le dossier du site public ?",
       message: next
-        ? "A summary, charges and timeline will be visible on FIA.gov."
-        : "The public case page will no longer be accessible.",
-      confirmLabel: next ? "Publish" : "Unpublish",
+        ? "Un résumé, les chefs d'accusation et la chronologie seront visibles sur FBI.gov."
+        : "La page publique du dossier ne sera plus accessible.",
+      confirmLabel: next ? "Publier" : "Dépublier",
     });
     if (!ok) return;
     setBusy(true);
     const res = await api(`/api/investigations/${investigationId}`, "PATCH", { isPublic: next });
     setBusy(false);
-    if (!res.ok) return toast("error", res.json.error ?? "Update failed.");
-    toast("success", next ? "Case published." : "Case unpublished.");
+    if (!res.ok) return toast("error", res.json.error ?? "Échec de la mise à jour.");
+    toast("success", next ? "Dossier publié." : "Dossier dépublié.");
     router.refresh();
   }
 
   return (
     <div className="space-y-3">
-      <Field label="Case Status">
+      <Field label="Statut du dossier">
         <Select
           value={currentStatus}
           disabled={busy || (!perms.edit && !perms.close)}
@@ -85,14 +93,14 @@ export function CaseStatusControl({ investigationId, currentStatus, isPublic, pe
         >
           {["OPEN", "ACTIVE", "SUSPENDED", "CLOSED", "ARCHIVED"].map((s) => (
             <option key={s} value={s}>
-              {s}
+              {STATUS_LABELS[s]}
             </option>
           ))}
         </Select>
       </Field>
       {perms.publish ? (
         <Button variant={isPublic ? "secondary" : "primary"} size="sm" onClick={togglePublic} disabled={busy}>
-          {isPublic ? "Unpublish from FIA.gov" : "Publish to FIA.gov"}
+          {isPublic ? "Retirer de FBI.gov" : "Publier sur FBI.gov"}
         </Button>
       ) : null}
     </div>
@@ -110,17 +118,17 @@ export function AddNote({ investigationId }: { investigationId: string }) {
     setBusy(true);
     const { ok, json } = await api(`/api/investigations/${investigationId}/notes`, "POST", { body });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Failed.");
+    if (!ok) return toast("error", json.error ?? "Échec.");
     setBody("");
-    toast("success", "Note added.");
+    toast("success", "Note ajoutée.");
     router.refresh();
   }
 
   return (
     <div className="space-y-2">
-      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Add a case note…" />
+      <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Ajouter une note au dossier…" />
       <Button size="sm" onClick={submit} disabled={busy}>
-        {busy ? "Saving…" : "Add Note"}
+        {busy ? "Enregistrement…" : "Ajouter une note"}
       </Button>
     </div>
   );
@@ -137,17 +145,17 @@ export function AddTimelineEntry({ investigationId }: { investigationId: string 
     setBusy(true);
     const { ok, json } = await api(`/api/investigations/${investigationId}/timeline`, "POST", { message });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Failed.");
+    if (!ok) return toast("error", json.error ?? "Échec.");
     setMessage("");
-    toast("success", "Timeline entry added.");
+    toast("success", "Entrée de chronologie ajoutée.");
     router.refresh();
   }
 
   return (
     <div className="flex gap-2">
-      <Input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Describe an action or development…" />
+      <Input value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Décrire une action ou un développement…" />
       <Button size="sm" onClick={submit} disabled={busy}>
-        Add
+        Ajouter
       </Button>
     </div>
   );
@@ -178,7 +186,7 @@ export function AddEvidence({
       if (j.ok) fileUrl = j.data.url;
       else {
         setBusy(false);
-        return toast("error", j.error ?? "Upload failed.");
+        return toast("error", j.error ?? "Échec du téléversement.");
       }
     }
     const { ok, json } = await api("/api/evidence", "POST", {
@@ -191,31 +199,45 @@ export function AddEvidence({
       fileUrl,
     });
     setBusy(false);
-    if (!ok) return toast("error", json.error ?? "Failed.");
+    if (!ok) return toast("error", json.error ?? "Échec.");
     (e.target as HTMLFormElement).reset();
-    toast("success", "Evidence logged.");
+    toast("success", "Preuve enregistrée.");
     router.refresh();
   }
 
   return (
     <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
-      <Field label="Title" required>
+      <Field label="Intitulé" required>
         <Input name="title" required />
       </Field>
       <Field label="Type">
         <Select name="type" defaultValue="PHYSICAL">
-          {["PHYSICAL", "DIGITAL", "DOCUMENT", "PHOTO", "VIDEO", "AUDIO", "FIREARM", "NARCOTIC", "FINANCIAL", "BIOLOGICAL", "OTHER"].map((t) => (
-            <option key={t}>{t}</option>
+          {[
+            ["PHYSICAL", "Physique"],
+            ["DIGITAL", "Numérique"],
+            ["DOCUMENT", "Document"],
+            ["PHOTO", "Photographie"],
+            ["VIDEO", "Vidéo"],
+            ["AUDIO", "Audio"],
+            ["FIREARM", "Arme à feu"],
+            ["NARCOTIC", "Stupéfiant"],
+            ["FINANCIAL", "Financier"],
+            ["BIOLOGICAL", "Biologique"],
+            ["OTHER", "Autre"],
+          ].map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
           ))}
         </Select>
       </Field>
       <Field label="Description" className="sm:col-span-2">
         <Textarea name="description" rows={2} />
       </Field>
-      <Field label="Chain of Custody">
-        <Input name="chainOfCustody" placeholder="Collected by / location" />
+      <Field label="Chaîne de possession">
+        <Input name="chainOfCustody" placeholder="Recueillie par / lieu de conservation" />
       </Field>
-      <Field label="Linked Person">
+      <Field label="Personne liée">
         <Select name="personId" defaultValue="">
           <option value="">—</option>
           {persons.map((p) => (
@@ -225,12 +247,12 @@ export function AddEvidence({
           ))}
         </Select>
       </Field>
-      <Field label="File" className="sm:col-span-2">
+      <Field label="Fichier" className="sm:col-span-2">
         <input type="file" name="file" className="block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-navy-800 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:text-white" />
       </Field>
       <div className="sm:col-span-2">
         <Button size="sm" type="submit" disabled={busy}>
-          {busy ? "Saving…" : "Log Evidence"}
+          {busy ? "Enregistrement…" : "Enregistrer la preuve"}
         </Button>
       </div>
     </form>

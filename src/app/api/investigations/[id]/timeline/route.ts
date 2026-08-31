@@ -11,7 +11,7 @@ export const POST = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("timeline.create");
     const inv = await getInvestigationOr404(params.id, actor);
-    if (!actor.agent) return fail("Agents only.", 403);
+    if (!actor.agent) return fail("Réservé aux Agents.", 403);
     const d = timelineEventSchema.parse(await req.json());
 
     await addTimelineEvent(
@@ -25,7 +25,7 @@ export const POST = handle(
       action: "timeline.create",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} added a timeline entry to ${inv.caseNumber}`,
+      summary: `${actor.name} a ajouté une entrée de chronologie à ${inv.caseNumber}`,
     });
 
     return created({ ok: true });

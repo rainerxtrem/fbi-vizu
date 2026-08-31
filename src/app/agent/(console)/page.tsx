@@ -78,8 +78,14 @@ export default async function AgentDashboard() {
     _count: true,
     where: visFilter,
   });
+  const PRIORITY_FR: Record<string, string> = {
+    LOW: "Faible",
+    MEDIUM: "Moyenne",
+    HIGH: "Élevée",
+    CRITICAL: "Critique",
+  };
   const priorityData = ["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((p) => ({
-    name: p[0] + p.slice(1).toLowerCase(),
+    name: PRIORITY_FR[p],
     value: priorityGroups.find((g) => g.priority === p)?._count ?? 0,
   }));
 
@@ -88,47 +94,47 @@ export default async function AgentDashboard() {
   return (
     <div>
       <PageTitle
-        title={`Welcome back, ${actor.name}`}
+        title={`Bon retour, ${actor.name}`}
         subtitle={
           actor.agent
-            ? `${actor.agent.title} · ${actor.agent.fieldOfficeName ?? "Headquarters"}`
-            : "Platform Administrator"
+            ? `${actor.agent.title} · ${actor.agent.fieldOfficeName ?? "Quartier général"}`
+            : "Administrateur de la plateforme"
         }
         action={
           can(actor, "investigation.create") ? (
             <ButtonLink href="/agent/investigations/new" size="sm">
-              + Create Investigation
+              + Créer une enquête
             </ButtonLink>
           ) : null
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Active Investigations" value={activeInv} href="/agent/investigations?status=ACTIVE" />
-        <StatCard label="Open Cases" value={openInv} href="/agent/investigations?status=OPEN" />
-        <StatCard label="High Priority Cases" value={highPriority} tone="red" href="/agent/investigations?priority=HIGH" />
-        <StatCard label="Published Most Wanted" value={mostWanted} href="/agent/most-wanted" />
-        <StatCard label="Pending Applications" value={pendingApps} tone="amber" href="/agent/applications" />
-        <StatCard label="Unread Tips" value={unreadTips} tone="amber" href="/agent/tips" />
-        <StatCard label="Evidence Items" value={evidenceItems} />
-        <StatCard label="Active Warrants" value={activeWarrants} />
+        <StatCard label="Enquêtes actives" value={activeInv} href="/agent/investigations?status=ACTIVE" />
+        <StatCard label="Dossiers ouverts" value={openInv} href="/agent/investigations?status=OPEN" />
+        <StatCard label="Dossiers prioritaires" value={highPriority} tone="red" href="/agent/investigations?priority=HIGH" />
+        <StatCard label="Most Wanted publiés" value={mostWanted} href="/agent/most-wanted" />
+        <StatCard label="Candidatures en attente" value={pendingApps} tone="amber" href="/agent/applications" />
+        <StatCard label="Renseignements non lus" value={unreadTips} tone="amber" href="/agent/tips" />
+        <StatCard label="Éléments de preuve" value={evidenceItems} />
+        <StatCard label="Mandats actifs" value={activeWarrants} />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Investigations by Status" />
+          <CardHeader title="Enquêtes par statut" />
           <CardBody>
             <StatusPie data={statusData} />
           </CardBody>
         </Card>
         <Card>
-          <CardHeader title="Investigations by Priority" />
+          <CardHeader title="Enquêtes par priorité" />
           <CardBody>
             <CategoryBar data={priorityData} />
           </CardBody>
         </Card>
         <Card className="lg:col-span-2">
-          <CardHeader title="Cases opened vs. closed (last 6 months)" />
+          <CardHeader title="Dossiers ouverts / clôturés (6 derniers mois)" />
           <CardBody>
             <TrendLine data={trend} />
           </CardBody>
@@ -138,13 +144,13 @@ export default async function AgentDashboard() {
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader
-            title="My recent investigations"
-            action={<Link href="/agent/investigations/mine" className="text-xs font-semibold uppercase text-navy-600">View all</Link>}
+            title="Mes enquêtes récentes"
+            action={<Link href="/agent/investigations/mine" className="text-xs font-semibold uppercase text-navy-600">Voir tout</Link>}
           />
           <CardBody className="p-0">
             {myCases.length === 0 ? (
               <p className="px-5 py-6 text-sm text-navy-500">
-                You are not assigned to any investigations yet.
+                Vous n&apos;êtes affecté à aucune enquête pour le moment.
               </p>
             ) : (
               <ul className="divide-y divide-navy-100">
@@ -172,8 +178,8 @@ export default async function AgentDashboard() {
         {can(actor, "audit.view") ? (
           <Card>
             <CardHeader
-              title="Recent activity"
-              action={<Link href="/agent/activity" className="text-xs font-semibold uppercase text-navy-600">Audit log</Link>}
+              title="Activité récente"
+              action={<Link href="/agent/activity" className="text-xs font-semibold uppercase text-navy-600">Journal d&apos;activité</Link>}
             />
             <CardBody className="p-0">
               <ul className="divide-y divide-navy-100">
@@ -201,7 +207,7 @@ async function buildTrend(visFilter: object) {
     const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
     months.push({
-      month: start.toLocaleString("en-US", { month: "short" }),
+      month: start.toLocaleString("fr-FR", { month: "short" }),
       opened: 0,
       closed: 0,
       start,

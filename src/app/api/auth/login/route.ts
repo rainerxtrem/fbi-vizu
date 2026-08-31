@@ -25,20 +25,20 @@ export const POST = handle(async (req: Request) => {
   if (!user || !valid) {
     await audit(null, {
       action: "auth.login.failed",
-      summary: `Failed login attempt for ${email}`,
+      summary: `Tentative de connexion échouée pour ${email}`,
       ip: clientIp(req),
     });
-    return fail("Invalid email or password.", 401);
+    return fail("Adresse e-mail ou mot de passe invalide.", 401);
   }
 
   if (user.agent && user.agent.status === "SUSPENDED") {
-    return fail("This account is suspended. Contact the platform administrator.", 403);
+    return fail("Ce compte est suspendu. Contactez l'administrateur de la plateforme.", 403);
   }
 
   await createSession({ sub: user.id, email: user.email, name: user.name });
   await audit(
     { userId: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, agent: null },
-    { action: "auth.login", summary: `${user.name} signed in`, ip: clientIp(req) },
+    { action: "auth.login", summary: `${user.name} s'est connecté`, ip: clientIp(req) },
   );
 
   return ok({ id: user.id, name: user.name, isAdmin: user.isAdmin, isAgent: !!user.agent });

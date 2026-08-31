@@ -37,11 +37,11 @@ export default async function ActivityLogPage({
 
   return (
     <div>
-      <PageTitle title="Activity Logs" subtitle={`${total} recorded events — tamper-evident audit trail`} />
+      <PageTitle title="Journal d'activité" subtitle={`${total} événements enregistrés — journal d'audit infalsifiable`} />
       <form className="mb-4" action="/agent/activity">
-        <input name="q" defaultValue={q} placeholder="Search actions, actors, summaries…" className="field-input max-w-md" />
+        <input name="q" defaultValue={q} placeholder="Rechercher actions, acteurs, résumés…" className="field-input max-w-md" />
       </form>
-      <DataTable head={["Timestamp", "Actor", "Action", "Summary", "IP"]}>
+      <DataTable head={["Horodatage", "Acteur", "Action", "Résumé", "IP"]}>
         {logs.map((l) => (
           <tr key={l.id} className="hover:bg-navy-50">
             <td className="whitespace-nowrap px-4 py-2 text-xs text-navy-500">

@@ -74,9 +74,9 @@ export function Sidebar({
       <div className="flex items-center gap-2 px-4 py-4 text-white">
         <Shield className="h-6 w-6" />
         <div className="leading-tight">
-          <p className="text-sm font-bold">FIA CONSOLE</p>
+          <p className="text-sm font-bold">CONSOLE FBI</p>
           <p className="text-[10px] uppercase tracking-widest text-navy-400">
-            Investigative Portal
+            Portail d&apos;enquête
           </p>
         </div>
       </div>
@@ -110,17 +110,17 @@ export function Sidebar({
         className="m-2 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-navy-300 hover:bg-navy-800 hover:text-white"
       >
         <LogOut className="h-4 w-4" />
-        Logout
+        Déconnexion
       </button>
     </nav>
   );
 
   return (
     <>
-      {/* Mobile top bar */}
+      {/* Barre supérieure mobile */}
       <div className="flex items-center justify-between border-b border-navy-200 bg-navy-950 px-4 py-3 text-white lg:hidden">
         <span className="flex items-center gap-2 text-sm font-bold">
-          <Shield className="h-5 w-5" /> FIA CONSOLE
+          <Shield className="h-5 w-5" /> CONSOLE FBI
         </span>
         <button onClick={() => setOpen((s) => !s)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

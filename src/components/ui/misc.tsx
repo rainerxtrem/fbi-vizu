@@ -66,7 +66,7 @@ export function Pagination({
   return (
     <div className="flex items-center justify-center gap-1 text-sm">
       <PageLink href={makeHref(Math.max(1, page - 1))} disabled={page === 1}>
-        Prev
+        Précédent
       </PageLink>
       {pages.map((p, i) =>
         p === "..." ? (
@@ -80,7 +80,7 @@ export function Pagination({
         ),
       )}
       <PageLink href={makeHref(Math.min(totalPages, page + 1))} disabled={page === totalPages}>
-        Next
+        Suivant
       </PageLink>
     </div>
   );

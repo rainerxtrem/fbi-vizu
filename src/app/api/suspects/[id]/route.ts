@@ -21,7 +21,7 @@ export const GET = handle(
         mostWanted: true,
       },
     });
-    if (!person) return fail("Not found.", 404);
+    if (!person) return fail("Introuvable.", 404);
     return ok(person);
   },
 );
@@ -31,7 +31,7 @@ export const PATCH = handle(
     const actor = await requireApiPermission("suspect.edit");
     const d = personSchema.partial().parse(await req.json());
     const existing = await prisma.person.findUnique({ where: { id: params.id } });
-    if (!existing) return fail("Not found.", 404);
+    if (!existing) return fail("Introuvable.", 404);
 
     const person = await prisma.person.update({
       where: { id: params.id },
@@ -53,7 +53,7 @@ export const PATCH = handle(
       action: "suspect.update",
       entityType: "person",
       entityId: person.id,
-      summary: `${actor.name} updated person record #${person.id.slice(-6)} (${person.fullName})`,
+      summary: `${actor.name} a mis à jour la fiche #${person.id.slice(-6)} (${person.fullName})`,
     });
 
     return ok(person);
@@ -66,7 +66,7 @@ export const POST = handle(
     const actor = await requireApiActor();
     const body = await req.json();
     const person = await prisma.person.findUnique({ where: { id: params.id } });
-    if (!person) return fail("Not found.", 404);
+    if (!person) return fail("Introuvable.", 404);
 
     if (body.action === "link-investigation" && body.investigationId) {
       await prisma.investigationPerson
@@ -82,11 +82,11 @@ export const POST = handle(
         action: "suspect.link",
         entityType: "person",
         entityId: person.id,
-        summary: `${actor.name} linked ${person.fullName} to a case`,
+        summary: `${actor.name} a lié ${person.fullName} à un dossier`,
       });
       return ok({ linked: true });
     }
 
-    return fail("Unknown action.", 400);
+    return fail("Action inconnue.", 400);
   },
 );

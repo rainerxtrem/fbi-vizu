@@ -30,7 +30,7 @@ export function MostWantedFilters() {
     [params, pathname, router],
   );
 
-  // debounce search
+  // anti-rebond de la recherche
   useEffect(() => {
     const t = setTimeout(() => {
       if ((params.get("q") ?? "") !== q) update({ q: q || null });
@@ -46,7 +46,7 @@ export function MostWantedFilters() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by name, alias, location or case number"
+          placeholder="Rechercher par nom, alias, lieu ou Case Number"
           className="field-input pl-9"
         />
       </div>
@@ -74,20 +74,20 @@ export function MostWantedFilters() {
           onChange={(e) => update({ status: e.target.value })}
           className="field-input w-auto"
         >
-          <option value="ALL">Any status</option>
+          <option value="ALL">Tout statut</option>
           <option value="PUBLISHED">At Large</option>
           <option value="CAPTURED">Captured</option>
-          <option value="LOCATED">Located</option>
+          <option value="LOCATED">Localisé</option>
         </select>
         <select
           value={sort}
           onChange={(e) => update({ sort: e.target.value })}
           className="field-input w-auto"
         >
-          <option value="danger">Sort: Danger level</option>
-          <option value="reward">Sort: Reward (high to low)</option>
-          <option value="recent">Sort: Recently published</option>
-          <option value="name">Sort: Name (A–Z)</option>
+          <option value="danger">Trier : niveau de dangerosité</option>
+          <option value="reward">Trier : récompense (décroissante)</option>
+          <option value="recent">Trier : publiés récemment</option>
+          <option value="name">Trier : nom (A–Z)</option>
         </select>
       </div>
     </div>

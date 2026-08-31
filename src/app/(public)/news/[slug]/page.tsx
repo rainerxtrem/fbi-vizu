@@ -23,7 +23,7 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const a = await load(params.slug);
-  if (!a) return { title: "Article not found" };
+  if (!a) return { title: "Article introuvable" };
   return { title: a.title, description: a.subtitle ?? undefined };
 }
 
@@ -40,8 +40,8 @@ export default async function NewsArticlePage({
       <PageHeader
         title={a.title}
         crumbs={[
-          { label: "Home", href: "/" },
-          { label: "News", href: "/news" },
+          { label: "Accueil", href: "/" },
+          { label: "Actualités", href: "/news" },
           { label: NEWS_CATEGORY[a.category] },
         ]}
       />
@@ -70,7 +70,7 @@ export default async function NewsArticlePage({
         <aside className="space-y-4 text-sm">
           {a.relatedMostWanted ? (
             <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-              <h3 className="font-semibold text-navy-800">Related Most Wanted</h3>
+              <h3 className="font-semibold text-navy-800">Most Wanted associé</h3>
               <Link
                 href={`/most-wanted/${a.relatedMostWanted.id}`}
                 className="link-underline mt-1 block"
@@ -81,7 +81,7 @@ export default async function NewsArticlePage({
           ) : null}
           {a.relatedInvestigation?.isPublic ? (
             <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-              <h3 className="font-semibold text-navy-800">Related Investigation</h3>
+              <h3 className="font-semibold text-navy-800">Enquête associée</h3>
               <Link
                 href={`/investigations/${a.relatedInvestigation.id}`}
                 className="link-underline mt-1 block"
@@ -91,9 +91,9 @@ export default async function NewsArticlePage({
             </div>
           ) : null}
           <div className="rounded-lg border border-navy-200 bg-navy-50 p-4">
-            <h3 className="font-semibold text-navy-800">Have information?</h3>
+            <h3 className="font-semibold text-navy-800">Vous avez des informations ?</h3>
             <Link href="/submit-tip" className="link-underline mt-1 block">
-              Submit a tip to the FIA
+              Soumettre un renseignement au FBI
             </Link>
           </div>
         </aside>

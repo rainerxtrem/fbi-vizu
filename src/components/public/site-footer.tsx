@@ -7,35 +7,35 @@ const COLS = [
     title: "Most Wanted",
     links: [
       { href: "/most-wanted", label: "Ten Most Wanted" },
-      { href: "/most-wanted?category=FUGITIVE", label: "Fugitives" },
+      { href: "/most-wanted?category=FUGITIVE", label: "Fugitifs" },
       { href: "/most-wanted?category=SEEKING_INFORMATION", label: "Seeking Information" },
-      { href: "/most-wanted?category=MISSING_PERSON", label: "Missing Persons" },
+      { href: "/most-wanted?category=MISSING_PERSON", label: "Personnes disparues" },
     ],
   },
   {
-    title: "Investigations",
+    title: "Enquêtes",
     links: [
-      { href: "/investigations", label: "Criminal Investigations" },
-      { href: "/investigations?topic=cyber", label: "Cybercrime" },
-      { href: "/investigations?topic=organized", label: "Organized Crime" },
-      { href: "/investigations?topic=financial", label: "Financial Crimes" },
+      { href: "/investigations", label: "Enquêtes criminelles" },
+      { href: "/investigations?topic=cyber", label: "Cybercriminalité" },
+      { href: "/investigations?topic=organized", label: "Crime organisé" },
+      { href: "/investigations?topic=financial", label: "Criminalité financière" },
     ],
   },
   {
-    title: "About",
+    title: "À propos",
     links: [
       { href: "/about", label: "Mission" },
-      { href: "/about#leadership", label: "Leadership" },
-      { href: "/about#history", label: "History" },
+      { href: "/about#leadership", label: "Direction" },
+      { href: "/about#history", label: "Histoire" },
       { href: "/contact", label: "Contact" },
     ],
   },
   {
-    title: "Careers",
+    title: "Carrières",
     links: [
-      { href: "/apply", label: "Apply" },
-      { href: "/careers#benefits", label: "Benefits" },
-      { href: "/careers", label: "Open Positions" },
+      { href: "/apply", label: "Candidater" },
+      { href: "/careers#benefits", label: "Avantages" },
+      { href: "/careers", label: "Postes ouverts" },
     ],
   },
 ];
@@ -75,7 +75,7 @@ export function SiteFooter() {
             <span className="font-semibold text-navy-200">{AGENCY.name}</span> —{" "}
             {AGENCY.baseline}
           </p>
-          <p>© {new Date().getFullYear()} {AGENCY.name}. This is a fictional agency for GTA RP.</p>
+          <p>© {new Date().getFullYear()} {AGENCY.name}. Agence fictive pour serveur GTA RP.</p>
         </div>
       </div>
     </footer>

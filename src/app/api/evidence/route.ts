@@ -16,7 +16,7 @@ export const POST = handle(async (req: Request) => {
 
   const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
   if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds })) {
-    return fail("You are not assigned to this investigation.", 403);
+    return fail("Vous n'êtes pas affecté à cette enquête.", 403);
   }
 
   let fileId: string | null = null;
@@ -43,14 +43,14 @@ export const POST = handle(async (req: Request) => {
   await addTimelineEvent(
     inv.id,
     "EVIDENCE_ADDED",
-    `${actor.name} added evidence #${evidenceNumber} — ${d.title}`,
+    `${actor.name} a ajouté la preuve #${evidenceNumber} — ${d.title}`,
     actor,
   );
   await audit(actor, {
     action: "evidence.create",
     entityType: "investigation",
     entityId: inv.id,
-    summary: `${actor.name} added evidence #${evidenceNumber} to ${inv.caseNumber}`,
+    summary: `${actor.name} a ajouté la preuve #${evidenceNumber} à ${inv.caseNumber}`,
   });
 
   return created(ev);

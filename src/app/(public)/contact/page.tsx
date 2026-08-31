@@ -12,9 +12,9 @@ export default async function ContactPage() {
   return (
     <div>
       <PageHeader
-        title="Contact the FIA"
+        title="Contacter le FBI"
         intro={`${AGENCY.name} — ${AGENCY.division}`}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "Contact" }]}
       />
       <div className="container-fia grid gap-10 py-12 lg:grid-cols-[1fr_1fr]">
         <div>
@@ -23,7 +23,7 @@ export default async function ContactPage() {
             {offices.map((o) => (
               <div key={o.id} className="rounded-lg border border-navy-200 bg-white p-5">
                 <p className="font-semibold text-navy-900">
-                  {o.name} {o.isHq ? "· Division Headquarters" : ""}
+                  {o.name} {o.isHq ? "· Quartier général de division" : ""}
                 </p>
                 <p className="mt-2 flex items-center gap-2 text-sm text-navy-600">
                   <MapPin className="h-4 w-4" /> {o.address}
@@ -39,10 +39,10 @@ export default async function ContactPage() {
           </div>
         </div>
         <div>
-          <h2 className="text-xl font-bold">Location</h2>
+          <h2 className="text-xl font-bold">Localisation</h2>
           <div className="mt-4 overflow-hidden rounded-lg border border-navy-200">
             <iframe
-              title="San Andreas map"
+              title="Carte de San Andreas"
               className="h-[420px] w-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -50,7 +50,7 @@ export default async function ContactPage() {
             />
           </div>
           <p className="mt-3 text-xs text-navy-400">
-            San Andreas is a fictional state. Map shown for illustrative purposes.
+            San Andreas est un État fictif. Carte affichée à titre indicatif.
           </p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { can, rankLevel, RANK_LABELS, effectivePermissions, type Rank } from "@/lib/rbac";
+import { AGENT_STATUS } from "@/lib/constants";
 import { PageTitle } from "@/components/agent/ui";
 import { Breadcrumbs } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
@@ -60,25 +61,25 @@ export default async function AgentDetailPage({ params }: { params: { id: string
       <PageTitle
         title={agent.user.name}
         subtitle={`${RANK_LABELS[agent.rank as Rank]} · ${agent.badgeNumber}`}
-        action={<Badge tone={agent.status === "ACTIVE" ? "green" : "amber"}>{agent.status}</Badge>}
+        action={<Badge tone={agent.status === "ACTIVE" ? "green" : "amber"}>{AGENT_STATUS[agent.status] ?? agent.status}</Badge>}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardHeader title="Assignment" />
+          <CardHeader title="Affectation" />
           <CardBody className="space-y-2 text-sm">
-            <Row label="Title" value={agent.title} />
+            <Row label="Fonction" value={agent.title} />
             <Row label="Division" value={agent.division} />
-            <Row label="Unit" value={agent.unit} />
+            <Row label="Unité" value={agent.unit} />
             <Row label="Field Office" value={agent.fieldOffice?.name} />
-            <Row label="Email" value={agent.user.email} />
-            <Row label="Phone" value={agent.phone} />
-            <Row label="Hire Date" value={formatDate(agent.hireDate)} />
+            <Row label="E-mail" value={agent.user.email} />
+            <Row label="Téléphone" value={agent.phone} />
+            <Row label="Date d'entrée en service" value={formatDate(agent.hireDate)} />
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader title="Effective Permissions" description={`${eff.length} permissions from rank + overrides`} />
+          <CardHeader title="Permissions effectives" description={`${eff.length} permissions (grade + dérogations)`} />
           <CardBody>
             <div className="flex max-h-56 flex-wrap gap-1.5 overflow-y-auto">
               {eff.map((p) => (
@@ -92,7 +93,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
 
         {canManageRank ? (
           <Card>
-            <CardHeader title="Rank Management" />
+            <CardHeader title="Gestion du grade" />
             <CardBody>
               <RankControl agentId={agent.id} currentRank={agent.rank as Rank} maxLevel={maxLevel} />
             </CardBody>
@@ -101,7 +102,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
 
         {can(actor, "system.manage") ? (
           <Card>
-            <CardHeader title="Permission Overrides (Admin)" />
+            <CardHeader title="Dérogations de permissions (Admin)" />
             <CardBody>
               <PermissionOverrides
                 agentId={agent.id}
@@ -113,10 +114,10 @@ export default async function AgentDetailPage({ params }: { params: { id: string
         ) : null}
 
         <Card className="lg:col-span-2">
-          <CardHeader title="Rank History" />
+          <CardHeader title="Historique des grades" />
           <CardBody className="p-0">
             {agent.rankChanges.length === 0 ? (
-              <p className="px-5 py-4 text-sm text-navy-500">No rank changes recorded.</p>
+              <p className="px-5 py-4 text-sm text-navy-500">Aucun changement de grade enregistré.</p>
             ) : (
               <ul className="divide-y divide-navy-100 text-sm">
                 {agent.rankChanges.map((rc) => (
@@ -125,7 +126,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                       {RANK_LABELS[rc.oldRank as Rank]} → {RANK_LABELS[rc.newRank as Rank]}
                     </p>
                     <p className="text-xs text-navy-400">
-                      {formatDateTime(rc.createdAt)} · by {rc.changedBy?.user.name ?? "system"}
+                      {formatDateTime(rc.createdAt)} · par {rc.changedBy?.user.name ?? "système"}
                       {rc.reason ? ` · ${rc.reason}` : ""}
                     </p>
                   </li>

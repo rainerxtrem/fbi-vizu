@@ -8,7 +8,7 @@ import { Pagination, EmptyState, Breadcrumbs } from "@/components/ui/misc";
 export const metadata: Metadata = {
   title: "Most Wanted",
   description:
-    "Individuals wanted by the Federal Investigative Agency for serious federal offenses across San Andreas.",
+    "Individus recherchés par le Federal Bureau of Investigation pour des infractions fédérales graves à travers San Andreas.",
 };
 
 const PAGE_SIZE = 12;
@@ -76,14 +76,14 @@ export default async function MostWantedPage({
       <div className="border-b border-navy-200 bg-navy-900 text-white">
         <div className="container-fia py-12">
           <Breadcrumbs
-            items={[{ label: "Home", href: "/" }, { label: "Most Wanted" }]}
+            items={[{ label: "Accueil", href: "/" }, { label: "Most Wanted" }]}
           />
           <h1 className="mt-3 text-4xl font-bold">Most Wanted</h1>
           <p className="mt-2 max-w-2xl text-navy-200">
-            The FIA is seeking the public&apos;s assistance in locating the
-            following individuals. If you have information, contact your nearest
-            field office or submit a tip. Do not attempt to apprehend any of
-            these individuals.
+            Le FBI sollicite l'aide du public pour localiser les individus
+            suivants. Si vous détenez des informations, contactez votre Field
+            Office le plus proche ou soumettez un renseignement. N'essayez pas
+            d'appréhender ces individus.
           </p>
         </div>
       </div>
@@ -95,13 +95,13 @@ export default async function MostWantedPage({
 
         <div>
           <p className="mb-4 text-sm text-navy-500">
-            {total} {total === 1 ? "result" : "results"}
-            {q ? ` for “${q}”` : ""}
+            {total} {total === 1 ? "résultat" : "résultats"}
+            {q ? ` pour « ${q} »` : ""}
           </p>
           {results.length === 0 ? (
             <EmptyState
-              title="No individuals match your search"
-              description="Try adjusting your filters or search terms."
+              title="Aucun individu ne correspond à votre recherche"
+              description="Essayez d'ajuster vos filtres ou vos termes de recherche."
             />
           ) : (
             <>

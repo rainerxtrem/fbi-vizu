@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/format";
 import { NEWS_CATEGORY } from "@/lib/constants";
 import { cn } from "@/lib/cn";
 
-export const metadata: Metadata = { title: "Newsroom" };
+export const metadata: Metadata = { title: "Salle de presse" };
 
 const PAGE_SIZE = 9;
 
@@ -39,13 +39,13 @@ export default async function NewsPage({
   return (
     <div>
       <PageHeader
-        title="FIA Newsroom"
-        intro="Press releases, case updates, and public notices from the Federal Investigative Agency."
-        crumbs={[{ label: "Home", href: "/" }, { label: "News" }]}
+        title="Salle de presse du FBI"
+        intro="Communiqués de presse, mises à jour d'enquête et avis au public du Federal Bureau of Investigation."
+        crumbs={[{ label: "Accueil", href: "/" }, { label: "Actualités" }]}
       />
       <div className="container-fia py-10">
         <div className="mb-8 flex flex-wrap gap-2">
-          <CatLink label="All" href="/news" active={!category} />
+          <CatLink label="Toutes" href="/news" active={!category} />
           {Object.entries(NEWS_CATEGORY).map(([k, v]) => (
             <CatLink
               key={k}
@@ -57,7 +57,7 @@ export default async function NewsPage({
         </div>
 
         {articles.length === 0 ? (
-          <EmptyState title="No articles published yet" />
+          <EmptyState title="Aucun article publié pour le moment" />
         ) : (
           <>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
