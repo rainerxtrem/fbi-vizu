@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Shield } from "lucide-react";
 import { getActor } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 import { AGENCY } from "@/lib/constants";
+import { Emblem } from "@/components/brand/emblem";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Espace Agent", robots: { index: false } };
@@ -21,7 +21,7 @@ export default async function LoginPage({
     <div className="flex min-h-screen">
       <div className="hidden flex-1 flex-col justify-between bg-navy-950 p-12 text-white lg:flex">
         <div className="flex items-center gap-3">
-          <Shield className="h-8 w-8" />
+          <Emblem size={46} />
           <div>
             <p className="text-lg font-bold">{AGENCY.abbr}</p>
             <p className="text-xs uppercase tracking-widest text-navy-400">
@@ -43,7 +43,7 @@ export default async function LoginPage({
       <div className="flex flex-1 items-center justify-center bg-white p-8">
         <div className="w-full max-w-sm">
           <div className="mb-8 lg:hidden">
-            <Shield className="h-8 w-8 text-navy-900" />
+            <Emblem size={46} />
           </div>
           <h2 className="text-2xl font-bold text-navy-900">Connexion Agent</h2>
           <p className="mt-1 text-sm text-navy-500">

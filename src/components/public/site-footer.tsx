@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Shield } from "lucide-react";
 import { AGENCY } from "@/lib/constants";
+import { Emblem } from "@/components/brand/emblem";
 
 const COLS = [
   {
@@ -46,7 +46,7 @@ export function SiteFooter() {
       <div className="container-fia grid gap-8 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-1">
           <div className="flex items-center gap-2 text-white">
-            <Shield className="h-6 w-6" />
+            <Emblem size={30} />
             <span className="text-lg font-bold">{AGENCY.abbr}</span>
           </div>
           <p className="mt-3 text-sm text-navy-400">{AGENCY.name}</p>

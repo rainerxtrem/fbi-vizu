@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Search, Shield } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { AGENCY } from "@/lib/constants";
+import { Emblem } from "@/components/brand/emblem";
 
 const NAV = [
   { href: "/most-wanted", label: "Most Wanted" },
@@ -54,9 +55,7 @@ export function SiteHeader() {
 
       <div className="container-fia flex h-20 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-sm bg-navy-900 text-white">
-            <Shield className="h-6 w-6" />
-          </span>
+          <Emblem size={46} />
           <span className="leading-tight">
             <span className="block text-lg font-bold tracking-tight text-navy-900">
               {AGENCY.abbr}

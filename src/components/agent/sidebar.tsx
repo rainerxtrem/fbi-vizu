@@ -23,10 +23,10 @@ import {
   Menu,
   X,
   Newspaper,
-  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import type { Permission } from "@/lib/rbac";
+import { Emblem } from "@/components/brand/emblem";
 
 export interface NavItem {
   href: string;
@@ -72,7 +72,7 @@ export function Sidebar({
   const nav = (
     <nav className="flex h-full flex-col">
       <div className="flex items-center gap-2 px-4 py-4 text-white">
-        <Shield className="h-6 w-6" />
+        <Emblem size={30} />
         <div className="leading-tight">
           <p className="text-sm font-bold">CONSOLE FBI</p>
           <p className="text-[10px] uppercase tracking-widest text-navy-400">
@@ -120,7 +120,7 @@ export function Sidebar({
       {/* Barre supérieure mobile */}
       <div className="flex items-center justify-between border-b border-navy-200 bg-navy-950 px-4 py-3 text-white lg:hidden">
         <span className="flex items-center gap-2 text-sm font-bold">
-          <Shield className="h-5 w-5" /> CONSOLE FBI
+          <Emblem size={22} /> CONSOLE FBI
         </span>
         <button onClick={() => setOpen((s) => !s)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
