@@ -7,6 +7,7 @@ import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
+import { PersonPicker } from "@/components/agent/person-picker";
 
 type Opt = { id: string; label: string };
 
@@ -280,12 +281,10 @@ const WSTATUS_TONE: Record<string, string> = {
 export function InvestigationPersons({
   investigationId,
   linked,
-  allPersons,
   caps,
 }: {
   investigationId: string;
   linked: { linkId: string; personId: string; name: string; alias: string | null; role: string }[];
-  allPersons: Opt[];
   caps: { link: boolean; createNew: boolean };
 }) {
   const router = useRouter();
@@ -296,8 +295,11 @@ export function InvestigationPersons({
 
   async function add(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setBusy(true);
     const fd = new FormData(e.currentTarget);
+    if (mode === "existing" && !fd.get("personId")) {
+      return toast("error", "Sélectionnez une personne dans la liste.");
+    }
+    setBusy(true);
     const { ok, json } = await req(`/api/investigations/${investigationId}/persons`, "POST", {
       personId: mode === "existing" ? fd.get("personId") || undefined : undefined,
       fullName: mode === "new" ? fd.get("fullName") || undefined : undefined,
@@ -397,16 +399,7 @@ export function InvestigationPersons({
           <form onSubmit={add} className="grid gap-3 sm:grid-cols-2">
             {mode === "existing" ? (
               <Field label="Personne" className="sm:col-span-2">
-                <Select name="personId" required defaultValue="">
-                  <option value="" disabled>
-                    Sélectionner…
-                  </option>
-                  {allPersons.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label}
-                    </option>
-                  ))}
-                </Select>
+                <PersonPicker name="personId" />
               </Field>
             ) : (
               <Field label="Nom complet" className="sm:col-span-2" required>

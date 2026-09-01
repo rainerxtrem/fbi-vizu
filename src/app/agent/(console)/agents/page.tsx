@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { can, RANK_LABELS, RANK_ORDER, type Rank } from "@/lib/rbac";
 import { PageTitle, DataTable } from "@/components/agent/ui";
 import { Badge } from "@/components/ui/badge";
-import { RANK_LABELS, RANK_ORDER, type Rank } from "@/lib/rbac";
+import { ButtonLink } from "@/components/ui/button";
 import { AGENT_STATUS } from "@/lib/constants";
 
 export default async function AgentsPage() {
-  await requirePermission("agents.view");
+  const actor = await requirePermission("agents.view");
   const agents = await prisma.agent.findMany({
     include: { user: true, fieldOffice: true, _count: { select: { ledInvestigations: true } } },
   });
@@ -16,7 +17,17 @@ export default async function AgentsPage() {
 
   return (
     <div>
-      <PageTitle title="Agents" subtitle={`${agents.length} membres du personnel`} />
+      <PageTitle
+        title="Agents"
+        subtitle={`${agents.length} membres du personnel`}
+        action={
+          can(actor, "agents.manage") ? (
+            <ButtonLink href="/agent/agents/new" size="sm">
+              + Nouvel agent
+            </ButtonLink>
+          ) : null
+        }
+      />
       <DataTable head={["Nom", "Matricule", "Grade", "Field Office", "Statut", "Dossiers dirigés"]}>
         {agents.map((a) => (
           <tr key={a.id} className="hover:bg-navy-50">

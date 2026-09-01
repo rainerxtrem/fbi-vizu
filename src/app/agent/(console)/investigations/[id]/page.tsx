@@ -80,22 +80,14 @@ export default async function InvestigationDetailPage({
   };
 
   const canManageRelations =
-    perms.linkPerson || perms.warrantCreate || perms.warrantEdit || perms.arrestCreate;
-  const [allPersons, activeAgents] = canManageRelations
-    ? await Promise.all([
-        prisma.person.findMany({
-          where: { deletedAt: null },
-          orderBy: { fullName: "asc" },
-          take: 1000,
-          select: { id: true, fullName: true, alias: true },
-        }),
-        prisma.agent.findMany({
-          where: { status: "ACTIVE" },
-          include: { user: true },
-          orderBy: { rank: "desc" },
-        }),
-      ])
-    : [[], []];
+    perms.arrestCreate || perms.arrestEdit;
+  const activeAgents = canManageRelations
+    ? await prisma.agent.findMany({
+        where: { status: "ACTIVE" },
+        include: { user: true },
+        orderBy: { rank: "desc" },
+      })
+    : [];
 
   const linkedPersons = inv.persons.map((p) => ({
     linkId: p.id,
@@ -105,10 +97,6 @@ export default async function InvestigationDetailPage({
     role: p.role,
   }));
   const personPickList = persons; // {id,label} — persons already on the case
-  const allPersonPickList = allPersons.map((p) => ({
-    id: p.id,
-    label: p.alias ? `${p.fullName} « ${p.alias} »` : p.fullName,
-  }));
   const agentPickList = activeAgents.map((a) => ({
     id: a.id,
     label: `${a.user.name} · ${RANK_ABBR[a.rank as Rank]} · ${a.badgeNumber}`,
@@ -276,7 +264,6 @@ export default async function InvestigationDetailPage({
                   <InvestigationPersons
                     investigationId={inv.id}
                     linked={linkedPersons}
-                    allPersons={allPersonPickList}
                     caps={{ link: perms.linkPerson, createNew: perms.createPerson }}
                   />
                 ),

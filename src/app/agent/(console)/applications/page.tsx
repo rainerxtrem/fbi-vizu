@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requirePermission } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { can } from "@/lib/rbac";
@@ -26,6 +27,13 @@ export default async function ApplicationsPage() {
   });
 
   const canReview = can(actor, "applications.review");
+  const canRecruit = can(actor, "agents.manage");
+  const hiredAppIds = new Set(
+    (await prisma.agent.findMany({
+      where: { applicationId: { not: null } },
+      select: { applicationId: true },
+    })).map((a) => a.applicationId),
+  );
 
   return (
     <div>
@@ -33,7 +41,7 @@ export default async function ApplicationsPage() {
       {rows.length === 0 ? (
         <EmptyState title="Aucune candidature reçue pour le moment" />
       ) : (
-        <DataTable head={["Réf", "Candidat", "Poste", "Soumise le", "Recruteur", "Statut"]}>
+        <DataTable head={["Réf", "Candidat", "Poste", "Soumise le", "Recruteur", "Statut", ""]}>
           {rows.map((a) => (
             <tr key={a.id} className="hover:bg-navy-50">
               <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{a.publicId}</td>
@@ -60,6 +68,18 @@ export default async function ApplicationsPage() {
                     {APPLICATION_STATUS[a.status]?.label}
                   </Badge>
                 )}
+              </td>
+              <td className="px-4 py-2.5 text-right">
+                {canRecruit && a.status === "APPROVED" && !hiredAppIds.has(a.id) ? (
+                  <Link
+                    href={`/agent/agents/new?application=${a.id}`}
+                    className="text-xs font-semibold uppercase text-navy-700 hover:underline"
+                  >
+                    Recruter
+                  </Link>
+                ) : hiredAppIds.has(a.id) ? (
+                  <span className="text-xs text-navy-400">Recruté</span>
+                ) : null}
               </td>
             </tr>
           ))}

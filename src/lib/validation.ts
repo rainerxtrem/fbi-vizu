@@ -329,22 +329,45 @@ export const tipUpdateSchema = z.object({
   investigationId: optionalStr(40),
 });
 
+export const RANK_ENUM = z.enum([
+  "NAT",
+  "SA",
+  "SSA_SENIOR",
+  "SSA",
+  "ASAC",
+  "SAC",
+  "AD",
+  "AEAD",
+  "EAD",
+  "ADD",
+  "DD",
+  "DIRECTOR",
+]);
+
 export const rankChangeSchema = z.object({
-  newRank: z.enum([
-    "NAT",
-    "SA",
-    "SSA_SENIOR",
-    "SSA",
-    "ASAC",
-    "SAC",
-    "AD",
-    "AEAD",
-    "EAD",
-    "ADD",
-    "DD",
-    "DIRECTOR",
-  ]),
+  newRank: RANK_ENUM,
   reason: optionalStr(2000),
+});
+
+export const agentCreateSchema = z.object({
+  name: str(120).min(2),
+  email: z.string().trim().email().max(200),
+  password: z
+    .string()
+    .min(10, "Le mot de passe temporaire doit comporter au moins 10 caractères.")
+    .max(200)
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+  badgeNumber: optionalStr(20),
+  rank: RANK_ENUM.default("NAT"),
+  title: str(200).min(2),
+  division: str(200).min(2),
+  unit: optionalStr(200),
+  fieldOfficeId: optionalStr(40),
+  phone: optionalStr(50),
+  isAdmin: z.boolean().default(false),
+  applicationId: optionalStr(40),
+  hireDate: optionalStr(40),
 });
 
 export const agentUpdateSchema = z.object({

@@ -33,6 +33,18 @@ export async function nextMostWantedPublicId(): Promise<string> {
   return `MW-${String(count + 1).padStart(4, "0")}`;
 }
 
+export async function nextBadgeNumber(): Promise<string> {
+  // Badges look like FBI-0042. Walk forward from the current count until free.
+  let n = (await prisma.agent.count()) + 1;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const candidate = `FBI-${String(n).padStart(4, "0")}`;
+    const taken = await prisma.agent.findUnique({ where: { badgeNumber: candidate } });
+    if (!taken) return candidate;
+    n += 1;
+  }
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
