@@ -23,6 +23,11 @@ import {
   InvestigationDelete,
   InvestigationEvidence,
 } from "@/components/agent/case-relations";
+import {
+  InvestigationEditForm,
+  InvestigationAgents,
+  InvestigationCharges,
+} from "@/components/agent/case-manage";
 import { formatDate, formatDateTime } from "@/lib/format";
 import {
   INVESTIGATION_STATUS,
@@ -77,19 +82,31 @@ export default async function InvestigationDetailPage({
     deleteEvidence: can(actor, "evidence.delete"),
     downloadEvidence: can(actor, "evidence.download"),
     deleteInvestigation: can(actor, "investigation.delete"),
+    editCase: editable && can(actor, "investigation.edit"),
+    assignAgents: can(actor, "investigation.assign"),
+    setLead:
+      editable || can(actor, "investigation.supervise") || can(actor, "investigation.edit.any"),
+    editCharges: editable,
   };
 
-  const canManageRelations = perms.arrestCreate || perms.arrestEdit;
-  const [activeAgents, chargeCatalog] = canManageRelations
-    ? await Promise.all([
-        prisma.agent.findMany({
+  const needsAgentList =
+    perms.arrestCreate || perms.arrestEdit || perms.assignAgents || perms.editCase;
+  const needsChargeCatalog = perms.arrestCreate || perms.arrestEdit || perms.editCharges;
+  const [activeAgents, chargeCatalog, offices] = await Promise.all([
+    needsAgentList
+      ? prisma.agent.findMany({
           where: { status: "ACTIVE" },
           include: { user: true },
           orderBy: { rank: "desc" },
-        }),
-        prisma.charge.findMany({ orderBy: [{ category: "asc" }, { title: "asc" }] }),
-      ])
-    : [[], []];
+        })
+      : Promise.resolve([]),
+    needsChargeCatalog
+      ? prisma.charge.findMany({ orderBy: [{ category: "asc" }, { title: "asc" }] })
+      : Promise.resolve([]),
+    perms.editCase
+      ? prisma.fieldOffice.findMany({ orderBy: { isHq: "desc" } })
+      : Promise.resolve([]),
+  ]);
 
   const linkedPersons = inv.persons.map((p) => ({
     linkId: p.id,
@@ -147,6 +164,19 @@ export default async function InvestigationDetailPage({
     collectedByName: e.collectedBy?.user.name ?? null,
     fileUrl: e.file?.url ?? null,
   }));
+  const chargeList = inv.charges.map((c) => ({
+    linkId: c.id,
+    title: c.charge.title,
+    personName: c.person?.fullName ?? null,
+  }));
+  const assignedAgentsList = inv.assignedAgents.map((a) => ({
+    id: a.agentId,
+    name: a.agent.user.name,
+    role: a.role,
+  }));
+  const leadInfo = inv.leadAgent
+    ? { id: inv.leadAgent.id, name: inv.leadAgent.user.name }
+    : null;
 
   return (
     <div>
@@ -200,18 +230,13 @@ export default async function InvestigationDetailPage({
                       <Card>
                         <CardHeader title="Chefs d'accusation" />
                         <CardBody>
-                          {inv.charges.length ? (
-                            <ul className="list-disc space-y-1 pl-5 text-sm">
-                              {inv.charges.map((c) => (
-                                <li key={c.id}>
-                                  {c.charge.title}
-                                  {c.person ? ` — ${c.person.fullName}` : ""}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-sm text-navy-500">Aucun chef d'accusation enregistré.</p>
-                          )}
+                          <InvestigationCharges
+                            investigationId={inv.id}
+                            charges={chargeList}
+                            chargeOptions={chargeOptions}
+                            casePersons={personPickList}
+                            canEdit={perms.editCharges}
+                          />
                         </CardBody>
                       </Card>
                       <Card>
@@ -393,6 +418,62 @@ export default async function InvestigationDetailPage({
                   </div>
                 ),
               },
+              ...(perms.editCase || perms.assignAgents
+                ? [
+                    {
+                      id: "manage",
+                      label: "Gestion",
+                      content: (
+                        <div className="space-y-6">
+                          {perms.assignAgents || perms.setLead ? (
+                            <Card>
+                              <CardHeader
+                                title="Agents affectés"
+                                description="Responsable et équipe du dossier"
+                              />
+                              <CardBody>
+                                <InvestigationAgents
+                                  investigationId={inv.id}
+                                  lead={leadInfo}
+                                  assigned={assignedAgentsList}
+                                  agents={agentPickList}
+                                  canAssign={perms.assignAgents}
+                                  canSetLead={perms.setLead}
+                                />
+                              </CardBody>
+                            </Card>
+                          ) : null}
+                          {perms.editCase ? (
+                            <Card>
+                              <CardHeader title="Modifier le dossier" />
+                              <CardBody>
+                                <InvestigationEditForm
+                                  investigationId={inv.id}
+                                  offices={offices.map((o) => ({ id: o.id, label: o.name }))}
+                                  initial={{
+                                    title: inv.title,
+                                    description: inv.description,
+                                    priority: inv.priority,
+                                    classification: inv.classification,
+                                    division: inv.division,
+                                    unit: inv.unit,
+                                    taskForce: inv.taskForce,
+                                    jurisdiction: inv.jurisdiction,
+                                    incidentDate: inv.incidentDate
+                                      ? inv.incidentDate.toISOString().slice(0, 10)
+                                      : null,
+                                    incidentLocation: inv.incidentLocation,
+                                    fieldOfficeId: inv.fieldOfficeId,
+                                  }}
+                                />
+                              </CardBody>
+                            </Card>
+                          ) : null}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>
