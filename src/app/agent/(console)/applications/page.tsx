@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { can } from "@/lib/rbac";
 import { PageTitle, DataTable } from "@/components/agent/ui";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/misc";
+import { EmptyState, Pagination } from "@/components/ui/misc";
 import { InlineStatus } from "@/components/agent/inline-status";
 import { APPLICATION_STATUS, APPLICATION_POSITION } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
@@ -18,13 +18,28 @@ const STATUSES = [
   "REJECTED",
   "WITHDRAWN",
 ];
+const PAGE_SIZE = 25;
 
-export default async function ApplicationsPage() {
+export default async function ApplicationsPage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | undefined>;
+}) {
   const actor = await requirePermission("applications.view");
-  const rows = await prisma.application.findMany({
-    include: { assignedRecruiter: { include: { user: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10) || 1);
+  const status = searchParams.status;
+  const where = status ? { status: status as never } : {};
+
+  const [total, rows] = await Promise.all([
+    prisma.application.count({ where }),
+    prisma.application.findMany({
+      where,
+      include: { assignedRecruiter: { include: { user: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+  ]);
 
   const canReview = can(actor, "applications.review");
   const canRecruit = can(actor, "agents.manage");
@@ -35,12 +50,33 @@ export default async function ApplicationsPage() {
     })).map((a) => a.applicationId),
   );
 
+  const mkHref = (p: number) => {
+    const sp = new URLSearchParams();
+    if (status) sp.set("status", status);
+    sp.set("page", String(p));
+    return `/agent/applications?${sp.toString()}`;
+  };
+
   return (
     <div>
-      <PageTitle title="Candidatures" subtitle={`${rows.length} candidatures`} />
+      <PageTitle
+        title="Candidatures"
+        subtitle={`${total} candidature${total === 1 ? "" : "s"}`}
+      />
+      <form className="mb-4" action="/agent/applications">
+        <select name="status" defaultValue={status ?? ""} className="field-input w-auto">
+          <option value="">Tout statut</option>
+          {STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {APPLICATION_STATUS[s]?.label ?? s}
+            </option>
+          ))}
+        </select>
+      </form>
       {rows.length === 0 ? (
-        <EmptyState title="Aucune candidature reçue pour le moment" />
+        <EmptyState title="Aucune candidature pour ces critères" />
       ) : (
+        <>
         <DataTable head={["Réf", "Candidat", "Poste", "Soumise le", "Recruteur", "Statut", ""]}>
           {rows.map((a) => (
             <tr key={a.id} className="hover:bg-navy-50">
@@ -84,6 +120,10 @@ export default async function ApplicationsPage() {
             </tr>
           ))}
         </DataTable>
+        <div className="mt-6">
+          <Pagination page={page} totalPages={Math.ceil(total / PAGE_SIZE)} makeHref={mkHref} />
+        </div>
+        </>
       )}
     </div>
   );

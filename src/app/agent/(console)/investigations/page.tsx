@@ -43,7 +43,7 @@ export default async function InvestigationsListPage({
       include: {
         leadAgent: { include: { user: true } },
         fieldOffice: true,
-        _count: { select: { assignedAgents: true, evidence: true } },
+        _count: { select: { assignedAgents: true, evidence: { where: { deletedAt: null } } } },
       },
       orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
       skip: (page - 1) * PAGE_SIZE,

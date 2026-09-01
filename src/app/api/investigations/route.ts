@@ -48,7 +48,13 @@ export const GET = handle(async (req: Request) => {
       include: {
         leadAgent: { include: { user: true } },
         fieldOffice: true,
-        _count: { select: { assignedAgents: true, evidence: true, persons: true } },
+        _count: {
+          select: {
+            assignedAgents: true,
+            evidence: { where: { deletedAt: null } },
+            persons: true,
+          },
+        },
       },
       orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
       skip,
