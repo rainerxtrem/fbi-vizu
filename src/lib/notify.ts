@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { log } from "./log";
 
 export type NotificationType =
   | "CASE_ASSIGNED"
@@ -36,6 +37,6 @@ export async function notify(
       })),
     });
   } catch (err) {
-    console.error("notify failed:", err);
+    log.warn("notify.failed", { type: input.type, count: ids.length }, err);
   }
 }

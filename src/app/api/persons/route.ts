@@ -1,10 +1,11 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/db";
-import { handle, ok } from "@/lib/api";
+import { handle, ok, assertRateLimit } from "@/lib/api";
 import { requireApiPermission } from "@/lib/auth";
 
 export const GET = handle(async (req: Request) => {
+  assertRateLimit(req, "person-search", 60, 60_000);
   await requireApiPermission("suspect.view");
   const q = new URL(req.url).searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) return ok({ persons: [] });

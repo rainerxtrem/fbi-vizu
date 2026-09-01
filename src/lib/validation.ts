@@ -378,10 +378,11 @@ export const agentCreateSchema = z.object({
 export const agentUpdateSchema = z.object({
   title: optionalStr(200),
   division: optionalStr(200),
-  unit: optionalStr(200),
+  // "" is a real value here (clear the unit / office / phone), so don't fold it to undefined.
+  unit: z.string().max(200).nullish(),
   status: z.enum(["ACTIVE", "ON_LEAVE", "SUSPENDED", "INACTIVE"]).optional(),
-  fieldOfficeId: optionalStr(40),
-  phone: optionalStr(50),
+  fieldOfficeId: z.string().max(40).nullish(),
+  phone: z.string().max(50).nullish(),
   permissionGrants: z.array(z.string()).optional(),
   permissionRevokes: z.array(z.string()).optional(),
 });

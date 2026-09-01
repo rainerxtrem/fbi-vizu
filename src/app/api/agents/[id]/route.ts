@@ -60,10 +60,11 @@ export const PATCH = handle(
       data: {
         title: d.title ?? undefined,
         division: d.division ?? undefined,
-        unit: d.unit ?? undefined,
+        // null/"" => clear the column; undefined => leave unchanged
+        unit: d.unit === undefined ? undefined : d.unit || null,
         status: d.status ?? undefined,
-        fieldOfficeId: d.fieldOfficeId || undefined,
-        phone: d.phone ?? undefined,
+        fieldOfficeId: d.fieldOfficeId === undefined ? undefined : d.fieldOfficeId || null,
+        phone: d.phone === undefined ? undefined : d.phone || null,
         permissionGrants: d.permissionGrants
           ? d.permissionGrants.filter(validPerm)
           : undefined,

@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import type { Actor } from "./rbac";
 import { RANK_ABBR, type Rank } from "./rbac";
+import { log } from "./log";
 
 interface AuditInput {
   action: string;
@@ -36,6 +37,6 @@ export async function audit(actor: Actor | null | undefined, input: AuditInput):
     });
   } catch (err) {
     // Never let audit failure break the primary operation.
-    console.error("audit log failed:", err);
+    log.error("audit.write_failed", err, { action: input.action });
   }
 }

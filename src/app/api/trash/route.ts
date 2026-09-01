@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { handle, ok, fail } from "@/lib/api";
+import { handle, ok, fail, assertRateLimit } from "@/lib/api";
 import { requireApiActor } from "@/lib/auth";
 import { can, type Permission } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
@@ -85,6 +85,7 @@ export const GET = handle(async () => {
 });
 
 export const POST = handle(async (req: Request) => {
+  assertRateLimit(req, "trash-action", 30, 60_000);
   const actor = await requireApiActor();
   const { entity, id, action } = actionSchema.parse(await req.json());
 

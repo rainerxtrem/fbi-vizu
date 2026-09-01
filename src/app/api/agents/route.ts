@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/db";
-import { handle, created, fail } from "@/lib/api";
+import { handle, created, fail, assertRateLimit } from "@/lib/api";
 import { agentCreateSchema } from "@/lib/validation";
 import { requireApiPermission } from "@/lib/auth";
 import { rankLevel, type Rank } from "@/lib/rbac";
@@ -10,6 +10,7 @@ import { nextBadgeNumber } from "@/lib/ids";
 import { audit } from "@/lib/audit";
 
 export const POST = handle(async (req: Request) => {
+  assertRateLimit(req, "agent-create", 10, 60_000);
   const actor = await requireApiPermission("agents.manage");
   const d = agentCreateSchema.parse(await req.json());
 

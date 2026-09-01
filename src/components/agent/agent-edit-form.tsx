@@ -38,7 +38,7 @@ export function AgentEditForm({
         division: fd.get("division"),
         unit: fd.get("unit"),
         status: fd.get("status"),
-        fieldOfficeId: fd.get("fieldOfficeId") || undefined,
+        fieldOfficeId: fd.get("fieldOfficeId"),
         phone: fd.get("phone"),
       }),
     });

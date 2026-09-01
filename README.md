@@ -90,13 +90,23 @@ classification — see `canViewInvestigation` / `investigationVisibilityFilter`.
 ### Security
 
 - bcrypt password hashing, httpOnly + `SameSite=Lax` session cookie, 8h expiry
+- Session revocation: `User.tokenVersion` in the JWT; bumped on password change,
+  agent suspension, or "sign out everywhere"
 - Server-side permission checks on every private route + record-level access
   checks (changing an ID in the URL returns 404)
+- Rank → permission baseline is code-owned; the Director tunes it per rank at
+  `/agent/roles` (stored as `RolePermissionOverride`)
 - Same-origin enforcement for mutating API requests (CSRF)
-- In-memory rate limiting on auth, tips, applications, uploads
+- In-memory rate limiting on auth, tips, applications, uploads, agent creation,
+  person search, trash actions
 - Zod input validation, file type/size validation on upload
-- Security headers (`next.config.mjs`)
+- Uploaded files are **never served statically** — `/uploads/*` is blocked and
+  every file goes through `GET /api/files/[id]`, which checks the caller against
+  the file's evidence / document / tip / application link
+- Content-Security-Policy + security headers (`next.config.mjs`)
 - Append-only audit log; no UI or API path deletes audit rows
+- Soft delete (`deletedAt`) on investigations, persons, evidence, warrants,
+  arrests — recoverable from `/agent/trash`
 
 ## Deployment (Railway)
 
@@ -108,9 +118,23 @@ classification — see `canViewInvestigation` / `investigationVisibilityFilter`.
    - `AUTH_SECRET` → a 32+ character random string
    - `NEXT_PUBLIC_SITE_URL` → the app's public URL
    - `SEED_DATABASE` → `true` for the first deploy (auto-seeds an empty DB),
-     then `false`. Use `force` to wipe and re-seed.
-4. (Optional) Add a volume mounted at `/app/public/uploads` for persistent file
-   uploads, or wire `src/lib/storage.ts` to S3-compatible storage.
+     then `false`. `force` wipes and re-seeds; in production it is ignored
+     unless `ALLOW_DESTRUCTIVE_SEED=yes` is also set for that deploy.
+   - `UPLOAD_DIR` *(optional)* → absolute path for uploaded files. Defaults to
+     `public/uploads`; set it to a non-public path (e.g. `/app/data/uploads`)
+     and mount the volume there for defence in depth.
+4. Add a volume for persistent file uploads, mounted at whatever `UPLOAD_DIR`
+   points to (default `/app/public/uploads`), or wire `src/lib/storage.ts` to
+   S3-compatible storage.
+
+### Backups
 
 `prisma db push` is used instead of migrations for simplicity; switch to
 `prisma migrate deploy` + committed migrations for a production workflow.
+
+Soft delete protects against operator mistakes, **not** against losing the
+Postgres volume. Schedule a `pg_dump` to object storage (Railway cron or an
+external job) and test a restore periodically.
+
+`scripts/release.mjs` also creates the `pg_trgm` search indexes and purges read
+notifications older than 60 days on every deploy.

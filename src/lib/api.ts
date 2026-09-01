@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { RbacError } from "./rbac";
+import { log } from "./log";
 
 export function ok<T>(data: T, init?: ResponseInit) {
   return NextResponse.json({ ok: true, data }, init);
@@ -28,7 +29,7 @@ export function handle<T extends unknown[]>(
       if (err instanceof RbacError) {
         return fail(err.message, err.status);
       }
-      console.error("API error:", err);
+      log.error("api.unhandled", err);
       return fail("Erreur interne du serveur", 500);
     }
   };

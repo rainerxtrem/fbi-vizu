@@ -47,7 +47,23 @@ try {
   }
 }
 
-const seedMode = process.env.SEED_DATABASE ?? "true";
+let seedMode = process.env.SEED_DATABASE ?? "true";
+
+// `force` wipes and reseeds the whole database. Refuse it in a production-like
+// environment unless the operator also sets ALLOW_DESTRUCTIVE_SEED=yes for this
+// one deploy, so a stray env var can never destroy live data.
+if (
+  seedMode === "force" &&
+  (process.env.RAILWAY_ENVIRONMENT === "production" || process.env.NODE_ENV === "production") &&
+  process.env.ALLOW_DESTRUCTIVE_SEED !== "yes"
+) {
+  console.warn(
+    "SEED_DATABASE=force ignored in production without ALLOW_DESTRUCTIVE_SEED=yes. " +
+      "Falling back to non-destructive seed.",
+  );
+  seedMode = "true";
+}
+
 if (seedMode === "false") {
   console.log("SEED_DATABASE=false — skipping seed.");
   process.exit(0);
