@@ -9,6 +9,15 @@ const MUTATING = new Set(["POST", "PUT", "PATCH", "DELETE"]);
  * cross-site form/JS attacks without needing a token.
  */
 export function middleware(req: NextRequest) {
+  // Raw uploaded files are never served statically — they go through
+  // /api/files/[id], which enforces per-file access control.
+  if (req.nextUrl.pathname.startsWith("/uploads/")) {
+    return NextResponse.json(
+      { ok: false, error: "Accès direct interdit. Utilisez le lien de la console." },
+      { status: 403 },
+    );
+  }
+
   if (req.nextUrl.pathname.startsWith("/api/") && MUTATING.has(req.method)) {
     const origin = req.headers.get("origin");
     const host = req.headers.get("host");
@@ -26,5 +35,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: ["/api/:path*", "/uploads/:path*"],
 };

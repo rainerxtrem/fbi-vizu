@@ -16,7 +16,7 @@ import type { Actor } from "./rbac";
  * putObject() below — the rest of the app only depends on the returned URL.
  */
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+const UPLOAD_DIR = process.env.UPLOAD_DIR ?? path.join(process.cwd(), "public", "uploads");
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 
 const ALLOWED_MIME = new Set([
@@ -62,18 +62,21 @@ export async function storeUpload(
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
   await fs.writeFile(path.join(UPLOAD_DIR, key), buf);
 
-  const url = `/uploads/${key}`;
   const record = await prisma.fileAsset.create({
     data: {
       filename: key,
       originalName: file.name.slice(0, 255),
       mimeType: file.type,
       size: file.size,
-      url,
+      // Access-controlled URL — the raw file is never served statically.
+      url: "",
       description: description ?? null,
       uploadedById: actor?.agent?.id ?? null,
     },
   });
+
+  const url = `/api/files/${record.id}`;
+  await prisma.fileAsset.update({ where: { id: record.id }, data: { url } });
 
   return {
     id: record.id,

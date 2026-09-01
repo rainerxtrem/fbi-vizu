@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { requirePermission } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { can, rankLevel, RANK_LABELS, effectivePermissions, type Rank } from "@/lib/rbac";
+import { can, rankLevel, RANK_LABELS, PERMISSIONS, type Rank } from "@/lib/rbac";
+import { effectivePermissionsForRank } from "@/lib/rbac-store";
 import { AGENT_STATUS } from "@/lib/constants";
 import { PageTitle } from "@/components/agent/ui";
 import { Breadcrumbs } from "@/components/ui/misc";
@@ -61,27 +62,17 @@ export default async function AgentDetailPage({ params }: { params: { id: string
       rankLevel(agent.rank as Rank) < rankLevel(actor.agent.rank as Rank));
   const maxLevel = actor.agent?.rank === "DIRECTOR" ? -1 : rankLevel(actor.agent?.rank as Rank);
 
-  const eff = Array.from(
-    effectivePermissions({
-      userId: agent.userId,
-      name: agent.user.name,
-      email: agent.user.email,
-      isAdmin: false,
-      agent: {
-        id: agent.id,
-        badgeNumber: agent.badgeNumber,
-        rank: agent.rank as Rank,
-        title: agent.title,
-        division: agent.division,
-        unit: agent.unit,
-        status: agent.status,
-        fieldOfficeId: agent.fieldOfficeId,
-        fieldOfficeName: agent.fieldOffice?.name ?? null,
-        permissionGrants: agent.permissionGrants,
-        permissionRevokes: agent.permissionRevokes,
-      },
-    }),
-  ).sort();
+  const effSet =
+    agent.rank === "DIRECTOR"
+      ? new Set(PERMISSIONS)
+      : await effectivePermissionsForRank(agent.rank as Rank);
+  if (agent.status === "ACTIVE" && agent.rank !== "DIRECTOR") {
+    for (const g of agent.permissionGrants) effSet.add(g as (typeof PERMISSIONS)[number]);
+    for (const r of agent.permissionRevokes) effSet.delete(r as (typeof PERMISSIONS)[number]);
+  } else if (agent.status !== "ACTIVE" && agent.rank !== "DIRECTOR") {
+    effSet.clear();
+  }
+  const eff = Array.from(effSet).sort();
 
   return (
     <div>

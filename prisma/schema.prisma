@@ -833,6 +833,26 @@ model AuditLog {
 }
 
 // ---------------------------------------------------------------------------
+// ROLE ↔ PERMISSION OVERRIDES
+//
+// The code defines a baseline permission set per rank (RANK_ADDITIONS). Rows
+// here let the Director tune that baseline per rank without a deploy:
+//   granted = true  → permission added to the rank
+//   granted = false → permission removed from the rank
+// Absence of a row = use the code default.
+// ---------------------------------------------------------------------------
+
+model RolePermissionOverride {
+  rank       Rank
+  permission String
+  granted    Boolean
+  updatedById String?
+  updatedAt  DateTime @updatedAt
+
+  @@id([rank, permission])
+}
+
+// ---------------------------------------------------------------------------
 // NOTIFICATIONS (per-agent, in-app)
 // ---------------------------------------------------------------------------
 

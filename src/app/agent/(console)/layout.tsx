@@ -21,6 +21,7 @@ const ALL_NAV: NavItem[] = [
   { href: "/agent/applications", label: "Candidatures", icon: "ClipboardList", perm: "applications.view" },
   { href: "/agent/tips", label: "Renseignements", icon: "Inbox", perm: "tips.view" },
   { href: "/agent/agents", label: "Agents", icon: "UsersRound", perm: "agents.view" },
+  { href: "/agent/roles", label: "Rôles et permissions", icon: "SlidersHorizontal", perm: "system.manage" },
   { href: "/agent/activity", label: "Journal d'activité", icon: "ScrollText", perm: "audit.view" },
   {
     href: "/agent/trash",

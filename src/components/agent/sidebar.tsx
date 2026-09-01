@@ -25,6 +25,7 @@ import {
   Newspaper,
   Trash2,
   Bell,
+  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import type { Permission } from "@/lib/rbac";
@@ -57,6 +58,7 @@ const ICONS = {
   Newspaper,
   Trash2,
   Bell,
+  SlidersHorizontal,
 };
 
 export function Sidebar({

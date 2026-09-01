@@ -5,6 +5,7 @@ import { prisma } from "./db";
 import { readSession } from "./session";
 import type { Actor, Permission, Rank } from "./rbac";
 import { can, RbacError } from "./rbac";
+import { rankOverridesFor } from "./rbac-store";
 
 /**
  * Loads the current Actor (user + agent profile) from the session cookie.
@@ -22,11 +23,16 @@ export const getActor = cache(async (): Promise<Actor | null> => {
   // Session revocation: a bumped tokenVersion invalidates every older session.
   if ((user.tokenVersion ?? 0) !== session.ver) return null;
 
+  const rankOverrides = user.agent
+    ? await rankOverridesFor(user.agent.rank as Rank)
+    : undefined;
+
   return {
     userId: user.id,
     name: user.name,
     email: user.email,
     isAdmin: user.isAdmin,
+    rankOverrides,
     agent: user.agent
       ? {
           id: user.agent.id,

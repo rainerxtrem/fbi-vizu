@@ -298,6 +298,11 @@ export interface Actor {
     permissionGrants: string[];
     permissionRevokes: string[];
   } | null;
+  /**
+   * DB-backed adjustments to what the actor's rank grants (managed by the
+   * Director in /agent/roles). Populated by getActor(); absent = code defaults.
+   */
+  rankOverrides?: { add: string[]; remove: string[] };
 }
 
 const ADMIN_PERMISSIONS: Permission[] = [
@@ -323,6 +328,14 @@ export function effectivePermissions(actor: Actor): Set<Permission> {
 
   if (actor.agent && actor.agent.status === "ACTIVE") {
     for (const p of permissionsForRank(actor.agent.rank)) set.add(p);
+    // Rank-level overrides configured by the Director (rbac-store).
+    if (actor.rankOverrides) {
+      for (const g of actor.rankOverrides.add) {
+        if ((PERMISSIONS as readonly string[]).includes(g)) set.add(g as Permission);
+      }
+      for (const r of actor.rankOverrides.remove) set.delete(r as Permission);
+    }
+    // Per-agent overrides always win over rank-level.
     for (const g of actor.agent.permissionGrants) {
       if ((PERMISSIONS as readonly string[]).includes(g)) set.add(g as Permission);
     }
