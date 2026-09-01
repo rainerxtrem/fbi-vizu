@@ -76,13 +76,14 @@ export function Sidebar({
     window.location.href = "/agent/login";
   }
 
+  // The console shell chrome stays dark in both themes.
   const nav = (
     <nav className="flex h-full flex-col">
-      <div className="flex items-center gap-2 px-4 py-4 text-white">
+      <div className="flex items-center gap-2 px-4 py-4 text-[#ffffff]">
         <Emblem size={30} />
         <div className="leading-tight">
           <p className="text-sm font-bold">CONSOLE FBI</p>
-          <p className="text-[10px] uppercase tracking-widest text-navy-400">
+          <p className="text-[10px] uppercase tracking-widest text-[#6b7c98]">
             Portail d&apos;enquête
           </p>
         </div>
@@ -102,8 +103,8 @@ export function Sidebar({
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium",
                 active
-                  ? "bg-navy-700 text-white"
-                  : "text-navy-300 hover:bg-navy-800 hover:text-white",
+                  ? "bg-[#1e2f4f] text-[#ffffff]"
+                  : "text-[#9fb0c8] hover:bg-[#16223c] hover:text-[#ffffff]",
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
@@ -114,7 +115,7 @@ export function Sidebar({
       </div>
       <button
         onClick={logout}
-        className="m-2 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-navy-300 hover:bg-navy-800 hover:text-white"
+        className="m-2 flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-[#9fb0c8] hover:bg-[#16223c] hover:text-[#ffffff]"
       >
         <LogOut className="h-4 w-4" />
         Déconnexion
@@ -125,7 +126,7 @@ export function Sidebar({
   return (
     <>
       {/* Barre supérieure mobile */}
-      <div className="flex items-center justify-between border-b border-navy-200 bg-navy-950 px-4 py-3 text-white lg:hidden">
+      <div className="flex items-center justify-between border-b border-navy-200 bg-[#0a1428] px-4 py-3 text-[#ffffff] lg:hidden">
         <span className="flex items-center gap-2 text-sm font-bold">
           <Emblem size={22} /> CONSOLE FBI
         </span>
@@ -136,12 +137,12 @@ export function Sidebar({
 
       {open ? (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-0 h-full w-64 bg-navy-950">{nav}</div>
+          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-0 h-full w-64 bg-[#0a1428]">{nav}</div>
         </div>
       ) : null}
 
-      <aside className="hidden w-64 shrink-0 bg-navy-950 lg:block">
+      <aside className="hidden w-64 shrink-0 bg-[#0a1428] lg:block">
         <div className="sticky top-0 h-screen">{nav}</div>
       </aside>
     </>

@@ -7,6 +7,7 @@ import { Menu, X, Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { AGENCY } from "@/lib/constants";
 import { Emblem } from "@/components/brand/emblem";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/most-wanted", label: "Most Wanted" },
@@ -83,6 +84,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle className="border-0 bg-transparent hover:bg-navy-100" />
           <button
             aria-label="Rechercher"
             onClick={() => setSearchOpen((s) => !s)}
@@ -92,7 +94,7 @@ export function SiteHeader() {
           </button>
           <Link
             href="/apply"
-            className="hidden rounded-md bg-federal-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white hover:bg-red-800 sm:inline-block"
+            className="hidden rounded-md bg-federal-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-on-accent hover:bg-red-800 sm:inline-block"
           >
             Apply
           </Link>
@@ -139,7 +141,7 @@ export function SiteHeader() {
             <Link
               href="/apply"
               onClick={() => setOpen(false)}
-              className="mt-3 rounded-md bg-federal-accent px-4 py-2 text-center text-sm font-semibold uppercase text-white"
+              className="mt-3 rounded-md bg-federal-accent px-4 py-2 text-center text-sm font-semibold uppercase text-on-accent"
             >
               Candidater
             </Link>

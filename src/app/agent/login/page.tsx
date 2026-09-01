@@ -5,6 +5,7 @@ import { getActor } from "@/lib/auth";
 import { LoginForm } from "./login-form";
 import { AGENCY } from "@/lib/constants";
 import { Emblem } from "@/components/brand/emblem";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Espace Agent", robots: { index: false } };
@@ -18,26 +19,28 @@ export default async function LoginPage({
   if (actor && (actor.agent || actor.isAdmin)) redirect("/agent");
 
   return (
-    <div className="flex min-h-screen">
-      <div className="hidden flex-1 flex-col justify-between bg-navy-950 p-12 text-white lg:flex">
+    <div className="relative flex min-h-screen">
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle />
+      </div>
+
+      <div className="on-dark hidden flex-1 flex-col justify-between p-12 lg:flex">
         <div className="flex items-center gap-3">
           <Emblem size={46} />
           <div>
             <p className="text-lg font-bold">{AGENCY.abbr}</p>
-            <p className="text-xs uppercase tracking-widest text-navy-400">
-              {AGENCY.name}
-            </p>
+            <p className="on-dark-muted text-xs uppercase tracking-widest">{AGENCY.name}</p>
           </div>
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Portail d&apos;enquête</h1>
-          <p className="mt-3 max-w-sm text-navy-300">
+          <h1 className="text-3xl font-bold text-[#f4f7fb]">Portail d&apos;enquête</h1>
+          <p className="on-dark-muted mt-3 max-w-sm">
             Réservé au personnel autorisé. Toute activité sur ce système est
             surveillée et enregistrée. Tout accès non autorisé constitue une
             infraction fédérale.
           </p>
         </div>
-        <p className="text-xs text-navy-500">{AGENCY.baseline}</p>
+        <p className="text-xs text-[#f3f4f6]">{AGENCY.baseline}</p>
       </div>
 
       <div className="flex flex-1 items-center justify-center bg-white p-8">

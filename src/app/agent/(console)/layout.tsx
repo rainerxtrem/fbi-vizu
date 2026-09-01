@@ -5,6 +5,7 @@ import { Sidebar, type NavItem } from "@/components/agent/sidebar";
 import { AgentBadge } from "@/components/agent/agent-badge";
 import { GlobalSearch } from "@/components/agent/global-search";
 import { NotificationBell } from "@/components/agent/notification-bell";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ConfirmProvider } from "@/components/ui/confirm";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +63,7 @@ export default async function AgentLayout({
           <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-navy-200 bg-white px-4 py-3 lg:px-8">
             <GlobalSearch />
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               {actor.agent ? <NotificationBell /> : null}
               <AgentBadge actor={actor} />
             </div>

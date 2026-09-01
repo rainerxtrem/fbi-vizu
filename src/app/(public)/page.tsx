@@ -34,23 +34,24 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative isolate overflow-hidden bg-navy-950 text-white">
+      {/* HERO — always dark, independent of the theme */}
+      <section className="on-dark relative isolate overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={HERO_IMG}
           alt="Silhouette de San Andreas au crépuscule"
-          className="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
+          className="absolute inset-0 -z-10 h-full w-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-950 via-navy-950/80 to-navy-950/30" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#050d1f] via-[#050d1f]/92 to-[#050d1f]/60" />
+        <div className="absolute inset-0 -z-10 bg-[#050d1f]/35" />
         <div className="container-fia py-24 sm:py-32">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-navy-300">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#9fb2cd]">
             Federal Bureau of Investigation
           </p>
-          <h1 className="mt-4 max-w-3xl text-5xl font-bold leading-[1.05] sm:text-6xl">
-            LA MISSION D'ABORD
+          <h1 className="mt-4 max-w-3xl text-5xl font-bold leading-[1.05] text-[#ffffff] [text-shadow:0_2px_18px_rgba(0,0,0,0.55)] sm:text-6xl">
+            LA MISSION D&apos;ABORD
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-navy-200">
+          <p className="mt-4 max-w-xl text-lg text-[#d6dfec] [text-shadow:0_1px_10px_rgba(0,0,0,0.5)]">
             Protéger San Andreas. Poursuivre la justice.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">

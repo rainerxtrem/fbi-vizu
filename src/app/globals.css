@@ -6,6 +6,41 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
   --font-serif: Georgia, "Times New Roman", "Source Serif Pro", serif;
+
+  /* Federal palette (light). "R G B" triplets so Tailwind can add /<alpha>. */
+  --n-50: 240 244 249;
+  --n-100: 217 226 239;
+  --n-200: 179 197 223;
+  --n-300: 125 156 196;
+  --n-400: 74 111 163;
+  --n-500: 43 77 128;
+  --n-600: 29 58 102;
+  --n-700: 22 45 82;
+  --n-800: 15 33 66;
+  --n-900: 10 24 52;
+  --n-950: 5 13 31;
+  --c-white: 255 255 255;
+
+  color-scheme: light;
+}
+
+.dark {
+  /* The same scale, swapped: low numbers become dark "paper", high numbers
+     become light "ink". Tuned for WCAG contrast, not a naive inversion. */
+  --n-50: 15 20 29;
+  --n-100: 24 31 43;
+  --n-200: 39 49 66;
+  --n-300: 55 66 85;
+  --n-400: 108 119 138;
+  --n-500: 140 151 170;
+  --n-600: 170 181 199;
+  --n-700: 197 205 220;
+  --n-800: 217 224 234;
+  --n-900: 235 240 247;
+  --n-950: 246 249 253;
+  --c-white: 26 34 48;
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -15,6 +50,7 @@
   body {
     @apply bg-white text-navy-900 antialiased;
     font-family: var(--font-sans);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   h1,
   h2,
@@ -26,7 +62,7 @@
     @apply transition-colors;
   }
   ::selection {
-    background: #0f2142;
+    background: rgb(var(--n-700));
     color: #fff;
   }
 }
@@ -62,6 +98,14 @@
   .gov-band {
     background-image: linear-gradient(90deg, #0a1834 0 33%, #ffffff 33% 66%, #b31942 66% 100%);
   }
+  /* A surface that must stay dark (hero, login aside) regardless of theme. */
+  .on-dark {
+    background-color: #050d1f;
+    color: #f4f7fb;
+  }
+  .on-dark-muted {
+    color: #b9c5d8;
+  }
 }
 
 /* Thin scrollbars in the agent console */
@@ -70,7 +114,7 @@
   height: 8px;
 }
 .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #b3c5df;
+  background: rgb(var(--n-300));
   border-radius: 9999px;
 }
 
@@ -87,9 +131,9 @@
   @apply absolute inset-0 -translate-x-full;
   background-image: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.6) 50%,
-    rgba(255, 255, 255, 0) 100%
+    rgb(var(--n-300) / 0) 0,
+    rgb(var(--n-300) / 0.35) 50%,
+    rgb(var(--n-300) / 0) 100%
   );
   animation: shimmer 1.6s infinite;
 }

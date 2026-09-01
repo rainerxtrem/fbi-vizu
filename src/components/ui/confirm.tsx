@@ -39,7 +39,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
     <ConfirmCtx.Provider value={confirm}>
       {children}
       {opts ? (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-navy-950/50 p-4">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start gap-3">
               <div className="rounded-full bg-amber-50 p-2">

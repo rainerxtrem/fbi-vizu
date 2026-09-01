@@ -1,24 +1,33 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * The `navy` scale and `white` resolve to CSS custom properties (see
+ * globals.css). In light mode they hold the federal palette; the `.dark` class
+ * on <html> swaps every value so the whole app flips theme without any
+ * component needing `dark:` variants. Convention across the codebase:
+ *   low navy numbers = "paper", high numbers = "ink", and that mapping inverts
+ *   in dark mode.
+ *
+ * Colours that must stay constant in both themes are literal:
+ *   - `federal.*` (institutional blue / accent red / gold)
+ *   - `on-accent` (text on the accent red)
+ */
+const navy = Object.fromEntries(
+  [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((k) => [
+    k,
+    `rgb(var(--n-${k}) / <alpha-value>)`,
+  ]),
+);
+
 const config: Config = {
+  darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Federal institutional palette
-        navy: {
-          50: "#f0f4f9",
-          100: "#d9e2ef",
-          200: "#b3c5df",
-          300: "#7d9cc4",
-          400: "#4a6fa3",
-          500: "#2b4d80",
-          600: "#1d3a66",
-          700: "#162d52",
-          800: "#0f2142",
-          900: "#0a1834",
-          950: "#050d1f",
-        },
+        white: "rgb(var(--c-white) / <alpha-value>)",
+        navy,
+        "on-accent": "#ffffff",
         federal: {
           blue: "#0a1834",
           accent: "#b31942",
