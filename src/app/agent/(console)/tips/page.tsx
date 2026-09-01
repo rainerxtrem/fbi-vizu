@@ -42,15 +42,16 @@ export default async function TipsPage() {
         <DataTable head={["Réf", "Objet", "De", "Lié à", "Reçu le", "Statut"]}>
           {rows.map((t) => (
             <tr key={t.id} className="hover:bg-navy-50">
-              <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{t.publicId}</td>
+              <td className="px-4 py-2.5 font-mono text-xs text-navy-500">
+                <Link href={`/agent/tips/${t.id}`} className="hover:underline">
+                  {t.publicId}
+                </Link>
+              </td>
               <td className="px-4 py-2.5">
-                <p className="font-medium text-navy-900">{t.subject}</p>
+                <Link href={`/agent/tips/${t.id}`} className="font-medium text-navy-900 hover:underline">
+                  {t.subject}
+                </Link>
                 <p className="line-clamp-1 max-w-md text-xs text-navy-500">{t.description}</p>
-                {t.file ? (
-                  <a href={t.file.url} target="_blank" className="text-xs text-navy-600 underline">
-                    Pièce jointe
-                  </a>
-                ) : null}
               </td>
               <td className="px-4 py-2.5 text-xs text-navy-600">
                 {t.anonymous ? "Anonyme" : t.name || t.email || "—"}

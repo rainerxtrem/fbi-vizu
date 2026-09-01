@@ -255,6 +255,7 @@ model Agent {
   application   Application? @relation("ApplicationHire", fields: [applicationId], references: [id])
 
   notifications Notification[]
+  tipNotes      TipNote[]
 
   ledInvestigations      Investigation[]      @relation("LeadAgent")
   assignments            InvestigationAgent[]
@@ -743,8 +744,20 @@ model Tip {
   fileId          String?
   file            FileAsset?    @relation(fields: [fileId], references: [id])
 
+  notes           TipNote[]
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+model TipNote {
+  id        String   @id @default(cuid())
+  tipId     String
+  tip       Tip      @relation(fields: [tipId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    Agent?   @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
 }
 
 // ---------------------------------------------------------------------------
