@@ -28,15 +28,17 @@ export const PATCH = handle(
       return fail("Vous n'êtes pas autorisé à prendre cette décision.", 403);
     }
 
+    const clr = (v: string | null | undefined) => (v === undefined ? undefined : v || null);
     const updated = await prisma.application.update({
       where: { id: params.id },
       data: {
         status: d.status ?? undefined,
-        assignedRecruiterId: d.assignedRecruiterId || undefined,
-        notes: d.notes ?? undefined,
-        interviewNotes: d.interviewNotes ?? undefined,
-        backgroundCheckNotes: d.backgroundCheckNotes ?? undefined,
-        decision: d.decision ?? undefined,
+        assignedRecruiterId:
+          d.assignedRecruiterId === undefined ? undefined : d.assignedRecruiterId || null,
+        notes: clr(d.notes),
+        interviewNotes: clr(d.interviewNotes),
+        backgroundCheckNotes: clr(d.backgroundCheckNotes),
+        decision: clr(d.decision),
         decidedById:
           d.status === "APPROVED" || d.status === "REJECTED"
             ? actor.agent?.id ?? undefined

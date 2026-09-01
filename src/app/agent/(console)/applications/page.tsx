@@ -80,11 +80,18 @@ export default async function ApplicationsPage({
         <DataTable head={["Réf", "Candidat", "Poste", "Soumise le", "Recruteur", "Statut", ""]}>
           {rows.map((a) => (
             <tr key={a.id} className="hover:bg-navy-50">
-              <td className="px-4 py-2.5 font-mono text-xs text-navy-500">{a.publicId}</td>
+              <td className="px-4 py-2.5 font-mono text-xs text-navy-500">
+                <Link href={`/agent/applications/${a.id}`} className="hover:underline">
+                  {a.publicId}
+                </Link>
+              </td>
               <td className="px-4 py-2.5">
-                <p className="font-medium text-navy-900">
+                <Link
+                  href={`/agent/applications/${a.id}`}
+                  className="font-medium text-navy-900 hover:underline"
+                >
                   {a.firstName} {a.lastName}
-                </p>
+                </Link>
                 <p className="text-xs text-navy-500">{a.email}</p>
               </td>
               <td className="px-4 py-2.5 text-navy-600">{APPLICATION_POSITION[a.position]}</td>

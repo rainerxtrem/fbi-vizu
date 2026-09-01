@@ -328,11 +328,12 @@ export const applicationUpdateSchema = z.object({
       "WITHDRAWN",
     ])
     .optional(),
-  assignedRecruiterId: optionalStr(40),
-  notes: optionalStr(8000),
-  interviewNotes: optionalStr(8000),
-  backgroundCheckNotes: optionalStr(8000),
-  decision: optionalStr(2000),
+  // "" is a real value (clear the field), so keep it rather than folding to undefined.
+  assignedRecruiterId: z.string().max(40).nullish(),
+  notes: z.string().max(8000).nullish(),
+  interviewNotes: z.string().max(8000).nullish(),
+  backgroundCheckNotes: z.string().max(8000).nullish(),
+  decision: z.string().max(2000).nullish(),
 });
 
 export const tipUpdateSchema = z.object({
