@@ -65,12 +65,12 @@ export function DataTable({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-navy-200 bg-white">
-      <table className="w-full text-sm">
+    <div className="-mx-4 overflow-x-auto rounded-lg border-y border-navy-200 bg-white sm:mx-0 sm:rounded-lg sm:border">
+      <table className="w-full min-w-[680px] text-sm">
         <thead>
           <tr className="border-b border-navy-200 bg-navy-50 text-left text-xs uppercase tracking-wide text-navy-500">
             {head.map((h) => (
-              <th key={h} className="px-4 py-2.5 font-semibold">
+              <th key={h} className="whitespace-nowrap px-4 py-2.5 font-semibold">
                 {h}
               </th>
             ))}

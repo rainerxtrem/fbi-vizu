@@ -8,14 +8,9 @@ import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
+import { PERSON_ROLE } from "@/lib/constants";
 
-const ROLE_FR: Record<string, string> = {
-  SUSPECT: "suspect",
-  VICTIM: "victime",
-  WITNESS: "témoin",
-  ASSOCIATE: "associé",
-  PERSON_OF_INTEREST: "personne d'intérêt",
-};
+const ROLE_FR = PERSON_ROLE;
 
 async function guard(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
   const inv = await getInvestigationOr404(id, actor);

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
+import { INVESTIGATION_STATUS } from "@/lib/constants";
 
 interface Props {
   investigationId: string;
@@ -32,13 +33,9 @@ async function api(url: string, method: string, body: unknown) {
   return { ok: r.ok, json: await r.json() };
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  OPEN: "Ouverte",
-  ACTIVE: "Active",
-  SUSPENDED: "Suspendue",
-  CLOSED: "Clôturée",
-  ARCHIVED: "Archivée",
-};
+const STATUS_LABELS: Record<string, string> = Object.fromEntries(
+  Object.entries(INVESTIGATION_STATUS).map(([k, v]) => [k, v.label]),
+);
 
 export function CaseStatusControl({ investigationId, currentStatus, isPublic, perms }: Props) {
   const router = useRouter();

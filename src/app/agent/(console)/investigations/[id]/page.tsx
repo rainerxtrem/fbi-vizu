@@ -114,6 +114,8 @@ export default async function InvestigationDetailPage({
     description: w.description,
     issuedDate: w.issuedDate ? w.issuedDate.toISOString().slice(0, 10) : null,
     expiryDate: w.expiryDate ? w.expiryDate.toISOString().slice(0, 10) : null,
+    isPublic: w.isPublic,
+    publicSummary: w.publicSummary,
   }));
   const chargeOptions = chargeCatalog.map((c) => ({
     id: c.id,
@@ -157,6 +159,15 @@ export default async function InvestigationDetailPage({
       <PageTitle
         title={inv.title}
         subtitle={`${inv.caseNumber} · Ouverte le ${formatDate(inv.openedAt)}`}
+        action={
+          <a
+            href={`/agent/print/investigation/${inv.id}`}
+            target="_blank"
+            className="rounded-md border border-navy-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-navy-700 hover:bg-navy-50"
+          >
+            Synthèse PDF
+          </a>
+        }
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -357,6 +368,7 @@ export default async function InvestigationDetailPage({
                             edit: perms.warrantEdit,
                             approve: perms.warrantApprove,
                             del: perms.warrantDelete,
+                            publish: perms.warrantApprove || perms.publish,
                           }}
                         />
                       </CardBody>

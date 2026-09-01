@@ -44,7 +44,20 @@ export default async function SuspectDetailPage({
       <PageTitle
         title={p.fullName}
         subtitle={p.alias ? `Alias « ${p.alias} »` : undefined}
-        action={<Badge tone={RISK_LEVEL[p.riskLevel]?.tone}>Risque {RISK_LEVEL[p.riskLevel]?.label}</Badge>}
+        action={
+          <div className="flex items-center gap-3">
+            <a
+              href={`/agent/print/suspect/${p.id}`}
+              target="_blank"
+              className="rounded-md border border-navy-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-navy-700 hover:bg-navy-50"
+            >
+              Fiche PDF
+            </a>
+            <Badge tone={RISK_LEVEL[p.riskLevel]?.tone}>
+              Risque {RISK_LEVEL[p.riskLevel]?.label}
+            </Badge>
+          </div>
+        }
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_300px]">

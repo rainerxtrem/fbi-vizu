@@ -45,6 +45,16 @@ export const PATCH = handle(
 
     const denying = d.status === "DENIED" && w.status !== "DENIED";
 
+    // Publishing a public "wanted notice" is a publication act.
+    const togglingPublic = d.isPublic !== undefined && d.isPublic !== w.isPublic;
+    if (
+      (togglingPublic || d.publicSummary !== undefined) &&
+      !can(actor, "warrant.approve") &&
+      !can(actor, "investigation.publish")
+    ) {
+      return fail("Vous n'êtes pas autorisé à publier ce mandat.", 403);
+    }
+
     const updated = await prisma.warrant.update({
       where: { id: w.id },
       data: {
@@ -56,6 +66,8 @@ export const PATCH = handle(
         issuedDate: d.issuedDate ? new Date(d.issuedDate) : undefined,
         expiryDate: d.expiryDate ? new Date(d.expiryDate) : undefined,
         deniedReason: denying ? d.deniedReason ?? null : undefined,
+        isPublic: d.isPublic ?? undefined,
+        publicSummary: d.publicSummary ?? undefined,
         approvedById: approving ? actor.agent?.id ?? null : undefined,
       },
     });

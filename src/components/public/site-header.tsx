@@ -10,6 +10,7 @@ import { Emblem } from "@/components/brand/emblem";
 
 const NAV = [
   { href: "/most-wanted", label: "Most Wanted" },
+  { href: "/warrants", label: "Mandats" },
   { href: "/investigations", label: "Enquêtes" },
   { href: "/news", label: "Actualités" },
   { href: "/how-we-can-help", label: "Comment nous pouvons vous aider" },

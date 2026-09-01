@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { useConfirm } from "@/components/ui/confirm";
 import { PersonPicker } from "@/components/agent/person-picker";
+import { PERSON_ROLE, WARRANT_TYPE, WARRANT_STATUS, EVIDENCE_TYPE } from "@/lib/constants";
+import { options } from "@/lib/i18n";
 
 type Opt = { id: string; label: string };
 
@@ -20,29 +22,10 @@ async function req(url: string, method: string, body?: unknown) {
   return { ok: r.ok, json: await r.json().catch(() => ({})) };
 }
 
-const ROLE_OPTS: [string, string][] = [
-  ["SUSPECT", "Suspect"],
-  ["VICTIM", "Victime"],
-  ["WITNESS", "Témoin"],
-  ["ASSOCIATE", "Associé"],
-  ["PERSON_OF_INTEREST", "Personne d'intérêt"],
-];
-const ROLE_LABEL = Object.fromEntries(ROLE_OPTS);
-
-const EVIDENCE_TYPE_OPTS: [string, string][] = [
-  ["PHYSICAL", "Physique"],
-  ["DIGITAL", "Numérique"],
-  ["DOCUMENT", "Document"],
-  ["PHOTO", "Photographie"],
-  ["VIDEO", "Vidéo"],
-  ["AUDIO", "Audio"],
-  ["FIREARM", "Arme à feu"],
-  ["NARCOTIC", "Stupéfiant"],
-  ["FINANCIAL", "Financier"],
-  ["BIOLOGICAL", "Biologique"],
-  ["OTHER", "Autre"],
-];
-const EVIDENCE_TYPE_LABEL = Object.fromEntries(EVIDENCE_TYPE_OPTS);
+const ROLE_OPTS = options(PERSON_ROLE);
+const ROLE_LABEL = PERSON_ROLE;
+const EVIDENCE_TYPE_OPTS = options(EVIDENCE_TYPE);
+const EVIDENCE_TYPE_LABEL = EVIDENCE_TYPE;
 
 // ---------------------------------------------------------------------------
 // Suppression d'une enquête (corbeille)
@@ -248,31 +231,18 @@ export function InvestigationEvidence({
   );
 }
 
-const WTYPE_OPTS: [string, string][] = [
-  ["ARREST", "Arrestation"],
-  ["SEARCH", "Perquisition"],
-  ["SURVEILLANCE", "Surveillance"],
-  ["SEIZURE", "Saisie"],
-];
-const WTYPE_LABEL = Object.fromEntries(WTYPE_OPTS);
+const WTYPE_OPTS = options(WARRANT_TYPE);
+const WTYPE_LABEL = WARRANT_TYPE;
 
-const WSTATUS_OPTS: [string, string][] = [
-  ["REQUESTED", "Demandé"],
-  ["APPROVED", "Approuvé"],
-  ["ACTIVE", "Actif"],
-  ["EXECUTED", "Exécuté"],
-  ["EXPIRED", "Expiré"],
-  ["DENIED", "Refusé"],
-];
-const WSTATUS_LABEL = Object.fromEntries(WSTATUS_OPTS);
-const WSTATUS_TONE: Record<string, string> = {
-  REQUESTED: "amber",
-  APPROVED: "blue",
-  ACTIVE: "green",
-  EXECUTED: "slate",
-  EXPIRED: "slate",
-  DENIED: "red",
-};
+const WSTATUS_OPTS = Object.entries(WARRANT_STATUS).map(
+  ([k, v]) => [k, v.label] as [string, string],
+);
+const WSTATUS_LABEL: Record<string, string> = Object.fromEntries(
+  Object.entries(WARRANT_STATUS).map(([k, v]) => [k, v.label]),
+);
+const WSTATUS_TONE: Record<string, string> = Object.fromEntries(
+  Object.entries(WARRANT_STATUS).map(([k, v]) => [k, v.tone]),
+);
 
 // ---------------------------------------------------------------------------
 // Personnes liées à l'enquête
@@ -452,9 +422,11 @@ export function InvestigationWarrants({
     description: string | null;
     issuedDate: string | null;
     expiryDate: string | null;
+    isPublic: boolean;
+    publicSummary: string | null;
   }[];
   casePersons: Opt[];
-  caps: { create: boolean; edit: boolean; approve: boolean; del: boolean };
+  caps: { create: boolean; edit: boolean; approve: boolean; del: boolean; publish: boolean };
 }) {
   const router = useRouter();
   const { toast } = useToast();
@@ -520,6 +492,15 @@ export function InvestigationWarrants({
                   <span className="font-mono text-xs text-navy-500">{w.warrantNumber}</span>{" "}
                   · {WTYPE_LABEL[w.type] ?? w.type}
                   {w.personName ? ` · ${w.personName}` : ""}
+                  {w.isPublic ? (
+                    <a
+                      href={`/warrants/${encodeURIComponent(w.warrantNumber)}`}
+                      target="_blank"
+                      className="ml-2 inline-flex"
+                    >
+                      <Badge tone="green">Public ↗</Badge>
+                    </a>
+                  ) : null}
                 </span>
                 <div className="flex items-center gap-2">
                   {canModify ? (
@@ -537,6 +518,13 @@ export function InvestigationWarrants({
                   ) : (
                     <Badge tone={WSTATUS_TONE[w.status]}>{WSTATUS_LABEL[w.status] ?? w.status}</Badge>
                   )}
+                  <a
+                    href={`/agent/print/warrant/${w.id}`}
+                    target="_blank"
+                    className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                  >
+                    PDF
+                  </a>
                   {caps.edit ? (
                     <button
                       onClick={() => setEditing(editing === w.id ? null : w.id)}
@@ -568,6 +556,12 @@ export function InvestigationWarrants({
                       description: fd.get("description") || undefined,
                       issuedDate: fd.get("issuedDate") || undefined,
                       expiryDate: fd.get("expiryDate") || undefined,
+                      ...(caps.publish
+                        ? {
+                            isPublic: fd.get("isPublic") === "on",
+                            publicSummary: fd.get("publicSummary") || undefined,
+                          }
+                        : {}),
                     });
                   }}
                   className="mt-3 grid gap-3 border-t border-navy-100 pt-3 sm:grid-cols-2"
@@ -605,6 +599,39 @@ export function InvestigationWarrants({
                   <Field label="Description" className="sm:col-span-2">
                     <Textarea name="description" rows={2} defaultValue={w.description ?? ""} />
                   </Field>
+                  {caps.publish ? (
+                    <div className="space-y-2 rounded-md border border-navy-200 bg-navy-50 p-3 sm:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-navy-700">
+                        <input
+                          type="checkbox"
+                          name="isPublic"
+                          defaultChecked={w.isPublic}
+                          className="h-4 w-4"
+                        />
+                        Publier un avis public sur FBI.gov
+                      </label>
+                      <Field label="Résumé public (aucune donnée sensible)">
+                        <Textarea
+                          name="publicSummary"
+                          rows={3}
+                          defaultValue={w.publicSummary ?? ""}
+                          placeholder="Texte affiché sur la page publique du mandat."
+                        />
+                      </Field>
+                      {w.isPublic ? (
+                        <p className="text-xs text-navy-500">
+                          Page publique :{" "}
+                          <a
+                            className="link-underline"
+                            href={`/warrants/${encodeURIComponent(w.warrantNumber)}`}
+                            target="_blank"
+                          >
+                            /warrants/{w.warrantNumber}
+                          </a>
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <div className="sm:col-span-2">
                     <Button size="sm" type="submit">
                       Enregistrer
@@ -812,6 +839,13 @@ export function InvestigationArrests({
                   {a.location ? ` · ${a.location}` : ""}
                 </span>
                 <div className="flex items-center gap-2">
+                  <a
+                    href={`/agent/print/arrest/${a.id}`}
+                    target="_blank"
+                    className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                  >
+                    PDF
+                  </a>
                   {caps.edit ? (
                     <button
                       onClick={() => setEditing(editing === a.id ? null : a.id)}

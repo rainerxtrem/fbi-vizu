@@ -28,9 +28,31 @@ export default async function AgentDetailPage({ params }: { params: { id: string
   if (!agent) notFound();
 
   const canManageAgent = can(actor, "agents.manage");
-  const offices = canManageAgent
-    ? await prisma.fieldOffice.findMany({ orderBy: { isHq: "desc" } })
-    : [];
+  const [offices, stats] = await Promise.all([
+    canManageAgent
+      ? prisma.fieldOffice.findMany({ orderBy: { isHq: "desc" } })
+      : Promise.resolve([]),
+    (async () => {
+      const [led, ledClosed, assigned, arrests, warrantsReq, warrantsApproved, evidence] =
+        await Promise.all([
+          prisma.investigation.count({ where: { deletedAt: null, leadAgentId: agent.id } }),
+          prisma.investigation.count({
+            where: {
+              deletedAt: null,
+              leadAgentId: agent.id,
+              status: { in: ["CLOSED", "ARCHIVED"] },
+            },
+          }),
+          prisma.investigationAgent.count({ where: { agentId: agent.id } }),
+          prisma.arrest.count({ where: { arrestingAgentId: agent.id } }),
+          prisma.warrant.count({ where: { requestedById: agent.id } }),
+          prisma.warrant.count({ where: { approvedById: agent.id } }),
+          prisma.evidence.count({ where: { deletedAt: null, collectedById: agent.id } }),
+        ]);
+      return { led, ledClosed, assigned, arrests, warrantsReq, warrantsApproved, evidence };
+    })(),
+  ]);
+  const closeRate = stats.led > 0 ? Math.round((stats.ledClosed / stats.led) * 100) : null;
 
   const canManageRank =
     (can(actor, "agents.promote") || can(actor, "agents.demote")) &&
@@ -93,6 +115,24 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                   {p}
                 </span>
               ))}
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader title="Statistiques" description="Activité de l'agent" />
+          <CardBody>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              <Stat label="Dossiers dirigés" value={stats.led} />
+              <Stat
+                label="Taux de clôture"
+                value={closeRate === null ? "—" : `${closeRate}%`}
+              />
+              <Stat label="Dossiers affectés" value={stats.assigned} />
+              <Stat label="Arrestations" value={stats.arrests} />
+              <Stat label="Mandats demandés" value={stats.warrantsReq} />
+              <Stat label="Mandats approuvés" value={stats.warrantsApproved} />
+              <Stat label="Preuves collectées" value={stats.evidence} />
             </div>
           </CardBody>
         </Card>
@@ -171,6 +211,15 @@ function Row({ label, value }: { label: string; value?: string | null }) {
     <div className="flex justify-between gap-3">
       <span className="text-xs uppercase tracking-wide text-navy-400">{label}</span>
       <span className="text-right text-navy-800">{value || "—"}</span>
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-2xl font-bold text-navy-900">{value}</p>
+      <p className="text-xs uppercase tracking-wide text-navy-400">{label}</p>
     </div>
   );
 }

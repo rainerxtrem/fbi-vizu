@@ -146,6 +146,38 @@ export const WARRANT_STATUS: Record<string, { label: string; tone: string }> = {
   DENIED: { label: "Refusé", tone: "red" },
 };
 
+export const WARRANT_TYPE: Record<string, string> = {
+  ARREST: "Arrestation",
+  SEARCH: "Perquisition",
+  SURVEILLANCE: "Surveillance",
+  SEIZURE: "Saisie",
+};
+
+export const TIMELINE_EVENT: Record<string, string> = {
+  INVESTIGATION_OPENED: "Enquête ouverte",
+  INVESTIGATION_UPDATED: "Dossier mis à jour",
+  STATUS_CHANGED: "Changement de statut",
+  NOTE_ADDED: "Note ajoutée",
+  EVIDENCE_ADDED: "Preuve ajoutée",
+  DOCUMENT_ADDED: "Document ajouté",
+  PERSON_LINKED: "Personne liée",
+  WARRANT_REQUESTED: "Mandat demandé",
+  WARRANT_APPROVED: "Mandat approuvé",
+  ARREST_MADE: "Arrestation",
+  AGENT_ASSIGNED: "Agent affecté",
+  MOST_WANTED_CREATED: "Bulletin Most Wanted créé",
+  CUSTOM: "Événement",
+};
+
+export const NOTIFICATION_TYPE: Record<string, string> = {
+  CASE_ASSIGNED: "Affectation à une enquête",
+  WARRANT_APPROVED: "Mandat approuvé",
+  WARRANT_DENIED: "Mandat refusé",
+  ARREST_MADE: "Arrestation",
+  RANK_CHANGED: "Changement de grade",
+  TIP_ASSIGNED: "Renseignement assigné",
+};
+
 export const RISK_LEVEL: Record<string, { label: string; tone: string }> = {
   LOW: { label: "Faible", tone: "slate" },
   MEDIUM: { label: "Moyen", tone: "blue" },
