@@ -4,14 +4,14 @@ import { prisma } from "@/lib/db";
 import { handle, ok, fail } from "@/lib/api";
 import { arrestUpdateSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 
-async function loadArrest(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
+async function loadArrest(id: string, actor: Parameters<typeof getInvestigationForEditOr404>[1]) {
   const a = await prisma.arrest.findUnique({ where: { id }, include: { person: true } });
   if (!a || a.deletedAt) return null;
-  const inv = await getInvestigationOr404(a.investigationId, actor);
+  const inv = await getInvestigationForEditOr404(a.investigationId, actor);
   return { a, inv };
 }
 
@@ -25,7 +25,7 @@ export const PATCH = handle(
     if (!loaded) return fail("Arrestation introuvable.", 404);
     const { a, inv } = loaded;
 
-    const assignedAgentIds = inv.assignedAgents.map((x) => x.agentId);
+    const assignedAgentIds = inv.assignedAgentIds;
     if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds })) {
       return fail("Vous n'êtes pas affecté à cette enquête.", 403);
     }

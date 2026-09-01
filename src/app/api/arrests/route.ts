@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { handle, created, fail } from "@/lib/api";
 import { arrestCreateSchema } from "@/lib/validation";
 import { requireApiPermission } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
 import { notify } from "@/lib/notify";
@@ -12,9 +12,8 @@ import { notify } from "@/lib/notify";
 export const POST = handle(async (req: Request) => {
   const actor = await requireApiPermission("arrest.create");
   const d = arrestCreateSchema.parse(await req.json());
-  const inv = await getInvestigationOr404(d.investigationId, actor);
-
-  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
+  const inv = await getInvestigationForEditOr404(d.investigationId, actor);
+  const assignedAgentIds = inv.assignedAgentIds;
   if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds })) {
     return fail("Vous n'êtes pas affecté à cette enquête.", 403);
   }

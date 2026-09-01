@@ -17,6 +17,36 @@ try {
   process.exit(1);
 }
 
+// Trigram indexes for the ILIKE '%…%' search paths, plus a light retention
+// sweep on notifications. Best-effort — never block the deploy on these.
+{
+  const p = new PrismaClient();
+  try {
+    await p.$executeRawUnsafe(`CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+    for (const [table, col] of [
+      ["Person", "fullName"],
+      ["Person", "alias"],
+      ["Investigation", "title"],
+      ["Investigation", "caseNumber"],
+      ["Agent", "badgeNumber"],
+    ]) {
+      const idx = `idx_trgm_${table.toLowerCase()}_${col.toLowerCase()}`;
+      await p.$executeRawUnsafe(
+        `CREATE INDEX IF NOT EXISTS "${idx}" ON "${table}" USING gin ("${col}" gin_trgm_ops)`,
+      );
+    }
+    const cutoff = new Date(Date.now() - 60 * 24 * 3600 * 1000);
+    const purged = await p.notification.deleteMany({
+      where: { readAt: { not: null, lt: cutoff } },
+    });
+    if (purged.count) console.log(`Purged ${purged.count} old read notifications.`);
+  } catch (e) {
+    console.warn("post-push maintenance skipped:", e?.message ?? e);
+  } finally {
+    await p.$disconnect();
+  }
+}
+
 const seedMode = process.env.SEED_DATABASE ?? "true";
 if (seedMode === "false") {
   console.log("SEED_DATABASE=false — skipping seed.");

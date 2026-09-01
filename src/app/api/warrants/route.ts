@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { handle, created, fail } from "@/lib/api";
 import { warrantCreateSchema } from "@/lib/validation";
 import { requireApiPermission } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { nextWarrantNumber } from "@/lib/ids";
 import { addTimelineEvent } from "@/lib/timeline";
@@ -13,10 +13,9 @@ import { audit } from "@/lib/audit";
 export const POST = handle(async (req: Request) => {
   const actor = await requireApiPermission("warrant.request");
   const d = warrantCreateSchema.parse(await req.json());
-  const inv = await getInvestigationOr404(d.investigationId, actor);
+  const inv = await getInvestigationForEditOr404(d.investigationId, actor);
 
-  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
-  if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds })) {
+  if (!canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds: inv.assignedAgentIds })) {
     return fail("Vous n'êtes pas affecté à cette enquête.", 403);
   }
   // Only an approver can create a warrant already in an approved/active state.

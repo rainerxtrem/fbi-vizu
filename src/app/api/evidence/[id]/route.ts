@@ -4,19 +4,18 @@ import { prisma } from "@/lib/db";
 import { handle, ok, fail } from "@/lib/api";
 import { evidenceUpdateSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
 
-async function loadEvidence(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
+async function loadEvidence(id: string, actor: Parameters<typeof getInvestigationForEditOr404>[1]) {
   const ev = await prisma.evidence.findFirst({ where: { id, deletedAt: null } });
   if (!ev) return null;
-  const inv = await getInvestigationOr404(ev.investigationId, actor);
-  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
+  const inv = await getInvestigationForEditOr404(ev.investigationId, actor);
   const mayEdit = canEditInvestigation(actor, {
     leadAgentId: inv.leadAgentId,
-    assignedAgentIds,
+    assignedAgentIds: inv.assignedAgentIds,
   });
   return { ev, inv, mayEdit };
 }

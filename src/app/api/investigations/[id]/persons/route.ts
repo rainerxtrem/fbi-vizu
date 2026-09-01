@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { handle, ok, created, fail } from "@/lib/api";
 import { investigationPersonSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
@@ -12,12 +12,14 @@ import { PERSON_ROLE } from "@/lib/constants";
 
 const ROLE_FR = PERSON_ROLE;
 
-async function guard(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
-  const inv = await getInvestigationOr404(id, actor);
-  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
+async function guard(id: string, actor: Parameters<typeof getInvestigationForEditOr404>[1]) {
+  const inv = await getInvestigationForEditOr404(id, actor);
   const mayEdit =
     can(actor, "person.link") &&
-    canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds });
+    canEditInvestigation(actor, {
+      leadAgentId: inv.leadAgentId,
+      assignedAgentIds: inv.assignedAgentIds,
+    });
   return { inv, mayEdit };
 }
 

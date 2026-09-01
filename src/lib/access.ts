@@ -81,6 +81,57 @@ export async function getInvestigationOr404(
   return inv;
 }
 
+/**
+ * Lightweight loader for write paths (warrants, arrests, evidence, person links).
+ * Selects only what's needed to authorise, not the whole investigation graph.
+ * Throws RbacError(404) when the actor may not see it.
+ */
+export async function getInvestigationForEditOr404(id: string, actor: Actor | null) {
+  const inv = await prisma.investigation.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      caseNumber: true,
+      title: true,
+      classification: true,
+      leadAgentId: true,
+      fieldOfficeId: true,
+      isPublic: true,
+      deletedAt: true,
+      assignedAgents: { select: { agentId: true } },
+    },
+  });
+
+  if (!inv || inv.deletedAt) {
+    const e = new RbacError("Enquête introuvable");
+    e.status = 404;
+    throw e;
+  }
+
+  const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
+  const allowed = canViewInvestigation(actor, {
+    id: inv.id,
+    classification: inv.classification,
+    leadAgentId: inv.leadAgentId,
+    fieldOfficeId: inv.fieldOfficeId,
+    isPublic: inv.isPublic,
+    assignedAgentIds,
+  });
+  if (!allowed) {
+    const e = new RbacError("Enquête introuvable");
+    e.status = 404;
+    throw e;
+  }
+
+  return {
+    id: inv.id,
+    caseNumber: inv.caseNumber,
+    title: inv.title,
+    leadAgentId: inv.leadAgentId,
+    assignedAgentIds,
+  };
+}
+
 /** Whether the actor may edit this investigation (lead, assigned + edit, or edit.any). */
 export function canEditInvestigation(
   actor: Actor | null,

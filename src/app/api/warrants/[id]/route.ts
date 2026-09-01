@@ -4,16 +4,16 @@ import { prisma } from "@/lib/db";
 import { handle, ok, fail } from "@/lib/api";
 import { warrantUpdateSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
-import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
+import { getInvestigationForEditOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
 import { notify } from "@/lib/notify";
 
-async function loadWarrant(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
+async function loadWarrant(id: string, actor: Parameters<typeof getInvestigationForEditOr404>[1]) {
   const w = await prisma.warrant.findUnique({ where: { id } });
   if (!w || w.deletedAt) return null;
-  const inv = await getInvestigationOr404(w.investigationId, actor);
+  const inv = await getInvestigationForEditOr404(w.investigationId, actor);
   return { w, inv };
 }
 
@@ -24,10 +24,12 @@ export const PATCH = handle(
     if (!loaded) return fail("Mandat introuvable.", 404);
     const { w, inv } = loaded;
 
-    const assignedAgentIds = inv.assignedAgents.map((a) => a.agentId);
     const mayEdit =
       can(actor, "warrant.edit") &&
-      canEditInvestigation(actor, { leadAgentId: inv.leadAgentId, assignedAgentIds });
+      canEditInvestigation(actor, {
+        leadAgentId: inv.leadAgentId,
+        assignedAgentIds: inv.assignedAgentIds,
+      });
     if (!mayEdit && !can(actor, "warrant.approve")) {
       return fail("Vous n'êtes pas autorisé à modifier ce mandat.", 403);
     }
