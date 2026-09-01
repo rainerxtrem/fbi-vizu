@@ -8,6 +8,7 @@ import { investigationVisibilityFilter, can } from "@/lib/rbac";
 import { nextCaseNumber } from "@/lib/ids";
 import { audit } from "@/lib/audit";
 import { addTimelineEvent } from "@/lib/timeline";
+import { notify } from "@/lib/notify";
 
 export const GET = handle(async (req: Request) => {
   const actor = await requireApiActor();
@@ -131,6 +132,18 @@ export const POST = handle(async (req: Request) => {
     entityId: inv.id,
     summary: `${actor.name} a créé l'enquête ${inv.caseNumber}`,
   });
+
+  await notify(
+    [inv.leadAgentId, ...Array.from(new Set(d.assignedAgentIds))].filter(
+      (id) => id && id !== actor.agent!.id,
+    ),
+    {
+      type: "CASE_ASSIGNED",
+      title: `Affecté à l'enquête ${inv.caseNumber}`,
+      body: inv.title,
+      linkUrl: `/agent/investigations/${inv.id}`,
+    },
+  );
 
   return created({ id: inv.id, caseNumber: inv.caseNumber });
 });

@@ -79,15 +79,17 @@ export default async function InvestigationDetailPage({
     deleteInvestigation: can(actor, "investigation.delete"),
   };
 
-  const canManageRelations =
-    perms.arrestCreate || perms.arrestEdit;
-  const activeAgents = canManageRelations
-    ? await prisma.agent.findMany({
-        where: { status: "ACTIVE" },
-        include: { user: true },
-        orderBy: { rank: "desc" },
-      })
-    : [];
+  const canManageRelations = perms.arrestCreate || perms.arrestEdit;
+  const [activeAgents, chargeCatalog] = canManageRelations
+    ? await Promise.all([
+        prisma.agent.findMany({
+          where: { status: "ACTIVE" },
+          include: { user: true },
+          orderBy: { rank: "desc" },
+        }),
+        prisma.charge.findMany({ orderBy: [{ category: "asc" }, { title: "asc" }] }),
+      ])
+    : [[], []];
 
   const linkedPersons = inv.persons.map((p) => ({
     linkId: p.id,
@@ -113,6 +115,11 @@ export default async function InvestigationDetailPage({
     issuedDate: w.issuedDate ? w.issuedDate.toISOString().slice(0, 10) : null,
     expiryDate: w.expiryDate ? w.expiryDate.toISOString().slice(0, 10) : null,
   }));
+  const chargeOptions = chargeCatalog.map((c) => ({
+    id: c.id,
+    label: c.title,
+    category: c.category,
+  }));
   const arrestList = inv.arrests.map((a) => ({
     id: a.id,
     personId: a.personId,
@@ -120,6 +127,8 @@ export default async function InvestigationDetailPage({
     date: a.arrestDate.toISOString().slice(0, 10),
     location: a.location,
     charges: a.charges,
+    chargeIds: a.chargeLinks.map((cl) => cl.chargeId),
+    chargeTitles: a.chargeLinks.map((cl) => cl.charge.title),
     notes: a.notes,
     agentId: a.arrestingAgentId,
     agentName: a.arrestingAgent?.user.name ?? null,
@@ -360,6 +369,7 @@ export default async function InvestigationDetailPage({
                           arrests={arrestList}
                           casePersons={personPickList}
                           agents={agentPickList}
+                          chargeOptions={chargeOptions}
                           caps={{
                             create: perms.arrestCreate,
                             edit: perms.arrestEdit,

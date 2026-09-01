@@ -31,6 +31,22 @@ export const PATCH = handle(
     }
 
     const d = arrestUpdateSchema.parse(await req.json());
+
+    if (d.chargeIds !== undefined) {
+      const valid = d.chargeIds.length
+        ? await prisma.charge.findMany({
+            where: { id: { in: d.chargeIds } },
+            select: { id: true },
+          })
+        : [];
+      await prisma.$transaction([
+        prisma.arrestCharge.deleteMany({ where: { arrestId: a.id } }),
+        prisma.arrestCharge.createMany({
+          data: valid.map((c) => ({ arrestId: a.id, chargeId: c.id })),
+        }),
+      ]);
+    }
+
     const updated = await prisma.arrest.update({
       where: { id: a.id },
       data: {

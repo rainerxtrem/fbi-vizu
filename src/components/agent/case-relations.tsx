@@ -681,11 +681,41 @@ export function InvestigationWarrants({
 // Arrestations
 // ---------------------------------------------------------------------------
 
+type ChargeOpt = { id: string; label: string; category: string };
+
+function ChargeChecklist({
+  options,
+  selected,
+}: {
+  options: ChargeOpt[];
+  selected: string[];
+}) {
+  if (options.length === 0) return null;
+  return (
+    <div className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-navy-200 bg-white p-2">
+      {options.map((c) => (
+        <label key={c.id} className="flex items-center gap-2 text-sm text-navy-700">
+          <input
+            type="checkbox"
+            name="chargeIds"
+            value={c.id}
+            defaultChecked={selected.includes(c.id)}
+            className="h-3.5 w-3.5"
+          />
+          {c.label}
+          <span className="text-xs text-navy-400">{c.category}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export function InvestigationArrests({
   investigationId,
   arrests,
   casePersons,
   agents,
+  chargeOptions,
   caps,
 }: {
   investigationId: string;
@@ -696,12 +726,15 @@ export function InvestigationArrests({
     date: string;
     location: string | null;
     charges: string | null;
+    chargeIds: string[];
+    chargeTitles: string[];
     notes: string | null;
     agentId: string | null;
     agentName: string | null;
   }[];
   casePersons: Opt[];
   agents: Opt[];
+  chargeOptions: ChargeOpt[];
   caps: { create: boolean; edit: boolean; del: boolean };
 }) {
   const router = useRouter();
@@ -720,6 +753,7 @@ export function InvestigationArrests({
       arrestDate: fd.get("arrestDate") || undefined,
       location: fd.get("location") || undefined,
       charges: fd.get("charges") || undefined,
+      chargeIds: fd.getAll("chargeIds").map(String),
       notes: fd.get("notes") || undefined,
       arrestingAgentId: fd.get("arrestingAgentId") || undefined,
     });
@@ -738,6 +772,7 @@ export function InvestigationArrests({
       arrestDate: fd.get("arrestDate") || undefined,
       location: fd.get("location") || undefined,
       charges: fd.get("charges") || undefined,
+      chargeIds: fd.getAll("chargeIds").map(String),
       notes: fd.get("notes") || undefined,
       arrestingAgentId: fd.get("arrestingAgentId") || "",
     });
@@ -795,6 +830,13 @@ export function InvestigationArrests({
                   ) : null}
                 </div>
               </div>
+              {a.chargeTitles.length > 0 ? (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {a.chargeTitles.map((t) => (
+                    <Badge key={t}>{t}</Badge>
+                  ))}
+                </div>
+              ) : null}
               {a.charges ? <p className="mt-1 text-navy-600">{a.charges}</p> : null}
 
               {editing === a.id ? (
@@ -827,7 +869,12 @@ export function InvestigationArrests({
                   <Field label="Lieu">
                     <Input name="location" defaultValue={a.location ?? ""} />
                   </Field>
-                  <Field label="Chefs d'accusation" className="sm:col-span-2">
+                  {chargeOptions.length > 0 ? (
+                    <Field label="Chefs d'accusation (référentiel)" className="sm:col-span-2">
+                      <ChargeChecklist options={chargeOptions} selected={a.chargeIds} />
+                    </Field>
+                  ) : null}
+                  <Field label="Chefs d'accusation (texte libre)" className="sm:col-span-2">
                     <Input name="charges" defaultValue={a.charges ?? ""} />
                   </Field>
                   <Field label="Notes" className="sm:col-span-2">
@@ -884,7 +931,12 @@ export function InvestigationArrests({
               <Field label="Lieu">
                 <Input name="location" />
               </Field>
-              <Field label="Chefs d'accusation" className="sm:col-span-2">
+              {chargeOptions.length > 0 ? (
+                <Field label="Chefs d'accusation (référentiel)" className="sm:col-span-2">
+                  <ChargeChecklist options={chargeOptions} selected={[]} />
+                </Field>
+              ) : null}
+              <Field label="Chefs d'accusation (texte libre)" className="sm:col-span-2">
                 <Input name="charges" />
               </Field>
               <Field label="Notes" className="sm:col-span-2">

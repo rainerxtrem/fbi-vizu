@@ -5,6 +5,7 @@ import { handle, ok, fail } from "@/lib/api";
 import { tipUpdateSchema } from "@/lib/validation";
 import { requireApiPermission } from "@/lib/auth";
 import { audit } from "@/lib/audit";
+import { notify } from "@/lib/notify";
 
 export const PATCH = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
@@ -30,6 +31,19 @@ export const PATCH = handle(
       summary: `${actor.name} a mis à jour le renseignement ${tip.publicId}`,
       meta: { status: data.status, assignedToId: data.assignedToId },
     });
+
+    if (
+      data.assignedToId &&
+      data.assignedToId !== tip.assignedToId &&
+      data.assignedToId !== actor.agent?.id
+    ) {
+      await notify([data.assignedToId], {
+        type: "TIP_ASSIGNED",
+        title: `Renseignement ${tip.publicId} qui vous est assigné`,
+        body: tip.subject,
+        linkUrl: "/agent/tips",
+      });
+    }
 
     return ok(updated);
   },

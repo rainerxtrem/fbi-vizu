@@ -42,7 +42,13 @@ export async function getInvestigationOr404(
           approvedBy: { include: { user: true } },
         },
       },
-      arrests: { include: { person: true, arrestingAgent: { include: { user: true } } } },
+      arrests: {
+        include: {
+          person: true,
+          arrestingAgent: { include: { user: true } },
+          chargeLinks: { include: { charge: true } },
+        },
+      },
       mostWanted: true,
       relatedFrom: { include: { to: true } },
       relatedTo: { include: { from: true } },

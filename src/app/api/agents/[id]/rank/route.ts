@@ -6,6 +6,7 @@ import { rankChangeSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
 import { canChangeRank, rankLevel, RANK_LABELS, type Rank } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
+import { notify } from "@/lib/notify";
 
 export const POST = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
@@ -50,6 +51,13 @@ export const POST = handle(
         RANK_LABELS[oldRank]
       } à ${RANK_LABELS[newRank]}`,
       meta: { oldRank, newRank, reason },
+    });
+
+    await notify([agent.id], {
+      type: "RANK_CHANGED",
+      title: promotion ? "Vous avez été promu" : "Changement de grade",
+      body: `${RANK_LABELS[oldRank]} → ${RANK_LABELS[newRank]}${reason ? ` — ${reason}` : ""}`,
+      linkUrl: "/agent/settings",
     });
 
     return ok({ oldRank, newRank });

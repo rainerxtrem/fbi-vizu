@@ -4,6 +4,7 @@ import { can, canAny, type Permission } from "@/lib/rbac";
 import { Sidebar, type NavItem } from "@/components/agent/sidebar";
 import { AgentBadge } from "@/components/agent/agent-badge";
 import { GlobalSearch } from "@/components/agent/global-search";
+import { NotificationBell } from "@/components/agent/notification-bell";
 import { ConfirmProvider } from "@/components/ui/confirm";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,7 @@ export const dynamic = "force-dynamic";
 const ALL_NAV: NavItem[] = [
   { href: "/agent", label: "Tableau de bord", icon: "LayoutDashboard" },
   { href: "/agent/investigations/mine", label: "Mes enquêtes", icon: "FolderSearch" },
+  { href: "/agent/notifications", label: "Notifications", icon: "Bell" },
   { href: "/agent/investigations", label: "Toutes les enquêtes", icon: "FolderSearch", perm: "investigation.view" },
   { href: "/agent/investigations/new", label: "Créer une enquête", icon: "FolderPlus", perm: "investigation.create" },
   { href: "/agent/most-wanted", label: "Most Wanted", icon: "ShieldAlert", perm: "mostwanted.view" },
@@ -51,7 +53,10 @@ export default async function AgentLayout({
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-navy-200 bg-white px-4 py-3 lg:px-8">
             <GlobalSearch />
-            <AgentBadge actor={actor} />
+            <div className="flex items-center gap-2">
+              {actor.agent ? <NotificationBell /> : null}
+              <AgentBadge actor={actor} />
+            </div>
           </header>
           <main className="flex-1 p-4 lg:p-8">{children}</main>
         </div>

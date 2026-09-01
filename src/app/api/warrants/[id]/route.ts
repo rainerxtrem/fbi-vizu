@@ -8,6 +8,7 @@ import { getInvestigationOr404, canEditInvestigation } from "@/lib/access";
 import { can } from "@/lib/rbac";
 import { addTimelineEvent } from "@/lib/timeline";
 import { audit } from "@/lib/audit";
+import { notify } from "@/lib/notify";
 
 async function loadWarrant(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
   const w = await prisma.warrant.findUnique({ where: { id } });
@@ -42,6 +43,8 @@ export const PATCH = handle(
       return fail("Seul un Agent habilité peut approuver un mandat.", 403);
     }
 
+    const denying = d.status === "DENIED" && w.status !== "DENIED";
+
     const updated = await prisma.warrant.update({
       where: { id: w.id },
       data: {
@@ -52,6 +55,7 @@ export const PATCH = handle(
         issuingJudge: d.issuingJudge ?? undefined,
         issuedDate: d.issuedDate ? new Date(d.issuedDate) : undefined,
         expiryDate: d.expiryDate ? new Date(d.expiryDate) : undefined,
+        deniedReason: denying ? d.deniedReason ?? null : undefined,
         approvedById: approving ? actor.agent?.id ?? null : undefined,
       },
     });
@@ -72,6 +76,19 @@ export const PATCH = handle(
         d.status ? ` → ${d.status}` : ""
       }`,
     });
+
+    if ((approving || denying) && w.requestedById && w.requestedById !== actor.agent?.id) {
+      await notify([w.requestedById], {
+        type: approving ? "WARRANT_APPROVED" : "WARRANT_DENIED",
+        title: approving
+          ? `Mandat ${w.warrantNumber} approuvé`
+          : `Mandat ${w.warrantNumber} refusé`,
+        body: approving
+          ? `Approuvé par ${actor.name} (${inv.caseNumber})`
+          : `Refusé par ${actor.name}${d.deniedReason ? ` — ${d.deniedReason}` : ""}`,
+        linkUrl: `/agent/investigations/${inv.id}`,
+      });
+    }
 
     return ok(updated);
   },

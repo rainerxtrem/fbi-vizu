@@ -174,6 +174,9 @@ export const warrantUpdateSchema = z.object({
   issuingJudge: optionalStr(200),
   issuedDate: optionalStr(40),
   expiryDate: optionalStr(40),
+  deniedReason: optionalStr(2000),
+  isPublic: z.boolean().optional(),
+  publicSummary: optionalStr(4000),
 });
 
 export const arrestCreateSchema = z.object({
@@ -182,6 +185,7 @@ export const arrestCreateSchema = z.object({
   arrestDate: optionalStr(40),
   location: optionalStr(300),
   charges: optionalStr(2000),
+  chargeIds: z.array(z.string().max(40)).max(50).default([]),
   notes: optionalStr(4000),
   arrestingAgentId: optionalStr(40),
 });
@@ -191,6 +195,7 @@ export const arrestUpdateSchema = z.object({
   arrestDate: optionalStr(40),
   location: optionalStr(300),
   charges: optionalStr(2000),
+  chargeIds: z.array(z.string().max(40)).max(50).optional(),
   notes: optionalStr(4000),
   arrestingAgentId: optionalStr(40),
 });
