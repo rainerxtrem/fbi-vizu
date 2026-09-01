@@ -6,6 +6,8 @@ import { applicationUpdateSchema } from "@/lib/validation";
 import { requireApiActor } from "@/lib/auth";
 import { can } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
+import { sendEmail, applicationStatusEmail } from "@/lib/email";
+import { APPLICATION_STATUS } from "@/lib/constants";
 
 export const PATCH = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
@@ -51,6 +53,17 @@ export const PATCH = handle(
       }`,
       meta: { status: d.status },
     });
+
+    // Notify the candidate on a meaningful status change.
+    if (
+      d.status &&
+      d.status !== app.status &&
+      ["UNDER_REVIEW", "INTERVIEW", "BACKGROUND_CHECK", "APPROVED", "REJECTED"].includes(d.status)
+    ) {
+      const label = APPLICATION_STATUS[d.status]?.label ?? d.status;
+      const mail = applicationStatusEmail(app.firstName, app.publicId, label);
+      await sendEmail(app.email, mail.subject, mail.title, mail.body);
+    }
 
     return ok(updated);
   },

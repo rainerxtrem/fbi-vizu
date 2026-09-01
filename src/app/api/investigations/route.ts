@@ -164,10 +164,14 @@ async function linkPersons(
 ) {
   for (const raw of entries.map((e) => e.trim()).filter(Boolean)) {
     let personId = raw;
-    const existing =
-      raw.length > 20
-        ? await prisma.person.findFirst({ where: { id: raw, deletedAt: null } })
-        : null;
+    // A cuid-shaped token is treated as an existing person id; anything else is
+    // a new name. An id-shaped token that doesn't resolve is skipped, never
+    // turned into a person literally named after the id.
+    const looksLikeId = /^c[a-z0-9]{20,}$/i.test(raw);
+    const existing = looksLikeId
+      ? await prisma.person.findFirst({ where: { id: raw, deletedAt: null } })
+      : null;
+    if (looksLikeId && !existing) continue;
     if (!existing) {
       const created = await prisma.person.create({
         data: {

@@ -137,6 +137,151 @@ export function InvestigationEditForm({
 }
 
 // ---------------------------------------------------------------------------
+// Documents du dossier
+// ---------------------------------------------------------------------------
+
+export function InvestigationDocuments({
+  investigationId,
+  documents,
+  canDownload,
+  caps,
+}: {
+  investigationId: string;
+  documents: {
+    id: string;
+    title: string;
+    category: string;
+    description: string | null;
+    uploadedBy: string | null;
+    createdAt: string;
+    fileUrl: string | null;
+    fileName: string | null;
+  }[];
+  canDownload: boolean;
+  caps: { create: boolean; del: boolean };
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const confirm = useConfirm();
+  const [busy, setBusy] = useState(false);
+
+  async function add(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setBusy(true);
+    const fd = new FormData(e.currentTarget);
+    let fileUrl: string | undefined;
+    const file = fd.get("file") as File | null;
+    if (file && file.size > 0) {
+      const up = new FormData();
+      up.append("file", file);
+      const r = await fetch("/api/uploads", { method: "POST", body: up });
+      const j = await r.json();
+      if (!j.ok) {
+        setBusy(false);
+        return toast("error", j.error ?? "Échec du téléversement.");
+      }
+      fileUrl = j.data.url;
+    }
+    const { ok, json } = await req("/api/documents", "POST", {
+      investigationId,
+      title: fd.get("title"),
+      category: fd.get("category") || undefined,
+      description: fd.get("description") || undefined,
+      fileUrl,
+    });
+    setBusy(false);
+    if (!ok) return toast("error", json.error ?? "Échec.");
+    (e.target as HTMLFormElement).reset();
+    toast("success", "Document ajouté.");
+    router.refresh();
+  }
+
+  async function del(id: string, title: string) {
+    const ok = await confirm({
+      title: `Supprimer « ${title} » ?`,
+      message: "Cette action est définitive.",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
+    const { ok: done, json } = await req(`/api/documents/${id}`, "DELETE");
+    if (!done) return toast("error", json.error ?? "Échec.");
+    toast("success", "Document supprimé.");
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-4">
+      {documents.length === 0 ? (
+        <p className="text-sm text-navy-500">Aucun document.</p>
+      ) : (
+        <div className="divide-y divide-navy-100 rounded-lg border border-navy-200 bg-white">
+          {documents.map((d) => (
+            <div key={d.id} className="flex items-start justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <p className="font-medium text-navy-900">{d.title}</p>
+                <p className="text-xs text-navy-500">
+                  {d.category}
+                  {d.uploadedBy ? ` · ${d.uploadedBy}` : ""}
+                </p>
+                {d.description ? (
+                  <p className="mt-1 text-sm text-navy-600">{d.description}</p>
+                ) : null}
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                {d.fileUrl && canDownload ? (
+                  <a
+                    href={d.fileUrl}
+                    target="_blank"
+                    className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                  >
+                    Ouvrir
+                  </a>
+                ) : null}
+                {caps.del ? (
+                  <button
+                    onClick={() => del(d.id, d.title)}
+                    className="text-xs font-semibold uppercase text-federal-accent hover:underline"
+                  >
+                    Supprimer
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {caps.create ? (
+        <form onSubmit={add} className="grid gap-3 rounded-lg border border-navy-200 bg-navy-50 p-4 sm:grid-cols-2">
+          <Field label="Titre" required>
+            <Input name="title" required />
+          </Field>
+          <Field label="Catégorie">
+            <Input name="category" placeholder="Général" />
+          </Field>
+          <Field label="Description" className="sm:col-span-2">
+            <Textarea name="description" rows={2} />
+          </Field>
+          <Field label="Fichier" className="sm:col-span-2">
+            <input
+              type="file"
+              name="file"
+              className="block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-navy-800 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:text-white"
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <Button size="sm" type="submit" disabled={busy}>
+              {busy ? "Ajout…" : "Ajouter le document"}
+            </Button>
+          </div>
+        </form>
+      ) : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Agents affectés
 // ---------------------------------------------------------------------------
 

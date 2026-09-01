@@ -224,6 +224,14 @@ export const evidenceSchema = z.object({
   fileUrl: optionalStr(500),
 });
 
+export const documentCreateSchema = z.object({
+  investigationId: str(40).min(1),
+  title: str(200).min(1),
+  category: optionalStr(80),
+  description: optionalStr(4000),
+  fileUrl: optionalStr(500),
+});
+
 export const evidenceUpdateSchema = z.object({
   title: optionalStr(200),
   type: z

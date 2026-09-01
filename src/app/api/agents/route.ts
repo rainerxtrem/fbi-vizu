@@ -8,6 +8,7 @@ import { rankLevel, type Rank } from "@/lib/rbac";
 import { hashPassword, randomPassword } from "@/lib/password";
 import { nextBadgeNumber } from "@/lib/ids";
 import { audit } from "@/lib/audit";
+import { sendEmail, agentWelcomeEmail } from "@/lib/email";
 
 export const POST = handle(async (req: Request) => {
   assertRateLimit(req, "agent-create", 10, 60_000);
@@ -89,6 +90,9 @@ export const POST = handle(async (req: Request) => {
     }`,
     meta: { rank: d.rank, isAdmin: d.isAdmin, applicationId: application?.id },
   });
+
+  const mail = agentWelcomeEmail(d.name, badgeNumber, generated);
+  await sendEmail(email, mail.subject, mail.title, mail.body);
 
   return created({
     agentId: user.agent!.id,

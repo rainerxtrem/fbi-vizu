@@ -27,6 +27,7 @@ import {
   InvestigationEditForm,
   InvestigationAgents,
   InvestigationCharges,
+  InvestigationDocuments,
 } from "@/components/agent/case-manage";
 import { formatDate, formatDateTime } from "@/lib/format";
 import {
@@ -83,6 +84,9 @@ export default async function InvestigationDetailPage({
     downloadEvidence: can(actor, "evidence.download"),
     deleteInvestigation: can(actor, "investigation.delete"),
     editCase: editable && can(actor, "investigation.edit"),
+    viewDocs: can(actor, "document.view"),
+    addDoc: editable && can(actor, "document.create"),
+    deleteDoc: can(actor, "document.delete"),
     assignAgents: can(actor, "investigation.assign"),
     setLead:
       editable || can(actor, "investigation.supervise") || can(actor, "investigation.edit.any"),
@@ -168,6 +172,16 @@ export default async function InvestigationDetailPage({
     linkId: c.id,
     title: c.charge.title,
     personName: c.person?.fullName ?? null,
+  }));
+  const docList = inv.documents.map((d) => ({
+    id: d.id,
+    title: d.title,
+    category: d.category,
+    description: d.description,
+    uploadedBy: d.uploadedBy?.user.name ?? null,
+    createdAt: d.createdAt.toISOString(),
+    fileUrl: d.file?.url ?? null,
+    fileName: d.file?.originalName ?? null,
   }));
   const assignedAgentsList = inv.assignedAgents.map((a) => ({
     id: a.agentId,
@@ -375,6 +389,23 @@ export default async function InvestigationDetailPage({
                   </div>
                 ),
               },
+              ...(perms.viewDocs
+                ? [
+                    {
+                      id: "documents",
+                      label: "Documents",
+                      count: inv.documents.length,
+                      content: (
+                        <InvestigationDocuments
+                          investigationId={inv.id}
+                          documents={docList}
+                          canDownload={perms.viewDocs}
+                          caps={{ create: perms.addDoc, del: perms.deleteDoc }}
+                        />
+                      ),
+                    },
+                  ]
+                : []),
               {
                 id: "warrants",
                 label: "Mandats et arrestations",

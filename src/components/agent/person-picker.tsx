@@ -25,6 +25,7 @@ export function PersonPicker({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<Person | null>(null);
+  const [active, setActive] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,11 +48,32 @@ export function PersonPicker({
       setLoading(false);
       if (j.ok) {
         setResults(j.data.persons);
+        setActive(0);
         setOpen(true);
       }
     }, 250);
     return () => clearTimeout(t);
   }, [q, selected]);
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!open || results.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((i) => Math.min(i + 1, results.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const p = results[active];
+      if (p) {
+        setSelected(p);
+        setOpen(false);
+      }
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
 
   if (selected) {
     return (
@@ -89,21 +111,34 @@ export function PersonPicker({
         value={q}
         onChange={(e) => setQ(e.target.value)}
         onFocus={() => results.length && setOpen(true)}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         className="field-input"
         autoComplete="off"
+        role="combobox"
+        aria-expanded={open}
+        aria-controls="person-picker-list"
       />
       {open && results.length > 0 ? (
-        <div className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-md border border-navy-200 bg-white shadow-xl">
-          {results.map((p) => (
+        <div
+          id="person-picker-list"
+          role="listbox"
+          className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-md border border-navy-200 bg-white shadow-xl"
+        >
+          {results.map((p, i) => (
             <button
               key={p.id}
               type="button"
+              role="option"
+              aria-selected={i === active}
+              onMouseEnter={() => setActive(i)}
               onClick={() => {
                 setSelected(p);
                 setOpen(false);
               }}
-              className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-navy-50"
+              className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm ${
+                i === active ? "bg-navy-100" : "hover:bg-navy-50"
+              }`}
             >
               <span className="text-navy-900">
                 {p.fullName}

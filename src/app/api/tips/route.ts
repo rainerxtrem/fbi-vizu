@@ -7,6 +7,7 @@ import { nextTipPublicId } from "@/lib/ids";
 import { getActor, requireApiPermission } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { can } from "@/lib/rbac";
+import { sendEmail, tipReceiptEmail } from "@/lib/email";
 
 // Public: submit a tip
 export const POST = handle(async (req: Request) => {
@@ -43,6 +44,11 @@ export const POST = handle(async (req: Request) => {
     summary: `Renseignement public ${publicId} soumis${data.anonymous ? " (anonyme)" : ""}`,
     ip: clientIp(req),
   });
+
+  if (!data.anonymous && data.email) {
+    const mail = tipReceiptEmail(publicId);
+    await sendEmail(data.email, mail.subject, mail.title, mail.body);
+  }
 
   return created({ publicId: tip.publicId, id: tip.id });
 });
