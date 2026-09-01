@@ -207,6 +207,10 @@ model User {
   // (password change, agent suspension, explicit "sign out everywhere").
   tokenVersion      Int       @default(0)
   passwordChangedAt DateTime?
+  // TOTP two-factor. `totpSecret` is also set (pending) during enrolment;
+  // `totpEnabledAt` non-null means 2FA is active and required at login.
+  totpSecret        String?
+  totpEnabledAt     DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

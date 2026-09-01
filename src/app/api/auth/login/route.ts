@@ -7,11 +7,12 @@ import { createSession } from "@/lib/session";
 import { loginSchema } from "@/lib/validation";
 import { handle, fail, ok, assertRateLimit, clientIp } from "@/lib/api";
 import { audit } from "@/lib/audit";
+import { verifyTotp } from "@/lib/totp";
 
 export const POST = handle(async (req: Request) => {
   assertRateLimit(req, "login", 8, 60_000);
   const body = await req.json();
-  const { email, password } = loginSchema.parse(body);
+  const { email, password, totpCode } = loginSchema.parse(body);
 
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
@@ -33,6 +34,20 @@ export const POST = handle(async (req: Request) => {
 
   if (user.agent && user.agent.status === "SUSPENDED") {
     return fail("Ce compte est suspendu. Contactez l'administrateur de la plateforme.", 403);
+  }
+
+  if (user.totpEnabledAt && user.totpSecret) {
+    if (!totpCode) {
+      return fail("Code de vérification requis.", 401, { needsTotp: true });
+    }
+    if (!verifyTotp(user.totpSecret, totpCode)) {
+      await audit(null, {
+        action: "auth.login.totp_failed",
+        summary: `Code 2FA invalide pour ${email}`,
+        ip: clientIp(req),
+      });
+      return fail("Code de vérification invalide.", 401, { needsTotp: true });
+    }
   }
 
   await createSession({

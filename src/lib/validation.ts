@@ -12,6 +12,7 @@ const optionalStr = (max = 5000) =>
 export const loginSchema = z.object({
   email: z.string().trim().email().max(200),
   password: z.string().min(1).max(200),
+  totpCode: z.string().trim().max(10).optional(),
 });
 
 export const passwordChangeSchema = z.object({

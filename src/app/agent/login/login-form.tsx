@@ -9,6 +9,7 @@ export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [needsTotp, setNeedsTotp] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,11 +22,13 @@ export function LoginForm() {
       body: JSON.stringify({
         email: fd.get("email"),
         password: fd.get("password"),
+        totpCode: fd.get("totpCode") || undefined,
       }),
     });
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
+      if (json.needsTotp) setNeedsTotp(true);
       setError(json.error ?? "Échec de la connexion.");
       return;
     }
@@ -52,8 +55,21 @@ export function LoginForm() {
           autoComplete="current-password"
         />
       </Field>
+      {needsTotp ? (
+        <Field label="Code de vérification (application d'authentification)" htmlFor="totpCode">
+          <Input
+            id="totpCode"
+            name="totpCode"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="123456"
+            autoFocus
+          />
+        </Field>
+      ) : null}
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Connexion…" : "Se connecter"}
+        {loading ? "Connexion…" : needsTotp ? "Vérifier et se connecter" : "Se connecter"}
       </Button>
     </form>
   );

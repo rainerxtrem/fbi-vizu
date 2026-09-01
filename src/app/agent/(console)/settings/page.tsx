@@ -1,4 +1,5 @@
 import { requireAgent } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { effectivePermissions, RANK_LABELS, type Rank } from "@/lib/rbac";
 import { AGENT_STATUS } from "@/lib/constants";
 import { PageTitle } from "@/components/agent/ui";
@@ -8,6 +9,10 @@ import { SecuritySettings } from "@/components/agent/security-settings";
 export default async function SettingsPage() {
   const actor = await requireAgent();
   const perms = Array.from(effectivePermissions(actor)).sort();
+  const me = await prisma.user.findUnique({
+    where: { id: actor.userId },
+    select: { totpEnabledAt: true },
+  });
 
   return (
     <div className="max-w-3xl">
@@ -56,7 +61,7 @@ export default async function SettingsPage() {
               expirent après 8 heures. Changer votre mot de passe déconnecte
               automatiquement tous vos autres appareils.
             </p>
-            <SecuritySettings />
+            <SecuritySettings twoFactorEnabled={!!me?.totpEnabledAt} />
           </CardBody>
         </Card>
       </div>
