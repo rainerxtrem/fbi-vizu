@@ -19,10 +19,15 @@ export interface SessionPayload {
   sub: string; // user id
   email: string;
   name: string;
+  ver: number; // User.tokenVersion at issue time — mismatched sessions are rejected
 }
 
 export async function createSession(payload: SessionPayload): Promise<void> {
-  const token = await new SignJWT({ email: payload.email, name: payload.name })
+  const token = await new SignJWT({
+    email: payload.email,
+    name: payload.name,
+    ver: payload.ver,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.sub)
     .setIssuedAt()
@@ -47,6 +52,7 @@ export async function readSession(): Promise<SessionPayload | null> {
       sub: String(payload.sub),
       email: String(payload.email ?? ""),
       name: String(payload.name ?? ""),
+      ver: Number(payload.ver ?? 0),
     };
   } catch {
     return null;

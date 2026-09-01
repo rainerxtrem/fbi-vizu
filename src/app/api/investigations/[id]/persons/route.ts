@@ -38,7 +38,9 @@ export const POST = handle(
     let personName = "";
 
     if (personId) {
-      const existing = await prisma.person.findUnique({ where: { id: personId } });
+      const existing = await prisma.person.findFirst({
+        where: { id: personId, deletedAt: null },
+      });
       if (!existing) return fail("Personne introuvable.", 404);
       personName = existing.fullName;
     } else {

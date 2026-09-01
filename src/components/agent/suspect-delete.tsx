@@ -29,13 +29,11 @@ export function SuspectDelete({
       parts.push(`${linkedCounts.mostWanted} bulletin(s) Most Wanted`);
 
     const ok = await confirm({
-      title: `Supprimer la fiche de ${name} ?`,
+      title: `Placer la fiche de ${name} dans la corbeille ?`,
       message:
-        "Cette action est définitive." +
-        (parts.length
-          ? ` Les éléments liés seront détachés ou supprimés (${parts.join(", ")}).`
-          : ""),
-      confirmLabel: "Supprimer définitivement",
+        "La fiche et tous ses liens sont conservés et peuvent être restaurés depuis la Corbeille." +
+        (parts.length ? ` Éléments liés : ${parts.join(", ")}.` : ""),
+      confirmLabel: "Mettre à la corbeille",
       danger: true,
     });
     if (!ok) return;
@@ -45,7 +43,7 @@ export function SuspectDelete({
     const j = await r.json();
     setBusy(false);
     if (!r.ok) return toast("error", j.error ?? "Échec de la suppression.");
-    toast("success", "Fiche supprimée.");
+    toast("success", "Fiche déplacée vers la corbeille.");
     router.push("/agent/suspects");
     router.refresh();
   }
@@ -53,11 +51,11 @@ export function SuspectDelete({
   return (
     <div className="space-y-2">
       <p className="text-sm text-navy-600">
-        Supprime définitivement cette fiche de personne et détache les preuves,
-        mandats et bulletins qui la référencent.
+        Retire cette fiche de la base active. Elle reste restaurable depuis la
+        Corbeille ; sa suppression définitive s&apos;y effectue ensuite.
       </p>
       <Button variant="danger" size="sm" onClick={del} disabled={busy}>
-        {busy ? "Suppression…" : "Supprimer la fiche"}
+        {busy ? "Suppression…" : "Mettre à la corbeille"}
       </Button>
     </div>
   );

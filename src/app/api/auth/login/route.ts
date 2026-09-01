@@ -35,7 +35,12 @@ export const POST = handle(async (req: Request) => {
     return fail("Ce compte est suspendu. Contactez l'administrateur de la plateforme.", 403);
   }
 
-  await createSession({ sub: user.id, email: user.email, name: user.name });
+  await createSession({
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    ver: user.tokenVersion,
+  });
   await audit(
     { userId: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, agent: null },
     { action: "auth.login", summary: `${user.name} s'est connecté`, ip: clientIp(req) },

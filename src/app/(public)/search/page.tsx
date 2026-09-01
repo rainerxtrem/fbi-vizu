@@ -42,6 +42,7 @@ export default async function SearchPage({
         prisma.investigation.findMany({
           where: {
             isPublic: true,
+            deletedAt: null,
             OR: [
               { title: { contains: q, mode: "insensitive" } },
               { description: { contains: q, mode: "insensitive" } },

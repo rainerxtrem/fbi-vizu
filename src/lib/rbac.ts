@@ -434,15 +434,16 @@ export function canViewInvestigation(
  * actor may see. Used for list endpoints so IDOR is impossible even in queries.
  */
 export function investigationVisibilityFilter(actor: Actor | null | undefined): object {
-  if (!actor) return { isPublic: true };
+  // Soft-deleted investigations are never returned by list / search queries.
+  if (!actor) return { deletedAt: null, isPublic: true };
 
   const agent = actor.agent;
-  if (!agent || agent.status !== "ACTIVE") return { isPublic: true };
+  if (!agent || agent.status !== "ACTIVE") return { deletedAt: null, isPublic: true };
 
   const eff = effectivePermissions(actor);
 
-  // Director / DD — everything
-  if (rankAtLeast(agent.rank, "DD")) return {};
+  // Director / DD — everything (still excluding the trash)
+  if (rankAtLeast(agent.rank, "DD")) return { deletedAt: null };
 
   const clauses: object[] = [
     { isPublic: true },
@@ -467,7 +468,7 @@ export function investigationVisibilityFilter(actor: Actor | null | undefined): 
     clauses.push(officeClause);
   }
 
-  return { OR: clauses };
+  return { deletedAt: null, OR: clauses };
 }
 
 // ---------------------------------------------------------------------------

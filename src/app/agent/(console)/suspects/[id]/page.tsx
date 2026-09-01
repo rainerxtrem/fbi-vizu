@@ -19,8 +19,8 @@ export default async function SuspectDetailPage({
   params: { id: string };
 }) {
   const actor = await requirePermission("suspect.view");
-  const p = await prisma.person.findUnique({
-    where: { id: params.id },
+  const p = await prisma.person.findFirst({
+    where: { id: params.id, deletedAt: null },
     include: {
       investigations: { include: { investigation: true } },
       evidence: true,

@@ -203,6 +203,10 @@ model User {
   passwordHash String
   name         String
   isAdmin      Boolean  @default(false)
+  // Bumped whenever every existing session for this user must be invalidated
+  // (password change, agent suspension, explicit "sign out everywhere").
+  tokenVersion      Int       @default(0)
+  passwordChangedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -245,6 +249,12 @@ model Agent {
   // permission overrides managed by platform Admin
   permissionGrants  String[] @default([])
   permissionRevokes String[] @default([])
+
+  // Set when this agent was onboarded from a recruitment application.
+  applicationId String?      @unique
+  application   Application? @relation("ApplicationHire", fields: [applicationId], references: [id])
+
+  notifications Notification[]
 
   ledInvestigations      Investigation[]      @relation("LeadAgent")
   assignments            InvestigationAgent[]
@@ -310,6 +320,10 @@ model Investigation {
   closedAt  DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Soft delete — hidden everywhere but restorable from the trash.
+  deletedAt   DateTime?
+  deletedById String?
 
   assignedAgents InvestigationAgent[]
   persons        InvestigationPerson[]
@@ -396,6 +410,10 @@ model Person {
   createdBy      Agent?     @relation("PersonCreator", fields: [createdById], references: [id])
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
+
+  // Soft delete — hidden everywhere but restorable from the trash.
+  deletedAt   DateTime?
+  deletedById String?
 
   investigations InvestigationPerson[]
   vehicles       PersonVehicle[]
@@ -506,6 +524,7 @@ model Charge {
   severity String  @default("Felony")
 
   investigations InvestigationCharge[]
+  arrests        ArrestCharge[]
 }
 
 model InvestigationCharge {
@@ -559,6 +578,10 @@ model Evidence {
   collectedBy     Agent?        @relation("EvidenceCollector", fields: [collectedById], references: [id])
   collectedAt     DateTime      @default(now())
   createdAt       DateTime      @default(now())
+
+  // Soft delete — hidden everywhere but restorable from the trash.
+  deletedAt   DateTime?
+  deletedById String?
 }
 
 model Document {
@@ -592,6 +615,10 @@ model Warrant {
   issuingJudge    String?
   issuedDate      DateTime?
   expiryDate      DateTime?
+  // Public "wanted notice" — a redacted summary shown on FBI.gov when true.
+  isPublic        Boolean       @default(false)
+  publicSummary   String?
+  deniedReason    String?
   requestedById   String?
   requestedBy     Agent?        @relation("WarrantRequester", fields: [requestedById], references: [id])
   approvedById    String?
@@ -607,11 +634,23 @@ model Arrest {
   person          Person        @relation(fields: [personId], references: [id])
   arrestDate      DateTime      @default(now())
   location        String?
-  charges         String?
+  charges         String?       // free-text notes; structured charges live in chargeLinks
   notes           String?
   arrestingAgentId String?
   arrestingAgent  Agent?        @relation("ArrestingAgent", fields: [arrestingAgentId], references: [id])
   createdAt       DateTime      @default(now())
+
+  chargeLinks     ArrestCharge[]
+}
+
+model ArrestCharge {
+  id       String @id @default(cuid())
+  arrestId String
+  arrest   Arrest @relation(fields: [arrestId], references: [id], onDelete: Cascade)
+  chargeId String
+  charge   Charge @relation(fields: [chargeId], references: [id], onDelete: Cascade)
+
+  @@unique([arrestId, chargeId])
 }
 
 // ---------------------------------------------------------------------------
@@ -731,6 +770,8 @@ model Application {
   certified Boolean            @default(false)
   status    ApplicationStatus  @default(SUBMITTED)
 
+  hiredAgent Agent? @relation("ApplicationHire")
+
   assignedRecruiterId String?
   assignedRecruiter   Agent?   @relation("ApplicationRecruiter", fields: [assignedRecruiterId], references: [id])
   notes               String?
@@ -789,4 +830,23 @@ model AuditLog {
 
   @@index([entityType, entityId])
   @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// NOTIFICATIONS (per-agent, in-app)
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id        String    @id @default(cuid())
+  agentId   String
+  agent     Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  type      String // e.g. CASE_ASSIGNED, WARRANT_APPROVED, WARRANT_DENIED, ARREST_MADE, RANK_CHANGED, TIP_ASSIGNED
+  title     String
+  body      String?
+  linkUrl   String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([agentId, readAt])
+  @@index([agentId, createdAt])
 }

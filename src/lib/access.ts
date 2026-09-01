@@ -8,7 +8,11 @@ import { canViewInvestigation, RbacError, can } from "./rbac";
  * (404-style — we return "not found" to avoid leaking existence) when the actor
  * may not see it. This is the guard against IDOR via URL tampering.
  */
-export async function getInvestigationOr404(id: string, actor: Actor | null) {
+export async function getInvestigationOr404(
+  id: string,
+  actor: Actor | null,
+  opts: { allowDeleted?: boolean } = {},
+) {
   const inv = await prisma.investigation.findUnique({
     where: { id },
     include: {
@@ -16,8 +20,9 @@ export async function getInvestigationOr404(id: string, actor: Actor | null) {
       fieldOffice: true,
       assignedAgents: { include: { agent: { include: { user: true } } } },
       charges: { include: { charge: true, person: true } },
-      persons: { include: { person: true } },
+      persons: { where: { person: { deletedAt: null } }, include: { person: true } },
       evidence: {
+        where: { deletedAt: null },
         include: { collectedBy: { include: { user: true } }, file: true, person: true },
         orderBy: { collectedAt: "desc" },
       },
@@ -44,7 +49,7 @@ export async function getInvestigationOr404(id: string, actor: Actor | null) {
     },
   });
 
-  if (!inv) {
+  if (!inv || (inv.deletedAt && !opts.allowDeleted)) {
     const e = new RbacError("Enquête introuvable");
     e.status = 404;
     throw e;

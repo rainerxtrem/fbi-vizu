@@ -13,7 +13,7 @@ export const GET = handle(async (req: Request) => {
   const q = url.searchParams.get("q")?.trim();
   const risk = url.searchParams.get("risk");
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { deletedAt: null };
   if (risk) where.riskLevel = risk;
   if (q) {
     where.OR = [

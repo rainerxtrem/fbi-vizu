@@ -101,14 +101,19 @@ export const DELETE = handle(
   async (_req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("investigation.delete");
     const inv = await prisma.investigation.findUnique({ where: { id: params.id } });
-    if (!inv) return fail("Enquête introuvable.", 404);
+    if (!inv || inv.deletedAt) return fail("Enquête introuvable.", 404);
 
-    await prisma.investigation.delete({ where: { id: inv.id } });
+    // Soft delete — the dossier is hidden everywhere but stays restorable from
+    // the trash (Corbeille).
+    await prisma.investigation.update({
+      where: { id: inv.id },
+      data: { deletedAt: new Date(), deletedById: actor.agent?.id ?? null },
+    });
     await audit(actor, {
       action: "investigation.delete",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} a supprimé l'enquête ${inv.caseNumber}`,
+      summary: `${actor.name} a placé l'enquête ${inv.caseNumber} dans la corbeille`,
     });
     return ok({ deleted: true });
   },

@@ -151,7 +151,10 @@ async function linkPersons(
 ) {
   for (const raw of entries.map((e) => e.trim()).filter(Boolean)) {
     let personId = raw;
-    const existing = raw.length > 20 ? await prisma.person.findUnique({ where: { id: raw } }) : null;
+    const existing =
+      raw.length > 20
+        ? await prisma.person.findFirst({ where: { id: raw, deletedAt: null } })
+        : null;
     if (!existing) {
       const created = await prisma.person.create({
         data: {

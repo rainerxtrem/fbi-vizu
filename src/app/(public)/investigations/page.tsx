@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function PublicInvestigationsPage() {
   const cases = await prisma.investigation.findMany({
-    where: { isPublic: true },
+    where: { isPublic: true, deletedAt: null },
     include: {
       leadAgent: { include: { user: true } },
       fieldOffice: true,

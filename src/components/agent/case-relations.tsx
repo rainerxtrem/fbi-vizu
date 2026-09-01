@@ -28,6 +28,225 @@ const ROLE_OPTS: [string, string][] = [
 ];
 const ROLE_LABEL = Object.fromEntries(ROLE_OPTS);
 
+const EVIDENCE_TYPE_OPTS: [string, string][] = [
+  ["PHYSICAL", "Physique"],
+  ["DIGITAL", "Numérique"],
+  ["DOCUMENT", "Document"],
+  ["PHOTO", "Photographie"],
+  ["VIDEO", "Vidéo"],
+  ["AUDIO", "Audio"],
+  ["FIREARM", "Arme à feu"],
+  ["NARCOTIC", "Stupéfiant"],
+  ["FINANCIAL", "Financier"],
+  ["BIOLOGICAL", "Biologique"],
+  ["OTHER", "Autre"],
+];
+const EVIDENCE_TYPE_LABEL = Object.fromEntries(EVIDENCE_TYPE_OPTS);
+
+// ---------------------------------------------------------------------------
+// Suppression d'une enquête (corbeille)
+// ---------------------------------------------------------------------------
+
+export function InvestigationDelete({
+  investigationId,
+  caseNumber,
+}: {
+  investigationId: string;
+  caseNumber: string;
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const confirm = useConfirm();
+  const [busy, setBusy] = useState(false);
+
+  async function del() {
+    const ok = await confirm({
+      title: `Placer l'enquête ${caseNumber} dans la corbeille ?`,
+      message:
+        "Le dossier disparaît des listes, recherches et pages publiques. Il reste restaurable depuis la Corbeille, où il peut aussi être supprimé définitivement.",
+      confirmLabel: "Mettre à la corbeille",
+      danger: true,
+    });
+    if (!ok) return;
+    setBusy(true);
+    const { ok: done, json } = await req(`/api/investigations/${investigationId}`, "DELETE");
+    setBusy(false);
+    if (!done) return toast("error", json.error ?? "Échec.");
+    toast("success", "Enquête déplacée vers la corbeille.");
+    router.push("/agent/investigations");
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm text-navy-600">
+        Retire ce dossier de la base active. Restaurable depuis la Corbeille.
+      </p>
+      <Button variant="danger" size="sm" onClick={del} disabled={busy}>
+        {busy ? "Suppression…" : "Mettre à la corbeille"}
+      </Button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Preuves — modification / suppression
+// ---------------------------------------------------------------------------
+
+export function InvestigationEvidence({
+  items,
+  casePersons,
+  canDownload,
+  caps,
+}: {
+  items: {
+    id: string;
+    evidenceNumber: string;
+    type: string;
+    title: string;
+    description: string | null;
+    chainOfCustody: string | null;
+    personId: string | null;
+    collectedAt: string;
+    collectedByName: string | null;
+    fileUrl: string | null;
+  }[];
+  casePersons: Opt[];
+  canDownload: boolean;
+  caps: { edit: boolean; del: boolean };
+}) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const confirm = useConfirm();
+  const [editing, setEditing] = useState<string | null>(null);
+
+  async function save(id: string, e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const { ok, json } = await req(`/api/evidence/${id}`, "PATCH", {
+      title: fd.get("title"),
+      type: fd.get("type"),
+      description: fd.get("description") || undefined,
+      chainOfCustody: fd.get("chainOfCustody") || undefined,
+      personId: fd.get("personId") || "",
+    });
+    if (!ok) return toast("error", json.error ?? "Échec.");
+    toast("success", "Preuve mise à jour.");
+    setEditing(null);
+    router.refresh();
+  }
+
+  async function del(id: string, num: string) {
+    const ok = await confirm({
+      title: `Retirer la preuve #${num} ?`,
+      message: "Elle est placée dans la corbeille et reste restaurable.",
+      confirmLabel: "Mettre à la corbeille",
+      danger: true,
+    });
+    if (!ok) return;
+    const { ok: done, json } = await req(`/api/evidence/${id}`, "DELETE");
+    if (!done) return toast("error", json.error ?? "Échec.");
+    toast("success", "Preuve déplacée vers la corbeille.");
+    router.refresh();
+  }
+
+  if (items.length === 0) {
+    return <p className="text-sm text-navy-500">Aucune preuve enregistrée.</p>;
+  }
+
+  return (
+    <div className="divide-y divide-navy-100 rounded-lg border border-navy-200 bg-white">
+      {items.map((e) => (
+        <div key={e.id} className="px-4 py-3">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-medium text-navy-900">
+                <span className="font-mono text-xs text-navy-500">#{e.evidenceNumber}</span>{" "}
+                {e.title}
+              </p>
+              <p className="text-xs text-navy-500">
+                {EVIDENCE_TYPE_LABEL[e.type] ?? e.type}
+                {e.collectedByName ? ` · ${e.collectedByName}` : ""}
+              </p>
+              {e.description ? (
+                <p className="mt-1 text-sm text-navy-600">{e.description}</p>
+              ) : null}
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              {e.fileUrl && canDownload ? (
+                <a
+                  href={e.fileUrl}
+                  target="_blank"
+                  className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                >
+                  Télécharger
+                </a>
+              ) : null}
+              {caps.edit ? (
+                <button
+                  onClick={() => setEditing(editing === e.id ? null : e.id)}
+                  className="text-xs font-semibold uppercase text-navy-600 hover:underline"
+                >
+                  {editing === e.id ? "Fermer" : "Modifier"}
+                </button>
+              ) : null}
+              {caps.del ? (
+                <button
+                  onClick={() => del(e.id, e.evidenceNumber)}
+                  className="text-xs font-semibold uppercase text-federal-accent hover:underline"
+                >
+                  Supprimer
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {editing === e.id ? (
+            <form
+              onSubmit={(ev) => save(e.id, ev)}
+              className="mt-3 grid gap-3 border-t border-navy-100 pt-3 sm:grid-cols-2"
+            >
+              <Field label="Intitulé" className="sm:col-span-2">
+                <Input name="title" defaultValue={e.title} required />
+              </Field>
+              <Field label="Type">
+                <Select name="type" defaultValue={e.type}>
+                  {EVIDENCE_TYPE_OPTS.map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Personne liée">
+                <Select name="personId" defaultValue={e.personId ?? ""}>
+                  <option value="">—</option>
+                  {casePersons.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label="Description" className="sm:col-span-2">
+                <Textarea name="description" rows={2} defaultValue={e.description ?? ""} />
+              </Field>
+              <Field label="Chaîne de possession" className="sm:col-span-2">
+                <Input name="chainOfCustody" defaultValue={e.chainOfCustody ?? ""} />
+              </Field>
+              <div className="sm:col-span-2">
+                <Button size="sm" type="submit">
+                  Enregistrer
+                </Button>
+              </div>
+            </form>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const WTYPE_OPTS: [string, string][] = [
   ["ARREST", "Arrestation"],
   ["SEARCH", "Perquisition"],

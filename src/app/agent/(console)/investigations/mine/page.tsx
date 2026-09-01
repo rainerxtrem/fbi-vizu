@@ -13,6 +13,7 @@ export default async function MyInvestigationsPage() {
 
   const rows = await prisma.investigation.findMany({
     where: {
+      deletedAt: null,
       OR: [
         { leadAgentId: agentId },
         { assignedAgents: { some: { agentId } } },

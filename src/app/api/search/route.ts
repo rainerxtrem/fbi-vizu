@@ -26,7 +26,10 @@ export const GET = handle(async (req: Request) => {
       }),
       can(actor, "suspect.view")
         ? prisma.person.findMany({
-            where: { OR: [{ fullName: like }, { alias: like }, { description: like }] },
+            where: {
+              deletedAt: null,
+              OR: [{ fullName: like }, { alias: like }, { description: like }],
+            },
             take: 8,
             select: { id: true, fullName: true, alias: true, riskLevel: true },
           })
@@ -40,7 +43,10 @@ export const GET = handle(async (req: Request) => {
         : [],
       can(actor, "evidence.view")
         ? prisma.evidence.findMany({
-            where: { OR: [{ title: like }, { evidenceNumber: like }, { description: like }] },
+            where: {
+              deletedAt: null,
+              OR: [{ title: like }, { evidenceNumber: like }, { description: like }],
+            },
             take: 8,
             select: { id: true, title: true, evidenceNumber: true, investigationId: true },
           })

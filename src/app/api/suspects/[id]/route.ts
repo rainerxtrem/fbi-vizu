@@ -9,8 +9,8 @@ import { audit } from "@/lib/audit";
 export const GET = handle(
   async (_req: Request, { params }: { params: { id: string } }) => {
     await requireApiPermission("suspect.view");
-    const person = await prisma.person.findUnique({
-      where: { id: params.id },
+    const person = await prisma.person.findFirst({
+      where: { id: params.id, deletedAt: null },
       include: {
         investigations: { include: { investigation: true } },
         vehicles: { include: { vehicle: true } },
@@ -30,7 +30,9 @@ export const PATCH = handle(
   async (req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("suspect.edit");
     const d = personSchema.partial().parse(await req.json());
-    const existing = await prisma.person.findUnique({ where: { id: params.id } });
+    const existing = await prisma.person.findFirst({
+      where: { id: params.id, deletedAt: null },
+    });
     if (!existing) return fail("Introuvable.", 404);
 
     const person = await prisma.person.update({
@@ -63,35 +65,23 @@ export const PATCH = handle(
 export const DELETE = handle(
   async (_req: Request, { params }: { params: { id: string } }) => {
     const actor = await requireApiPermission("suspect.delete");
-    const person = await prisma.person.findUnique({
-      where: { id: params.id },
-      include: { _count: { select: { investigations: true, arrests: true, mostWanted: true } } },
+    const person = await prisma.person.findFirst({
+      where: { id: params.id, deletedAt: null },
     });
     if (!person) return fail("Introuvable.", 404);
 
-    // Detach optional references, then remove the person and its dependent rows.
-    await prisma.$transaction([
-      prisma.evidence.updateMany({ where: { personId: person.id }, data: { personId: null } }),
-      prisma.warrant.updateMany({ where: { personId: person.id }, data: { personId: null } }),
-      prisma.mostWanted.updateMany({ where: { personId: person.id }, data: { personId: null } }),
-      prisma.investigationCharge.updateMany({
-        where: { personId: person.id },
-        data: { personId: null },
-      }),
-      prisma.arrest.deleteMany({ where: { personId: person.id } }),
-      prisma.person.delete({ where: { id: person.id } }),
-    ]);
+    // Soft delete — the fiche and all its links are kept and can be restored
+    // from the trash (Corbeille).
+    await prisma.person.update({
+      where: { id: person.id },
+      data: { deletedAt: new Date(), deletedById: actor.agent?.id ?? null },
+    });
 
     await audit(actor, {
       action: "suspect.delete",
       entityType: "person",
       entityId: person.id,
-      summary: `${actor.name} a supprimé la fiche de ${person.fullName}`,
-      meta: {
-        investigations: person._count.investigations,
-        arrests: person._count.arrests,
-        mostWanted: person._count.mostWanted,
-      },
+      summary: `${actor.name} a placé la fiche de ${person.fullName} dans la corbeille`,
     });
 
     return ok({ deleted: true });

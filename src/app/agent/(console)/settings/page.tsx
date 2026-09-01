@@ -3,6 +3,7 @@ import { effectivePermissions, RANK_LABELS, type Rank } from "@/lib/rbac";
 import { AGENT_STATUS } from "@/lib/constants";
 import { PageTitle } from "@/components/agent/ui";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { SecuritySettings } from "@/components/agent/security-settings";
 
 export default async function SettingsPage() {
   const actor = await requireAgent();
@@ -45,14 +46,17 @@ export default async function SettingsPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Sécurité" />
-          <CardBody className="text-sm text-navy-600">
-            <p>
+          <CardHeader
+            title="Sécurité"
+            description="Mot de passe et sessions actives"
+          />
+          <CardBody className="space-y-4">
+            <p className="text-sm text-navy-600">
               Toute activité dans cette console est enregistrée. Les sessions
-              expirent après 8 heures d&apos;inactivité. Si vous pensez que votre
-              compte a été compromis, contactez immédiatement l&apos;administrateur
-              de la plateforme.
+              expirent après 8 heures. Changer votre mot de passe déconnecte
+              automatiquement tous vos autres appareils.
             </p>
+            <SecuritySettings />
           </CardBody>
         </Card>
       </div>

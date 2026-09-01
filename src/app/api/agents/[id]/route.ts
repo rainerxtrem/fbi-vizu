@@ -18,6 +18,12 @@ export const PATCH = handle(
     });
     if (!agent) return fail("Agent introuvable.", 404);
 
+    // Suspending / deactivating an agent immediately revokes their sessions.
+    const nowLockedOut =
+      d.status !== undefined &&
+      d.status !== "ACTIVE" &&
+      agent.status === "ACTIVE";
+
     // Permission overrides are a technical (Admin / Director) capability.
     const touchingOverrides =
       d.permissionGrants !== undefined || d.permissionRevokes !== undefined;
@@ -67,11 +73,20 @@ export const PATCH = handle(
       },
     });
 
+    if (nowLockedOut) {
+      await prisma.user.update({
+        where: { id: agent.userId },
+        data: { tokenVersion: { increment: 1 } },
+      });
+    }
+
     await audit(actor, {
       action: "agent.update",
       entityType: "agent",
       entityId: agent.id,
-      summary: `${actor.name} a mis à jour l'Agent ${agent.user.name} (${agent.badgeNumber})`,
+      summary: `${actor.name} a mis à jour l'Agent ${agent.user.name} (${agent.badgeNumber})${
+        nowLockedOut ? " — sessions révoquées" : ""
+      }`,
       meta: { fields: Object.keys(d) },
     });
 

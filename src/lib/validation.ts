@@ -14,6 +14,14 @@ export const loginSchema = z.object({
   password: z.string().min(1).max(200),
 });
 
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(1).max(200),
+  newPassword: z
+    .string()
+    .min(10, "Le nouveau mot de passe doit comporter au moins 10 caractères.")
+    .max(200),
+});
+
 export const tipSchema = z.object({
   anonymous: z.boolean().default(false),
   name: optionalStr(200),
@@ -209,6 +217,28 @@ export const evidenceSchema = z.object({
   chainOfCustody: optionalStr(4000),
   personId: optionalStr(40),
   fileUrl: optionalStr(500),
+});
+
+export const evidenceUpdateSchema = z.object({
+  title: optionalStr(200),
+  type: z
+    .enum([
+      "PHYSICAL",
+      "DIGITAL",
+      "DOCUMENT",
+      "PHOTO",
+      "VIDEO",
+      "AUDIO",
+      "FIREARM",
+      "NARCOTIC",
+      "FINANCIAL",
+      "BIOLOGICAL",
+      "OTHER",
+    ])
+    .optional(),
+  description: optionalStr(8000),
+  chainOfCustody: optionalStr(4000),
+  personId: optionalStr(40),
 });
 
 export const mostWantedCreateSchema = z.object({

@@ -9,7 +9,7 @@ import { INVESTIGATION_STATUS, PRIORITY } from "@/lib/constants";
 
 async function load(id: string) {
   return prisma.investigation.findFirst({
-    where: { id, isPublic: true },
+    where: { id, isPublic: true, deletedAt: null },
     include: {
       leadAgent: { include: { user: true } },
       fieldOffice: true,

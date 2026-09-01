@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getActor } from "@/lib/auth";
-import { can, type Permission } from "@/lib/rbac";
+import { can, canAny, type Permission } from "@/lib/rbac";
 import { Sidebar, type NavItem } from "@/components/agent/sidebar";
 import { AgentBadge } from "@/components/agent/agent-badge";
 import { GlobalSearch } from "@/components/agent/global-search";
@@ -20,6 +20,12 @@ const ALL_NAV: NavItem[] = [
   { href: "/agent/tips", label: "Renseignements", icon: "Inbox", perm: "tips.view" },
   { href: "/agent/agents", label: "Agents", icon: "UsersRound", perm: "agents.view" },
   { href: "/agent/activity", label: "Journal d'activité", icon: "ScrollText", perm: "audit.view" },
+  {
+    href: "/agent/trash",
+    label: "Corbeille",
+    icon: "Trash2",
+    anyPerm: ["investigation.delete", "suspect.delete", "evidence.delete"],
+  },
   { href: "/agent/settings", label: "Paramètres", icon: "Settings" },
 ];
 
@@ -33,6 +39,7 @@ export default async function AgentLayout({
   if (!actor.agent && !actor.isAdmin) redirect("/agent/login?error=not_an_agent");
 
   const nav = ALL_NAV.filter((n) => {
+    if (n.anyPerm) return canAny(actor, n.anyPerm);
     if (!n.perm) return true;
     return can(actor, n.perm as Permission);
   });

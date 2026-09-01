@@ -19,6 +19,8 @@ export const getActor = cache(async (): Promise<Actor | null> => {
     include: { agent: { include: { fieldOffice: true } } },
   });
   if (!user) return null;
+  // Session revocation: a bumped tokenVersion invalidates every older session.
+  if ((user.tokenVersion ?? 0) !== session.ver) return null;
 
   return {
     userId: user.id,

@@ -20,6 +20,8 @@ import {
   InvestigationPersons,
   InvestigationWarrants,
   InvestigationArrests,
+  InvestigationDelete,
+  InvestigationEvidence,
 } from "@/components/agent/case-relations";
 import { formatDate, formatDateTime } from "@/lib/format";
 import {
@@ -27,7 +29,6 @@ import {
   PRIORITY,
   CLASSIFICATION,
   PERSON_ROLE,
-  EVIDENCE_TYPE,
   MOST_WANTED_STATUS,
 } from "@/lib/constants";
 
@@ -72,6 +73,10 @@ export default async function InvestigationDetailPage({
     arrestCreate: editable && can(actor, "arrest.create"),
     arrestEdit: editable && can(actor, "arrest.edit"),
     arrestDelete: can(actor, "arrest.delete"),
+    editEvidence: editable && can(actor, "evidence.create"),
+    deleteEvidence: can(actor, "evidence.delete"),
+    downloadEvidence: can(actor, "evidence.download"),
+    deleteInvestigation: can(actor, "investigation.delete"),
   };
 
   const canManageRelations =
@@ -79,6 +84,7 @@ export default async function InvestigationDetailPage({
   const [allPersons, activeAgents] = canManageRelations
     ? await Promise.all([
         prisma.person.findMany({
+          where: { deletedAt: null },
           orderBy: { fullName: "asc" },
           take: 1000,
           select: { id: true, fullName: true, alias: true },
@@ -129,6 +135,18 @@ export default async function InvestigationDetailPage({
     notes: a.notes,
     agentId: a.arrestingAgentId,
     agentName: a.arrestingAgent?.user.name ?? null,
+  }));
+  const evidenceList = inv.evidence.map((e) => ({
+    id: e.id,
+    evidenceNumber: e.evidenceNumber,
+    type: e.type,
+    title: e.title,
+    description: e.description,
+    chainOfCustody: e.chainOfCustody,
+    personId: e.personId,
+    collectedAt: e.collectedAt.toISOString(),
+    collectedByName: e.collectedBy?.user.name ?? null,
+    fileUrl: e.file?.url ?? null,
   }));
 
   return (
@@ -269,41 +287,12 @@ export default async function InvestigationDetailPage({
                 count: inv.evidence.length,
                 content: (
                   <div className="space-y-4">
-                    {inv.evidence.length === 0 ? (
-                      <p className="text-sm text-navy-500">Aucune preuve enregistrée.</p>
-                    ) : (
-                      <div className="overflow-x-auto rounded-lg border border-navy-200 bg-white">
-                        <table className="w-full text-sm">
-                          <tbody className="divide-y divide-navy-100">
-                            {inv.evidence.map((e) => (
-                              <tr key={e.id}>
-                                <td className="px-4 py-2 font-mono text-xs text-navy-500">
-                                  #{e.evidenceNumber}
-                                </td>
-                                <td className="px-4 py-2">
-                                  <p className="font-medium text-navy-900">{e.title}</p>
-                                  <p className="text-xs text-navy-500">
-                                    {EVIDENCE_TYPE[e.type]} · {formatDate(e.collectedAt)}
-                                    {e.collectedBy ? ` · ${e.collectedBy.user.name}` : ""}
-                                  </p>
-                                </td>
-                                <td className="px-4 py-2 text-right">
-                                  {e.file && can(actor, "evidence.download") ? (
-                                    <a
-                                      href={e.file.url}
-                                      target="_blank"
-                                      className="text-xs font-semibold uppercase text-navy-600 hover:underline"
-                                    >
-                                      Télécharger
-                                    </a>
-                                  ) : null}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                    <InvestigationEvidence
+                      items={evidenceList}
+                      casePersons={personPickList}
+                      canDownload={perms.downloadEvidence}
+                      caps={{ edit: perms.editEvidence, del: perms.deleteEvidence }}
+                    />
                     {perms.addEvidence ? (
                       <Card>
                         <CardHeader title="Enregistrer une nouvelle preuve" />
@@ -475,6 +464,15 @@ export default async function InvestigationDetailPage({
               </CardBody>
             </Card>
           )}
+
+          {perms.deleteInvestigation ? (
+            <Card>
+              <CardHeader title="Zone de danger" />
+              <CardBody>
+                <InvestigationDelete investigationId={inv.id} caseNumber={inv.caseNumber} />
+              </CardBody>
+            </Card>
+          ) : null}
         </div>
       </div>
     </div>

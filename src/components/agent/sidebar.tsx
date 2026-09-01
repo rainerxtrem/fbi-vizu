@@ -23,6 +23,8 @@ import {
   Menu,
   X,
   Newspaper,
+  Trash2,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import type { Permission } from "@/lib/rbac";
@@ -33,6 +35,7 @@ export interface NavItem {
   label: string;
   icon: keyof typeof ICONS;
   perm?: Permission;
+  anyPerm?: Permission[];
 }
 
 const ICONS = {
@@ -52,6 +55,8 @@ const ICONS = {
   ScrollText,
   Settings,
   Newspaper,
+  Trash2,
+  Bell,
 };
 
 export function Sidebar({

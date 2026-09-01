@@ -23,8 +23,10 @@ export default async function HomePage() {
     }),
     Promise.all([
       prisma.mostWanted.count({ where: { status: "PUBLISHED" } }),
-      prisma.investigation.count(),
-      prisma.investigation.count({ where: { status: { in: ["OPEN", "ACTIVE"] } } }),
+      prisma.investigation.count({ where: { deletedAt: null } }),
+      prisma.investigation.count({
+        where: { deletedAt: null, status: { in: ["OPEN", "ACTIVE"] } },
+      }),
     ]),
   ]);
 

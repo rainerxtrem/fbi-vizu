@@ -44,7 +44,7 @@ export default async function AgentDashboard() {
             : { status: "NEW", OR: [{ assignedToId: agentId }, { investigation: { leadAgentId: agentId } }] },
         })
       : 0,
-    prisma.evidence.count(),
+    prisma.evidence.count({ where: { deletedAt: null } }),
     prisma.warrant.count({ where: { status: { in: ["APPROVED", "ACTIVE"] } } }),
     prisma.investigation.groupBy({
       by: ["status"],
@@ -56,6 +56,7 @@ export default async function AgentDashboard() {
       : [],
     prisma.investigation.findMany({
       where: {
+        deletedAt: null,
         OR: [
           { leadAgentId: agentId },
           { assignedAgents: { some: { agentId } } },

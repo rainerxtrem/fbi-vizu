@@ -21,7 +21,7 @@ export default async function SuspectsPage({
   const q = (searchParams.q ?? "").trim();
   const risk = searchParams.risk;
 
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = { deletedAt: null };
   if (risk) where.riskLevel = risk;
   if (q)
     where.OR = [

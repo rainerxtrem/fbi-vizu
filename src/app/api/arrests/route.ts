@@ -18,7 +18,9 @@ export const POST = handle(async (req: Request) => {
     return fail("Vous n'êtes pas affecté à cette enquête.", 403);
   }
 
-  const person = await prisma.person.findUnique({ where: { id: d.personId } });
+  const person = await prisma.person.findFirst({
+    where: { id: d.personId, deletedAt: null },
+  });
   if (!person) return fail("Personne introuvable.", 404);
 
   const a = await prisma.arrest.create({
