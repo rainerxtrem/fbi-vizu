@@ -12,7 +12,7 @@ import { notify } from "@/lib/notify";
 
 async function loadWarrant(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
   const w = await prisma.warrant.findUnique({ where: { id } });
-  if (!w) return null;
+  if (!w || w.deletedAt) return null;
   const inv = await getInvestigationOr404(w.investigationId, actor);
   return { w, inv };
 }
@@ -116,12 +116,15 @@ export const DELETE = handle(
     if (!loaded) return fail("Mandat introuvable.", 404);
     const { w, inv } = loaded;
 
-    await prisma.warrant.delete({ where: { id: w.id } });
+    await prisma.warrant.update({
+      where: { id: w.id },
+      data: { deletedAt: new Date(), deletedById: actor.agent?.id ?? null },
+    });
     await audit(actor, {
       action: "warrant.delete",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} a supprimé le mandat ${w.warrantNumber} de ${inv.caseNumber}`,
+      summary: `${actor.name} a placé le mandat ${w.warrantNumber} dans la corbeille (${inv.caseNumber})`,
     });
     return ok({ deleted: true });
   },

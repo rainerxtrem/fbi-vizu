@@ -467,15 +467,15 @@ export function InvestigationWarrants({
 
   async function del(id: string, num: string) {
     const ok = await confirm({
-      title: `Supprimer le mandat ${num} ?`,
-      message: "Cette action est définitive.",
-      confirmLabel: "Supprimer",
+      title: `Placer le mandat ${num} dans la corbeille ?`,
+      message: "Il reste restaurable depuis la Corbeille.",
+      confirmLabel: "Mettre à la corbeille",
       danger: true,
     });
     if (!ok) return;
     const { ok: done, json } = await req(`/api/warrants/${id}`, "DELETE");
     if (!done) return toast("error", json.error ?? "Échec.");
-    toast("success", "Mandat supprimé.");
+    toast("success", "Mandat déplacé vers la corbeille.");
     router.refresh();
   }
 
@@ -811,15 +811,15 @@ export function InvestigationArrests({
 
   async function del(id: string, name: string) {
     const ok = await confirm({
-      title: `Supprimer l'arrestation de ${name} ?`,
-      message: "Cette action est définitive.",
-      confirmLabel: "Supprimer",
+      title: `Placer l'arrestation de ${name} dans la corbeille ?`,
+      message: "Elle reste restaurable depuis la Corbeille.",
+      confirmLabel: "Mettre à la corbeille",
       danger: true,
     });
     if (!ok) return;
     const { ok: done, json } = await req(`/api/arrests/${id}`, "DELETE");
     if (!done) return toast("error", json.error ?? "Échec.");
-    toast("success", "Arrestation supprimée.");
+    toast("success", "Arrestation déplacée vers la corbeille.");
     router.refresh();
   }
 

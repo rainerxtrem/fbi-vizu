@@ -27,7 +27,13 @@ const ALL_NAV: NavItem[] = [
     href: "/agent/trash",
     label: "Corbeille",
     icon: "Trash2",
-    anyPerm: ["investigation.delete", "suspect.delete", "evidence.delete"],
+    anyPerm: [
+      "investigation.delete",
+      "suspect.delete",
+      "evidence.delete",
+      "warrant.delete",
+      "arrest.delete",
+    ],
   },
   { href: "/agent/settings", label: "Paramètres", icon: "Settings" },
 ];

@@ -95,12 +95,29 @@ export const DELETE = handle(
     const actor = await requireApiPermission("mostwanted.delete");
     const mw = await prisma.mostWanted.findUnique({ where: { id: params.id } });
     if (!mw) return fail("Introuvable.", 404);
+
+    // First delete archives (reversible); a second delete on an archived
+    // bulletin removes it for good.
+    if (mw.status !== "ARCHIVED") {
+      await prisma.mostWanted.update({
+        where: { id: mw.id },
+        data: { status: "ARCHIVED" },
+      });
+      await audit(actor, {
+        action: "mostwanted.archive",
+        entityType: "most_wanted",
+        entityId: mw.id,
+        summary: `${actor.name} a archivé le Most Wanted ${mw.publicId}`,
+      });
+      return ok({ archived: true });
+    }
+
     await prisma.mostWanted.delete({ where: { id: mw.id } });
     await audit(actor, {
       action: "mostwanted.delete",
       entityType: "most_wanted",
       entityId: mw.id,
-      summary: `${actor.name} a supprimé le Most Wanted ${mw.publicId}`,
+      summary: `${actor.name} a supprimé définitivement le Most Wanted ${mw.publicId}`,
     });
     return ok({ deleted: true });
   },

@@ -15,11 +15,13 @@ import { canAny } from "./rbac";
 /** Prisma `where` fragment that excludes soft-deleted rows. */
 export const notDeleted = { deletedAt: null } as const;
 
-/** The three permissions that also govern restore / purge in the trash. */
+/** Permissions that also govern restore / purge in the trash. */
 export const TRASH_PERMISSIONS: Permission[] = [
   "investigation.delete",
   "suspect.delete",
   "evidence.delete",
+  "warrant.delete",
+  "arrest.delete",
 ];
 
 export function canUseTrash(actor: Actor | null | undefined): boolean {

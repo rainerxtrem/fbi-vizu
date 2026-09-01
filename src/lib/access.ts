@@ -36,6 +36,7 @@ export async function getInvestigationOr404(
       organizations: { include: { organization: true } },
       locations: true,
       warrants: {
+        where: { deletedAt: null },
         include: {
           person: true,
           requestedBy: { include: { user: true } },
@@ -43,6 +44,7 @@ export async function getInvestigationOr404(
         },
       },
       arrests: {
+        where: { deletedAt: null },
         include: {
           person: true,
           arrestingAgent: { include: { user: true } },

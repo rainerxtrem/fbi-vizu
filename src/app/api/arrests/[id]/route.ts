@@ -10,7 +10,7 @@ import { audit } from "@/lib/audit";
 
 async function loadArrest(id: string, actor: Parameters<typeof getInvestigationOr404>[1]) {
   const a = await prisma.arrest.findUnique({ where: { id }, include: { person: true } });
-  if (!a) return null;
+  if (!a || a.deletedAt) return null;
   const inv = await getInvestigationOr404(a.investigationId, actor);
   return { a, inv };
 }
@@ -79,12 +79,15 @@ export const DELETE = handle(
     if (!loaded) return fail("Arrestation introuvable.", 404);
     const { a, inv } = loaded;
 
-    await prisma.arrest.delete({ where: { id: a.id } });
+    await prisma.arrest.update({
+      where: { id: a.id },
+      data: { deletedAt: new Date(), deletedById: actor.agent?.id ?? null },
+    });
     await audit(actor, {
       action: "arrest.delete",
       entityType: "investigation",
       entityId: inv.id,
-      summary: `${actor.name} a supprimé l'arrestation de ${a.person.fullName} (${inv.caseNumber})`,
+      summary: `${actor.name} a placé l'arrestation de ${a.person.fullName} dans la corbeille (${inv.caseNumber})`,
     });
     return ok({ deleted: true });
   },

@@ -2,19 +2,30 @@ import { prisma } from "./db";
 
 const YEAR = () => new Date().getFullYear();
 
+/**
+ * Row count that ignores the soft-delete read guard — sequence numbers must
+ * keep advancing past deleted rows so they never collide.
+ */
+async function totalRows(table: string): Promise<number> {
+  const rows = await prisma.$queryRawUnsafe<{ c: bigint }[]>(
+    `SELECT COUNT(*)::bigint AS c FROM "${table}"`,
+  );
+  return Number(rows[0]?.c ?? 0);
+}
+
 export async function nextCaseNumber(): Promise<string> {
-  const count = await prisma.investigation.count();
+  const count = await totalRows("Investigation");
   const seq = String(count + 1).padStart(5, "0");
   return `FBI-${YEAR()}-${seq}`;
 }
 
 export async function nextEvidenceNumber(): Promise<string> {
-  const count = await prisma.evidence.count();
+  const count = await totalRows("Evidence");
   return `E-${String(count + 1001)}`;
 }
 
 export async function nextWarrantNumber(): Promise<string> {
-  const count = await prisma.warrant.count();
+  const count = await totalRows("Warrant");
   return `W-${YEAR()}-${String(count + 1).padStart(4, "0")}`;
 }
 
